@@ -6,7 +6,7 @@
 #include "..\AILogic\AIConsts.h"
 #include "..\Misc\BitData.h"
 #include "..\StreamIO\RandomGen.h"
-#include "..\zlib\zlib.h"
+#include <zlib.h>
 #include "iMain.h"
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline int GetRandom( int nAverage, int nRandom )
@@ -705,8 +705,8 @@ class CRPGStatsAutomagic : public IRPGStatsAutomagic
 {
 	OBJECT_COMPLETE_METHODS( CRPGStatsAutomagic );
 	
-	typedef std::hash_map<int, std::string> CI2SMap;
-	typedef std::hash_map<std::string, int> CS2IMap;
+	typedef std::unordered_map<int, std::string> CI2SMap;
+	typedef std::unordered_map<std::string, int> CS2IMap;
 	//
 	CI2SMap i2s;
 	CS2IMap s2i;

@@ -123,7 +123,7 @@ public:
 	virtual bool IsFiring() const ;
 	virtual bool IsBursting() const { return shootState == WAIT_FOR_ACTION_POINT || shootState == EST_SHOOTING; }
 
-	const SBaseGunRPGStats& CGun::GetGun() const;
+	const SBaseGunRPGStats& GetGun() const;
 	virtual const SWeaponRPGStats* GetWeapon() const;
 	virtual const SWeaponRPGStats::SShell& GetShell() const;
 	

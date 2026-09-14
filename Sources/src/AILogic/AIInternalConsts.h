@@ -437,7 +437,7 @@ public:
 
 		SRevealInfo() : fRevealByQuery( 0.0f ), fRevealByMovingOff( 0.0f ), fForgetRevealDistance( 0.0f ), nTimeOfReveal( 0 ) { }
 	};
-	static std::hash_map<int, SRevealInfo> REVEAL_INFO;
+	static std::unordered_map<int, SRevealInfo> REVEAL_INFO;
 	
 	//
 	static void Load();

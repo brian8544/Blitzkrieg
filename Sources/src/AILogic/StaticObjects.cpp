@@ -650,7 +650,7 @@ void CStaticObjects::Segment()
 
 	// דמנÿשטו מבתוךעû
 	std::list<int> burningList;
-	for ( std::hash_set<int>::const_iterator iter = burningObjects.begin(); iter != burningObjects.end(); ++iter )
+	for ( std::unordered_set<int>::const_iterator iter = burningObjects.begin(); iter != burningObjects.end(); ++iter )
 		burningList.push_back( *iter );
 
 	for ( std::list<int>::iterator iter = burningList.begin(); iter != burningList.end(); ++iter )

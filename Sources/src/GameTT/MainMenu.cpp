@@ -66,7 +66,7 @@ void CICMainMenu::Configure( const char *pszConfig )
 	if ( szStrings.size() > 1 ) 
 	{
 		nNextIC = NStr::ToInt( szStrings[1] );
-		szNextICConfig.c_str();
+		szNextICConfig.clear();
 		for ( int i = 2; i < szStrings.size(); ++i )
 			szNextICConfig += szStrings[i] + ';';
 		if ( !szNextICConfig.empty() && szNextICConfig[szNextICConfig.size() - 1] == ';' ) 
@@ -185,7 +185,7 @@ void CInterfaceMainMenu::RefreshCursor()
 bool GetFileVersion( const std::string &szFileName, VS_FIXEDFILEINFO *pVersionInfo )
 {
 	char pszLocalFileName[2048];
-	strcpy( pszLocalFileName, szFileName.c_str() );
+	strcpy_s( pszLocalFileName, sizeof(pszLocalFileName), szFileName.c_str() );
 	DWORD dwLength = 0;
 	const int nVersionSize = GetFileVersionInfoSize( pszLocalFileName, &dwLength );
 	if ( nVersionSize == 0 ) 

@@ -17,37 +17,29 @@ Por favor, leia atentamente os termos do [acordo de licença](LICENSE.md) antes 
 
 # Preparação
 
-Todas as bibliotecas do diretório SDK são necessárias para a compilação. Os caminhos para elas devem ser inseridos em **Tools => Options => Directories** na seguinte ordem:
+Requisitos:
 
-## Include
-```
-C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\STLPORT
-C:\SDK\BINK (não incluído no repositório)
-C:\SDK\FMOD\API\INC (não incluído no repositório)
-C:\SDK\S3TC
-C:\SDK\STINGRAY STUDIO 2002\INCLUDE\TOOLKIT (não incluído no repositório)
-C:\SDK\STINGRAY STUDIO 2002\INCLUDE (não incluído no repositório)
-C:\SDK\STINGRAY STUDIO 2002\REGEX\INCLUDE (não incluído no repositório)
-C:\SDK\Maya4.0\include
-```
+- Windows 10 ou 11.
+- CMake 4.2 ou mais recente.
+- Visual Studio 2026 com a carga de trabalho **Desenvolvimento para desktop com C++** e um Windows SDK.
+- Git e [vcpkg](https://github.com/microsoft/vcpkg). Defina `VCPKG_ROOT` para o diretório do vcpkg.
+- FMOD Engine 2.01.x para Windows. O FMOD tem licença separada e não está incluído neste repositório.
 
-## Lib
-```
-C:\SDK\BINK (não incluído no repositório)
-C:\SDK\FMOD\API\LIB (não incluído no repositório)
-C:\SDK\S3TC
-C:\SDK\STINGRAY STUDIO 2002\LIB (não incluído no repositório)
-C:\SDK\STINGRAY STUDIO 2002\REGEX\LIB (não incluído no repositório)
-C:\SDK\Maya4.0\lib
+Os fontes de compatibilidade Direct3D estão incluídos em `Sources/sdk`. Coloque o SDK do FMOD nesta estrutura sem espaços:
+
+```text
+Sources/sdk/FMOD/Include/fmod.hpp
+Sources/sdk/FMOD/lib/x86/fmod_vc.lib
+Sources/sdk/FMOD/lib/x86/fmod.dll
 ```
 
-Além disso, é necessário o **DirectX 8.1** ou superior (será adicionado automaticamente aos caminhos).
+Execute `build.bat`. O manifesto vcpkg instala automaticamente FFmpeg, libpng, libsquish, pugixml e zlib. O SDK incluído em `Sources/src/GameSpy` é compilado a partir do código-fonte; não é necessário baixar o GameSpy separadamente. Bink, STLPort, Stingray e o antigo SDK do DirectX 8 não são necessários para o alvo atual do jogo.
 
-### Notas Importantes
+O executável Release é gravado em `build/bin/Release`. Para usar os dados de uma instalação comercial:
 
-- As bibliotecas **Bink, FMOD, Stingray** não estão incluídas neste repositório, pois exigem licença separada.
-- O **stlport** *deve* estar localizado no diretório do Visual C, junto ao `include`.
-- O caminho `C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\STLPORT` deve ser o **primeiro**, caso contrário, a compilação falhará.
+```bat
+build\bin\Release\Game.exe -datadir "C:\path\to\Blitzkrieg"
+```
 
 ---
 

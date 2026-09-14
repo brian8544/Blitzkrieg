@@ -1,59 +1,40 @@
 #ifndef __DATATREEXML_H__
 #define __DATATREEXML_H__
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma ONCE
+#pragma once
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#import "msxml.dll"
+#include <pugixml.hpp>
+#include <list>
+#include <string>
+#include <vector>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-using namespace MSXML;
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// эти две структурки специально созданы для того, чтобы, чтобы можно было сбрасывать com_ptr объекты в STL контейнеры
-// горбуха, конечно, но такова природа com_ptr - косяк полный
-template <class TYPE>
-struct SCOMPtr
+struct SNodesList
 {
-	TYPE data;
-};
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-struct SNodeslList
-{
-	SCOMPtr<IXMLDOMNodeListPtr> nodes;
+	std::vector<pugi::xml_node> nodes;
 	int nCurrElement;
 	//
-	SNodeslList() : nCurrElement( -1 ) {  }
+	SNodesList() : nCurrElement( -1 ) {}
 };
 class CDataTreeXML : public IDataTree
 {
 	OBJECT_MINIMAL_METHODS( CDataTreeXML );
 	//
 	CPtr<IDataStream> pStream;						// stream, this table was open with
-	IXMLDOMDocumentPtr xmlDocument;				// открытый документ
+	pugi::xml_document xmlDocument;			// открытый документ
 	//
-	std::list< SCOMPtr<IXMLDOMNodePtr> > nodes;	// стек нодов по иерархии углублени
-	std::list< SNodeslList > nodelists;					// стек списков нодов по иерархии углублени
-	IXMLDOMNodePtr xmlCurrNode;						// текущий node
+	std::list<pugi::xml_node> nodes;		// стек нодов по иерархии углублени
+	std::list<SNodesList> nodelists;			// стек списков нодов по иерархии углублени
+	pugi::xml_node xmlCurrNode;				// текущий node
 	//
-	std::list< SCOMPtr<IXMLDOMElementPtr> > elements;	// стек элементов по иерархии углублени
-	std::list< SCOMPtr<IXMLDOMElementPtr> > arrbases; // стек элементов сонований массивов по иерархии углублени
-	IXMLDOMElementPtr xmlCurrElement;			// текущий элемент в блочной структуре при записи
+	std::list<pugi::xml_node> elements;	// стек элементов по иерархии углублени
+	std::list<pugi::xml_node> arrbases;	// стек элементов сонований массивов по иерархии углублени
+	pugi::xml_node xmlCurrElement;			// текущий элемент в блочной структуре при записи
 	//
 	IDataTree::EAccessMode eMode;
 	//
-	// получить из текущего node атрибут по имени.
-	IXMLDOMNodePtr GetAttribute( DTChunkID idChunk )
-	{
-		NI_ASSERT_TF( xmlCurrNode != 0, "can't get attribute - no current node set", return 0 );
-		return xmlCurrNode->attributes->getNamedItem( idChunk );
-	}
 	// получить текстовый node по имени. Это либо атрибут текущего node, либо single node из текущего.
-	IXMLDOMNodePtr GetTextNode( DTChunkID idChunk )
-	{
-		NI_ASSERT_TF( xmlCurrNode != 0, "can't get node - no current node set", return 0 );
-		IXMLDOMNodePtr xmlNode = xmlCurrNode->attributes->getNamedItem( idChunk );
-		if ( xmlNode == 0 )
-			xmlNode = xmlCurrNode->selectSingleNode( idChunk );
-		return xmlNode;
-	}
+	bool GetTextValue( DTChunkID idChunk, std::string *pValue ) const;
+	bool SaveDocument();
 public:
 	CDataTreeXML( IDataTree::EAccessMode eMode );
 	virtual ~CDataTreeXML();
@@ -79,6 +60,7 @@ public:
 	virtual void STDCALL FinishContainerChunk();
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Kept as a source-compatible no-op for callers from the old MSXML implementation.
 void InitCOM();
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif // __DATATREEXML_H__

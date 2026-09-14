@@ -171,9 +171,9 @@ public:
 	TImage* operator->() const { return pImage; }
 	// comparison operators
 	bool operator==( const CTImageAccessor &ptr ) const { return ( pImage == ptr.pImage ); }
-	bool operator==( TImage *pNewObject ) const { return ( pImage == pNewObject ); }
+	bool operator==( TImage *pNewObject ) const { return ( static_cast<TImage*>(pImage) == pNewObject ); }
 	bool operator!=( const CTImageAccessor &ptr ) const { return ( pImage != ptr.pImage ); }
-	bool operator!=( TImage *pNewObject ) const { return ( pImage != pNewObject ); }
+	bool operator!=( TImage *pNewObject ) const { return ( static_cast<TImage*>(pImage) != pNewObject ); }
 	//
 	const TColor* operator[]( int nY ) const { return rows[nY]; }
 	TColor* operator[]( int nY ) { return rows[nY]; }

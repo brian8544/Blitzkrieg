@@ -5,14 +5,14 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "AILogic.h"
 #include "Scripts\Scripts.h"
-#include "..\zlib\zlib.h"
+#include <zlib.h>
 #include "LinkObject.h"
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CCommonUnit;
 class CAIUnit;
 class CBridgeSpan;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef std::hash_map<CLinkObject*, SMapObjectInfo::SLinkInfo, SUniqueIdHash> LinkInfo;
+typedef std::unordered_map<CLinkObject*, SMapObjectInfo::SLinkInfo, SUniqueIdHash> LinkInfo;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CAILogic : public IAILogic
 {
@@ -44,7 +44,7 @@ class CAILogic : public IAILogic
 	bool bSegment;
 	bool bNetGameStarted;
 	
-	typedef std::hash_set<CGDBPtr<SMechUnitRPGStats>, SDefaultPtrHash> CAvailTrucks;
+	typedef std::unordered_set<CGDBPtr<SMechUnitRPGStats>, SDefaultPtrHash> CAvailTrucks;
 	CAvailTrucks availableTrucks;
 	// проверить, не является ли object грузовиком, подцеплённым к сценарийной артиллерии
 	// если да, ищет подходящий к артиллерии грузовик (в pNewStats) и возвращает true, если артиллерия не найдена - возвращает false
@@ -175,8 +175,8 @@ public:
 	virtual bool STDCALL ToggleShow( const int nShowType );
 
 	virtual bool STDCALL IsCombatSituation();
-	void InitStartCommands( const LinkInfo &linksInfo, std::hash_map<int, int> &old2NewLinks );
-	void InitReservePositions( std::hash_map<int, int> &old2NewLinks );
+	void InitStartCommands( const LinkInfo &linksInfo, std::unordered_map<int, int> &old2NewLinks );
+	void InitReservePositions( std::unordered_map<int, int> &old2NewLinks );
 	
 	bool IsSegment() const { return bSegment; }
 	

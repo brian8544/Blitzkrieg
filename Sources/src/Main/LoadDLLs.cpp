@@ -2,6 +2,7 @@
 
 #include "..\Misc\Win32Helper.h"
 #include "..\Misc\FileUtils.h"
+#include "..\SFX\SFX.h"
 #include "..\RandomMapGen\Registry_Types.h"
 
 using namespace NWin32Helper;
@@ -92,8 +93,12 @@ namespace NMain
 	// 
 	void STDCALL UnloadAllModules()
 	{
+		CPtr<ISFX> pSFX = GetSingleton<ISFX>();
 		GetSingletonGlobal()->Done();
 		//
+		if ( pSFX )
+			pSFX->Done();
+		pSFX = 0;
 		modules.clear();
 	}
 	// iterating

@@ -40,11 +40,11 @@ DO_NOT_WORK_AROUND_SRCLINE_BUG - Define this to NOT work around the
 #ifndef _SYMBOLENGINE_H
 #define _SYMBOLENGINE_H
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include <imagehlp.h>
+#include <dbghelp.h>
 #include <tchar.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include these in case the user forgets to link against them.
-#pragma comment( lib, "imagehlp.lib" )
+#pragma comment( lib, "dbghelp.lib" )
 #pragma comment( lib, "version.lib" )
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // The API_VERSION_NUMBER define is 5 with the NT4 IMAGEHLP.H.  It is
@@ -374,13 +374,6 @@ public:
                      Public Symbol Manipulation
 ----------------------------------------------------------------------*/
 public:
-
-  BOOL SymEnumerateSymbols( IN DWORD BaseOfDll,
-                            IN PSYM_ENUMSYMBOLS_CALLBACK EnumSymbolsCallback,
-                            IN PVOID UserContext )
-  {
-    return ::SymEnumerateSymbols( m_hProcess, BaseOfDll, EnumSymbolsCallback, UserContext );
-  }
 
   BOOL SymGetSymFromAddr( IN  DWORD dwAddr,
                           OUT PDWORD pdwDisplacement,

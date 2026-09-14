@@ -9,7 +9,7 @@
 class CFormationCenter : public CCommonUnit
 {
 	DECLARE_SERIALIZE;
-	
+
 	CVec2 speed;
 	CVec2 center;
 	CVec2 dir;
@@ -49,7 +49,7 @@ public:
 	virtual IStaticPath* CreateBigStaticPath( const CVec2 &vStartPoint, const CVec2 &vFinishPoint, interface IPointChecking *pPointChecking );
 
 	virtual const SRect GetUnitRectForLock() const;
-	
+
 	virtual bool TurnToDir( const WORD &newDir, const bool bCanBackward = true, const bool bForward = true );
 	virtual void UpdateDirection( const CVec2 &newDir );
 	virtual void UpdateDirection( const WORD newDir );
@@ -67,7 +67,7 @@ public:
 	virtual bool SendAlongPath( IPath *pPath );
 
 	virtual interface IStaticPathFinder* GetPathFinder() const;
-	
+
 	interface ISmoothPath* GetCurPath() const { return pSmoothPath; }
 	interface IStaticPath* GetStaticPath() const { return pStaticPath; }
 
@@ -76,14 +76,14 @@ public:
 	virtual void UnlockTiles( const bool bUpdate = true ) { }
 	virtual void FixUnlocking() { }
 	virtual void UnfixUnlocking() { }
-	virtual bool CanTurnToFrontDir( const WORD wDir ) { return true; }	
+	virtual bool CanTurnToFrontDir( const WORD wDir ) { return true; }
 
 	const CVec2 GetNearFormationPos() const;
 	const CVec2 GetFarFormationPos() const;
 	void GetNextTiles( std::list<SVector> *pTiles ) const;
 
 	void NotifyDiff( const float fDiff );
-	
+
 	virtual float GetSmoothTurnThreshold() const;
 	virtual const int CanGoBackward() const { return false; }
 
@@ -91,10 +91,10 @@ public:
 	virtual const float GetRadius() const = 0;
 	virtual const int Size() const = 0;
 	virtual bool IsLockingTiles() const { return false; }
-	
+
 	virtual bool CheckToTurn( const WORD wNewDir ) { return true; }
 	virtual bool HasSuspendedPoint() const { return false; }
-	
+
 	virtual bool IsInOneTrain( interface IBasePathUnit *pUnit ) const;
 	virtual bool IsTrain() const { return false; }
 
@@ -102,7 +102,7 @@ public:
 	virtual const float GetPathSegmentsPeriod() const;
 
 	virtual const SVector GetLastKnownGoodTile() const;
-	
+
 	virtual bool IsDangerousDirExist() const { return false; }
 	virtual const WORD GetDangerousDir() const { return 0; }
 };
@@ -111,7 +111,7 @@ class CFormation : public CFormationCenter
 {
 	OBJECT_NORMAL_METHODS( CFormation );
 	DECLARE_SERIALIZE;
-	
+
 	struct SUnitInfo
 	{
 		DECLARE_SERIALIZE;
@@ -150,7 +150,7 @@ class CFormation : public CFormationCenter
 	int nCurGeometry;
 
 	float fPass;
-	
+
 	NTimer::STime timeToCamouflage;
 	WORD id;
 
@@ -177,7 +177,7 @@ class CFormation : public CFormationCenter
 	enum EObjectInsideOf { EOIO_NONE, EOIO_BUILDING, EOIO_TRANSPORT, EOIO_ENTRENCHMENT, EOIO_UNKNOWN };
 	EObjectInsideOf eInsideType;
 	IRefCount *pObjInside;
-	
+
 	float fMaxFireRange;
 
 	struct SVirtualUnit
@@ -203,7 +203,7 @@ class CFormation : public CFormationCenter
 		int nDBID;
 	public:
 		CCarryedMortar() : bHasMortar( false ), nDBID( -1 ) { }
-		bool HasMortar() const { return bHasMortar; } 
+		bool HasMortar() const { return bHasMortar; }
 		int CreateMortar( const class CFormation *pOwner );
 		void Init( const class CAIUnit *pArt );
 	};
@@ -229,20 +229,20 @@ public:
 	void ChangeGeometry( const int nGeometry );
 	const int GetNGeometries() const;
 	const int GetCurGeometry() const { return nCurGeometry; }
-	
+
 	virtual const WORD GetID() const { return id; }
 	const SSquadRPGStats* GetStats() const { return pStats; }
 
 	// добавить новый юнит в формацию, порядковый номер его в статах - nSlot, местоположение юнита инициализируется
 	void AddNewUnitToSlot( class CSoldier *pUnit, const int nSlot, const bool bSendToWorld = true );
-	
+
 	// добавить новый юнит на позицию nPos в списке юнитов объекта formation, причём местоположение юнита не инициализируется
 	void AddUnit( class CSoldier *pUnit, const int nPos );
 	void DelUnit( const BYTE cPos );
 	void DelUnit( class CSoldier *pUnit );
 	// для Save/Load
 	void SetUnitToPos( const BYTE cPos, class CSoldier *pUnit );
-	
+
 	virtual BYTE GetAIClass() const;
 
 	const CVec2 GetUnitCoord( const BYTE cSlot ) const;
@@ -252,14 +252,14 @@ public:
 	const CVec2 GetUnitShift( const BYTE cSlot ) const;
 	// каким должно быть собственное направление юнита
 	const WORD GetUnitDir( const BYTE cSlot ) const;
-	// возвращает позицию в статах формации для юнита с порядковым номером cSlot в массиве units 
+	// возвращает позицию в статах формации для юнита с порядковым номером cSlot в массиве units
 	const int GetUnitSlotInStats( const BYTE cSlot ) const;
 	virtual const float GetPassability() const { return fPass; }
 
 	bool IsStopped() const;
 	virtual const CVec2& GetCenter() const { return CFormationCenter::GetCenter(); }
 	virtual const float GetRadius() const { return geomInfo[nCurGeometry].fRadius; }
-	
+
 	void Segment();
 
 	void GetNextPositions( const BYTE cPos, std::list<SVector> *pTiles ) const;
@@ -301,27 +301,27 @@ public:
 	void SetToWaitingState() { bWaiting = true; }
 	void UnsetFromWaitingState() { bWaiting = false; }
 	const bool IsInWaitingState() const { return bWaiting; }
-	
+
 	virtual const bool IsVisible( const BYTE party ) const;
-	
+
 	//
 	void WasHitNearUnit();
-	
+
 	virtual void Fired( const float fGunRadius, const int nGun  ) { }
-	
+
 	virtual void SetAmbush();
 	virtual void RemoveAmbush();
-	
+
 	virtual const NTimer::STime GetTimeToCamouflage() const;
 	virtual void SetCamoulfage();
 	virtual void RemoveCamouflage( ECamouflageRemoveReason eReason );
-	
+
 	virtual void UpdateArea( const EActionNotify eAction );
-	
+
 	virtual class CTurret* GetTurret( const int nTurret ) const { return 0; }
 	virtual const int GetNTurrets() const { return 0; }
 	virtual bool IsMech() const { return false; }
-	
+
 	virtual void Disappear();
 	virtual void Die( const bool fromExplosion, const float fDamage );
 
@@ -329,21 +329,21 @@ public:
 	// возвращает - поехал или нет
 	virtual bool SendAlongPath( interface IStaticPath *pStaticPath, const CVec2 &vShift, bool bSmoothTurn = true );
 	virtual bool SendAlongPath( IPath *pPath );
-	
+
 	virtual const float GetCurSpeedBonus() const;
 	virtual const float GetDispersionBonus() const;
 	virtual const float GetRelaxTimeBonus() const;
 	virtual const float GetFireRateBonus() const;
 	virtual const float GetCoverBonus() const;
 	const float GetSightMultiplier() const;
-	
+
 	bool IsAllowedLieDown() const;
 	bool IsAllowedStandUp() const;
-	
+
 	void Disable();
 	void Enable();
 	bool IsDisabled() const { return bDisabled; }
-	
+
 	virtual void UnitCommand( CAICommand *pCommand, bool bPlaceInQueue, bool bOnlyThisUnitCommand );
 
 	bool IsFree() const { return eInsideType == EOIO_NONE; }
@@ -359,16 +359,16 @@ public:
 	class CBuilding* GetBuilding() const;
 	class CEntrenchment* GetEntrenchment() const;
 	class CMilitaryCar* GetTransportUnit() const;
-	
+
 	virtual void GetNewUnitInfo( struct SNewUnitInfo *pNewUnitInfo );
 
 	virtual bool IsFormation() const { return true; }
-	
+
 	virtual void SendAcknowledgement( EUnitAckType ack, bool bForce = false );
 	virtual void SendAcknowledgement( CAICommand *pCommand, EUnitAckType ack, bool bForce = false );
 	// установить центр формации в центр тяжести юнитов
 	void BalanceCenter();
-	
+
 	virtual const int GetMinArmor() const { return 0; }
 	virtual const int GetMaxArmor() const { return 0; }
 	virtual const int GetMinPossibleArmor( const int nSide ) const { return 0; }
@@ -378,7 +378,7 @@ public:
 
 	virtual float GetMaxFireRange() const { return fMaxFireRange; }
 	void AddAvailCmd( const EActionCommand &eCmd ) { availCommands.SetData( eCmd ); }
-	
+
 	virtual EUnitAckType GetGunsRejectReason() const;
 
 	// используется только для отложенных updates
@@ -418,13 +418,13 @@ public:
 	virtual bool IsResupplyable() const { return bCanBeResupplied; }
 	virtual void SetResupplyable( const bool _bCanBeResupplied ) { bCanBeResupplied = _bCanBeResupplied; }
 
-	virtual const IsWithMoraleOfficer() const { return bWithMoraleOfficer; }
+	virtual const bool IsWithMoraleOfficer() const { return bWithMoraleOfficer; }
 
 	virtual void FreezeByState( const bool bFreeze );
-	
+
 	// slow working
 	virtual const float GetTargetScanRadius();
-	
+
 	virtual bool CanMoveAfterUserCommand() const { return CanMove(); }
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -562,7 +562,7 @@ int CMapInfo::UpdateObjects( SLoadMapInfo *pLoadMapInfo, const CTRect<int> &rUpd
 
 	//UPDATE_LINK_ID
 	//usedIDs[old nLinkID] = new nLinkID;
-	std::hash_map<int, int> usedIDs;
+	std::unordered_map<int, int> usedIDs;
 
 	int nCurrentLinkID = RMGC_INVALID_LINK_ID_VALUE + 1;
 	

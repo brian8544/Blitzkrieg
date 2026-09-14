@@ -44,7 +44,10 @@ public:
 inline DWORD DOSToWin32DateTime( time_t time )
 {
 	// transform DOS time to local time 'tm' structure
-	tm *pTime = localtime( &time );
+	tm localTime;
+	if ( localtime_s(&localTime, &time) != 0 )
+		return 0;
+	const tm *pTime = &localTime;
 	// fill 'SWin32Time' structure to automagically convert to Win32 date/time format
 	SWin32Time filetime;
 	filetime.year    = pTime->tm_year - 80;	// due to 'tm' year relative to 1900 year, but we need relative to 1980

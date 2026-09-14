@@ -1354,7 +1354,7 @@ void CAIUnit::InitializeShootArea( SShootArea *pArea, CBasicGun *pGun, const flo
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CAIUnit::GetShootAreas( SShootAreas *pShootAreas, int *pnAreas ) const
 {
-	std::construct( pShootAreas );
+	std::construct_at( pShootAreas );
 	*pnAreas = 1;
 
 	if ( GetFirstArtilleryGun() != 0 )

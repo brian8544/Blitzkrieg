@@ -452,7 +452,7 @@ bool CGeneral::IsMobileReinforcement( int nGroupID ) const
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGeneral::GiveNewUnits( const std::list<CCommonUnit*> &pUnits )
 {
-	typedef std::hash_map<int, bool> Formations;
+	typedef std::unordered_map<int, bool> Formations;
 	Formations formations; // добавляемые формации
 	
 	// забрать все юниты, кроме солдат. солдат забирать формациями	

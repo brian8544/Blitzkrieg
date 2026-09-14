@@ -55,7 +55,7 @@ if ( !(bCond) )																																												\
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CScripts::~CScripts()
 {
-	for ( std::hash_map<int, SScriptInfo>::iterator iter = activeScripts.begin(); iter != activeScripts.end(); ++iter )
+	for ( std::unordered_map<int, SScriptInfo>::iterator iter = activeScripts.begin(); iter != activeScripts.end(); ++iter )
 		script.Unref( iter->first );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -151,7 +151,7 @@ int CScripts::KillActiveScript( const std::string szName )
 	
 	const int nRef = name2script[szName];
 	
-	std::hash_map<int, SScriptInfo>::iterator killIter = activeScripts.find( nRef );
+	std::unordered_map<int, SScriptInfo>::iterator killIter = activeScripts.find( nRef );
 	NI_ASSERT_T(  killIter != activeScripts.end(), "Wrong script reference to kill" );
 
 	if ( segmIter == killIter )
@@ -293,7 +293,7 @@ void CScripts::LandSuspendedReiforcements()
 				CVec2 vShift( VNULL2 );
 				if ( CanLandWithShift( reinforcsIter->mapObject, pIDB, &vShift ) )
 				{
-					std::hash_set<int> candidates;
+					std::unordered_set<int> candidates;
 					const int nLink = reinforcsIter->mapObject.link.nLinkID;
 					candidates.insert( nLink );
 					CReinfList candObjects;
@@ -445,7 +445,7 @@ void CScripts::DelInvalidBegin( const int targetId )
 		}
 
 		int nDeleted;
-		for( std::hash_map< int, int>::iterator it = groupUnits.begin(); it != groupUnits.end(); ++it )
+		for( std::unordered_map< int, int>::iterator it = groupUnits.begin(); it != groupUnits.end(); ++it )
 		{
 			const int nUniqueId = it->first;
 			CLinkObject *pObj = GetObjectByUniqueIdSafe<CLinkObject>( nUniqueId );
@@ -474,7 +474,7 @@ void CScripts::DelInvalidUnits( const int scriptId )
 		}
 
 		std::list<int> deleted;
-		for( std::hash_map< int, int>::iterator it = groupUnits.begin(); it != groupUnits.end(); ++it )
+		for( std::unordered_map< int, int>::iterator it = groupUnits.begin(); it != groupUnits.end(); ++it )
 		{
 			const int nUniqueId = it->first;
 			CLinkObject *pObj = GetObjectByUniqueIdSafe<CLinkObject>( nUniqueId );
@@ -775,7 +775,7 @@ int CScripts::GetNUnitsInScriptGroup( struct lua_State *state )
 	return 1;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CScripts::SetNewLinksToReinforcement( CReinfList *pReinf, std::hash_map<int, int> *pOld2NewLinks )
+void CScripts::SetNewLinksToReinforcement( CReinfList *pReinf, std::unordered_map<int, int> *pOld2NewLinks )
 {
 	// set new links (not intersected with existing)
 	std::list<int> freeLinks;
@@ -797,7 +797,7 @@ void CScripts::SetNewLinksToReinforcement( CReinfList *pReinf, std::hash_map<int
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CScripts::LandReinforcementWithoutLandCheck( CReinfList *pReinf, const CVec2 &vShift )
 {
-	std::hash_map<int, int> old2NewLinks;
+	std::unordered_map<int, int> old2NewLinks;
 	SetNewLinksToReinforcement( pReinf, &old2NewLinks );
 
 	std::list<CCommonUnit*> pUnits;
@@ -1396,7 +1396,7 @@ int CScripts::GiveQCommand( struct lua_State *state )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CScripts::ShowActiveScripts( struct lua_State *state )
 {
-	for ( std::hash_map<std::string, int>::iterator iter = pScripts->name2script.begin(); iter != pScripts->name2script.end(); ++iter )
+	for ( std::unordered_map<std::string, int>::iterator iter = pScripts->name2script.begin(); iter != pScripts->name2script.end(); ++iter )
 		pScripts->pConsole->WriteASCII( CONSOLE_STREAM_CONSOLE, iter->first.c_str(), 0xff00ff00 );
 
 	return 0;
@@ -2247,7 +2247,7 @@ int CScripts::ReturnScriptIDs( struct lua_State *pState )
 	Script script( pState );
 
 	const int nReturns = script.GetTop();
-	std::hash_set<int> selectedUnits;
+	std::unordered_set<int> selectedUnits;
 	for ( int i = 1; i <= nReturns; ++i )
 	{
 		NI_ASSERT_T( script.IsNumber( i ), "ReturnScriptIDs: %d parameter isn't a number" );

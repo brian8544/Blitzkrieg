@@ -183,7 +183,8 @@ static void IndentFile(FILE* file, unsigned int indentLevel)
 {
 	// Write out indentation.
 	char spaces[500];
-	for (unsigned int i = 0; i < indentLevel; ++i)
+	unsigned int i = 0;
+	for (; i < indentLevel && i + 1 < sizeof(spaces); ++i)
 		spaces[i] = ' ';
 	spaces[i] = 0;
 	fputs(spaces, file);
@@ -206,7 +207,7 @@ static void WriteObject(Script& script, FILE* file, const char* name,
 		return;
 	}
 
-	using Script::Object;
+	using Object = Script::Object;
 
 	// Indent the line the number of spaces for the current indentation level.
 	const unsigned int INDENT_SIZE = 4;
@@ -321,12 +322,12 @@ static void WriteObject(Script& script, FILE* file, const char* name,
 				}
 
 				// Build the table entry name for the number.
-				sprintf(keyName, "[%.16g]", key.GetNumber());
+				sprintf_s(keyName, "[%.16g]", key.GetNumber());
 			}
 			else
 			{
 				// Build the table entry name for the string key name.
-				strcpy(keyName, key.GetString());
+				strcpy_s(keyName, key.GetString());
 			}
 
 			// If we wrote a sequential list, the value we're about to write
@@ -388,7 +389,10 @@ static void WriteObject(Script& script, FILE* file, const char* name,
 void Script::SaveText(const char* filename)
 {
 	// Open the text file to write the script state to.
-	FILE* file = fopen(filename, "wt");
+	FILE* file = NULL;
+	fopen_s(&file, filename, "wt");
+	if (!file)
+		return;
 
 	// For safety, just in case we leave something behind on the script stack.
 	AutoBlock block(*this);

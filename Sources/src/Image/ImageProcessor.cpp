@@ -7,9 +7,7 @@
 #include "ImageTGA.h"
 #include "ImageMMP.h"
 
-extern "C" { 
-#include <s3tc.h>
-}
+#include <squish.h>
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IImage* CImageProcessor::LoadImage( IDataStream *pStream ) const
 {
@@ -73,61 +71,37 @@ IImage* CImageProcessor::CreateMip( const IImage *pImage, int nLevel ) const
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IDDSImage* CompressDXTN( const IImage *pImage, EGFXPixelFormat format )
 {
-	float fWeights[] = { 0.309f, 0.609f, 0.082f, 0, 0, 0, 0, 0 };
-	DWORD dwEncodeType = 0;
-	SDDSPixelFormat ddsformat;
-	// compose encoding type
-	GetDDSPixelFormat( format, &ddsformat );
+	int squishFlags = squish::kColourIterativeClusterFit;
+	float perceptualMetric[3] = { 0.2126f, 0.7152f, 0.0722f };
 	switch ( format )
 	{
-		case GFXPF_DXT1:
-			dwEncodeType = S3TC_ENCODE_RGB_COLOR_KEY;
-			break;
+		case GFXPF_DXT1: squishFlags |= squish::kDxt1; break;
 		case GFXPF_DXT2:
-			dwEncodeType = S3TC_ENCODE_RGB_ALPHA_COMPARE | S3TC_ENCODE_ALPHA_EXPLICIT;
-			break;
-		case GFXPF_DXT3:
-			dwEncodeType = S3TC_ENCODE_RGB_FULL | S3TC_ENCODE_ALPHA_EXPLICIT;
-			break;
+		case GFXPF_DXT3: squishFlags |= squish::kDxt3; break;
 		case GFXPF_DXT4:
-			dwEncodeType = S3TC_ENCODE_RGB_ALPHA_COMPARE | S3TC_ENCODE_ALPHA_INTERPOLATED;
-			break;
-		case GFXPF_DXT5:
-			dwEncodeType = S3TC_ENCODE_RGB_FULL | S3TC_ENCODE_ALPHA_INTERPOLATED;
-			break;
+		case GFXPF_DXT5: squishFlags |= squish::kDxt5; break;
+		default: return 0;
 	}
-	// compose in header
-	DDSURFACEDESC ddsdIn;
-	Zero( ddsdIn );
-	ddsdIn.dwSize = sizeof( DDSURFACEDESC );
 
-	ddsdIn.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_LINEARSIZE | DDSD_PIXELFORMAT | DDSD_LPSURFACE;
-	ddsdIn.dwWidth = pImage->GetSizeX();
-	ddsdIn.dwHeight = pImage->GetSizeY();
-	ddsdIn.lPitch = pImage->GetSizeX() * 4;
-	ddsdIn.lpSurface = const_cast<SColor*>( pImage->GetLFB() );
+	const int width = pImage->GetSizeX();
+	const int height = pImage->GetSizeY();
+	std::vector<BYTE> rgba( static_cast<size_t>(width) * height * 4 );
+	const SColor *src = pImage->GetLFB();
+	for ( int i = 0; i < width * height; ++i )
+	{
+		rgba[i*4+0] = src[i].r;
+		rgba[i*4+1] = src[i].g;
+		rgba[i*4+2] = src[i].b;
+		rgba[i*4+3] = src[i].a;
+	}
 
-	ddsdIn.ddpfPixelFormat.dwSize = sizeof( DDPIXELFORMAT );
-	ddsdIn.ddpfPixelFormat.dwRGBBitCount = 32;
-	ddsdIn.ddpfPixelFormat.dwFlags = DDPF_ALPHAPIXELS | DDPF_RGB;
-	ddsdIn.ddpfPixelFormat.dwRBitMask = 0x00FF0000;
-	ddsdIn.ddpfPixelFormat.dwGBitMask = 0x0000FF00;
-	ddsdIn.ddpfPixelFormat.dwBBitMask = 0x000000FF;
-	ddsdIn.ddpfPixelFormat.dwRGBAlphaBitMask = 0xFF000000;
-	// compose out header
-	DDSURFACEDESC ddsdOut;
-	Zero( ddsdOut );
-	ddsdOut.dwSize = sizeof( DDSURFACEDESC );
-	int nNumCompressedBytes = S3TCgetEncodeSize( &ddsdIn, dwEncodeType );
-	// create MMP image and add empty mip
-	CImageDDS *pImageMMP = new CImageDDS( pImage->GetSizeX(), pImage->GetSizeY(), ddsformat );
-	std::vector<BYTE> &outdata = pImageMMP->AddEmptyMipLevel();
-	outdata.resize( nNumCompressedBytes );
-	//
-	S3TCsetAlphaReference( 0 );
-	S3TCencode( &ddsdIn, 0, &ddsdOut, &(outdata[0]), dwEncodeType, fWeights );
-	//
-	return pImageMMP;
+	SDDSPixelFormat ddsformat;
+	GetDDSPixelFormat( format, &ddsformat );
+	CImageDDS *pImageDDS = new CImageDDS( width, height, ddsformat );
+	std::vector<BYTE> &outdata = pImageDDS->AddEmptyMipLevel();
+	outdata.resize( squish::GetStorageRequirements( width, height, squishFlags ) );
+	squish::CompressImage( rgba.data(), width, height, outdata.data(), squishFlags, perceptualMetric );
+	return pImageDDS;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IDDSImage* CompressRGBA( const IImage *pImage, EGFXPixelFormat format )
@@ -206,57 +180,29 @@ IImage* CImageProcessor::Decompress( const IDDSImage *pImage ) const
 	//
 	//
 	//
-	DDSURFACEDESC ddsdIn;
-	Zero( ddsdIn );
-	ddsdIn.dwSize = sizeof( DDSURFACEDESC );
-	ddsdIn.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_PIXELFORMAT | DDSD_LPSURFACE;
-	ddsdIn.dwWidth = pImage->GetSizeX( 0 );
-	ddsdIn.dwHeight = pImage->GetSizeY( 0 );
-	ddsdIn.lpSurface = const_cast<void*>( pImage->GetLFB(0) );
-	ddsdIn.ddpfPixelFormat.dwSize = sizeof( DDPIXELFORMAT );
-	//
-	switch ( pImage->GetGFXFormat() ) 
+	const int width = pImage->GetSizeX( 0 );
+	const int height = pImage->GetSizeY( 0 );
+	int squishFlags = 0;
+	switch ( pImage->GetGFXFormat() )
 	{
-		case GFXPF_DXT1:
+		case GFXPF_DXT1: squishFlags = squish::kDxt1; break;
 		case GFXPF_DXT2:
-		case GFXPF_DXT3:
+		case GFXPF_DXT3: squishFlags = squish::kDxt3; break;
 		case GFXPF_DXT4:
-		case GFXPF_DXT5:
-			ddsdIn.ddpfPixelFormat.dwRGBBitCount = 0;
-			ddsdIn.dwFlags |= DDSD_LINEARSIZE;
-			ddsdIn.lPitch = pImage->GetSizeX( 0 ) * pImage->GetSizeY( 0 ) * pImage->GetBPP() / 8;
-			ddsdIn.ddpfPixelFormat.dwRGBBitCount = 0;
-			ddsdIn.ddpfPixelFormat.dwFlags = DDPF_FOURCC;
-			ddsdIn.ddpfPixelFormat.dwRBitMask = 0;
-			ddsdIn.ddpfPixelFormat.dwGBitMask = 0;
-			ddsdIn.ddpfPixelFormat.dwBBitMask = 0;
-			ddsdIn.ddpfPixelFormat.dwRGBAlphaBitMask = 0;
-			ddsdIn.ddpfPixelFormat.dwFourCC = pImage->GetDDSFormat()->dwFourCC;
-			break;
-		case GFXPF_ARGB8888:
-		case GFXPF_ARGB4444:
-		case GFXPF_ARGB1555:
-		case GFXPF_ARGB0565:
-			ddsdIn.ddpfPixelFormat.dwRGBBitCount = pImage->GetBPP();
-			ddsdIn.dwFlags |= DDSD_PITCH;
-			ddsdIn.lPitch = pImage->GetSizeX( 0 ) * pImage->GetBPP() / 8;
-			ddsdIn.ddpfPixelFormat.dwRGBBitCount = 32;
-			ddsdIn.ddpfPixelFormat.dwFlags = DDPF_ALPHAPIXELS | DDPF_RGB;
-			ddsdIn.ddpfPixelFormat.dwRBitMask = 0x00FF0000;
-			ddsdIn.ddpfPixelFormat.dwGBitMask = 0x0000FF00;
-			ddsdIn.ddpfPixelFormat.dwBBitMask = 0x000000FF;
-			ddsdIn.ddpfPixelFormat.dwRGBAlphaBitMask = 0xFF000000;
-			break;
+		case GFXPF_DXT5: squishFlags = squish::kDxt5; break;
+		default:
+			return 0;
 	}
-	// compose out header
-	DDSURFACEDESC ddsdOut;
-	Zero( ddsdOut );
-	ddsdOut.dwSize = sizeof( DDSURFACEDESC );
-	const int nNumUncompressedBytes = S3TCgetDecodeSize( &ddsdIn );
-	// create MMP image and add empty mip
-	std::vector<DWORD> outdata( nNumUncompressedBytes / 4 );
-	S3TCdecode( &ddsdIn, &ddsdOut, &(outdata[0]) );
-	CImage *pDstImage = new CImage( pImage->GetSizeX(0), pImage->GetSizeY(0), outdata );
+
+	std::vector<BYTE> rgba( static_cast<size_t>(width) * height * 4 );
+	squish::DecompressImage( rgba.data(), width, height, pImage->GetLFB(0), squishFlags );
+	std::vector<DWORD> outdata( static_cast<size_t>(width) * height );
+	for ( int i = 0; i < width * height; ++i )
+	{
+		const SColor color( rgba[i*4+3], rgba[i*4+0], rgba[i*4+1], rgba[i*4+2] );
+		outdata[i] = color.color;
+	}
+	CImage *pDstImage = new CImage( width, height, outdata );
 	return pDstImage;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -387,7 +387,7 @@ bool CMapInfo::FillTerrain( int nTileIndex )
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CMapInfo::FillTileSet( const std::list<CVec2> &rInclusivePolygon, const std::list<std::list<CVec2> > &rExclusivePolygons, const CRMTileSet &rTileSet, std::hash_map<LPARAM, float> *pDistances )
+bool CMapInfo::FillTileSet( const std::list<CVec2> &rInclusivePolygon, const std::list<std::list<CVec2> > &rExclusivePolygons, const CRMTileSet &rTileSet, std::unordered_map<LPARAM, float> *pDistances )
 {
 	if ( IDataStorage* pDataStorage = GetSingleton<IDataStorage>() )
 	{
@@ -405,7 +405,7 @@ bool CMapInfo::FillObjectSet( const std::list<CVec2> &rInclusivePolygon, const s
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CMapInfo::FillProfilePattern( const std::list<CVec2> &rInclusivePolygon, const std::list<std::list<CVec2> > &rExclusivePolygons, const SVAGradient &rGradient, const CTPoint<int> &rPatternSize, float fPositiveRatio, std::hash_map<LPARAM, float> *pDistances )
+bool CMapInfo::FillProfilePattern( const std::list<CVec2> &rInclusivePolygon, const std::list<std::list<CVec2> > &rExclusivePolygons, const SVAGradient &rGradient, const CTPoint<int> &rPatternSize, float fPositiveRatio, std::unordered_map<LPARAM, float> *pDistances )
 {
 	return FillProfilePattern( &terrain, rInclusivePolygon, rExclusivePolygons, rGradient, rPatternSize, fPositiveRatio, pDistances );
 }

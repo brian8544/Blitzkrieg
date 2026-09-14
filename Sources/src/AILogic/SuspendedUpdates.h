@@ -16,14 +16,14 @@ class CSuspendedUpdates
 	typedef CAreaMap<IUpdatableObj, CPtr<IUpdatableObj>, SVector, int> CObjectsByCells;
 	CObjectsByCells objectsByCells;
 	// по объекту - updates, которые для него отложены
-	std::hash_map< CObj<IUpdatableObj>, std::vector< CPtr<IDataStream> >, SUpdatableObjectObjHash > updates;
+	std::unordered_map< CObj<IUpdatableObj>, std::vector< CPtr<IDataStream> >, SUpdatableObjectObjHash > updates;
 	// по объекту - тайлы, при видимости которых нужно послать все отложенные updates
-	typedef std::hash_map< int, std::hash_set<SVector, STilesHash > > CTilesMap;
+	typedef std::unordered_map< int, std::unordered_set<SVector, STilesHash > > CTilesMap;
 	CTilesMap tilesOfObj;
 	
 	// объекту - отложенные updates дипломатии
 	// предполагается, что таких updates будет немного
-	typedef std::hash_map< CObj<IUpdatableObj>, CPtr<IDataStream>, SUpdatableObjectObjHash > CDiplomacyUpdatesType;
+	typedef std::unordered_map< CObj<IUpdatableObj>, CPtr<IDataStream>, SUpdatableObjectObjHash > CDiplomacyUpdatesType;
 	CDiplomacyUpdatesType diplomacyUpdates;
 
 	// для каждого eAction все вспомненные updates
@@ -45,7 +45,7 @@ class CSuspendedUpdates
 	std::vector<CRecalledUpdatesType> recalledUpdates;
 
 	// тайлы, которые стали видны после очередного сканирования тумана
-	std::hash_set< SVector, STilesHash > visibleTiles;
+	std::unordered_set< SVector, STilesHash > visibleTiles;
 
 	int nMyParty;
 
@@ -56,7 +56,7 @@ class CSuspendedUpdates
 	void DeleteUpdate( IUpdatableObj *pObj, const EActionNotify &eAction );
 	void CommonInit();
 	void SuspendUpdate( const EActionNotify &eAction, IUpdatableObj * pObj, const  SSuspendedUpdate &update );
-	void UpdateVisibleTiles( const std::hash_set< SVector, STilesHash > &tilesSet, std::hash_set<SVector, STilesHash> *pCoverTiles );
+	void UpdateVisibleTiles( const std::unordered_set< SVector, STilesHash > &tilesSet, std::unordered_set<SVector, STilesHash> *pCoverTiles );
 public:
 	CSuspendedUpdates();
 

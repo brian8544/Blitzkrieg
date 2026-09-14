@@ -7,7 +7,7 @@ template < class TKey, class TValue, int NClassTypeID, class THash = std::hash<T
 class CBasicShare
 {
 public:	
-	typedef std::hash_map< TKey, CObj<TValue>, THash > CDataHash;
+	typedef std::unordered_map< TKey, CObj<TValue>, THash > CDataHash;
 	typedef CDataHash::iterator iterator;
 	typedef CDataHash::const_iterator const_iterator;
 private:

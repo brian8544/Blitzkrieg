@@ -17,37 +17,29 @@
 
 # 準備
 
-SDKディレクトリ内のすべてのライブラリがコンパイルには必要です。次の順番でパスを **Tools => Options => Directories** に入力してください：
+必要なもの：
 
-## Include
-```
-C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\STLPORT
-C:\SDK\BINK（リポジトリには含まれていません）
-C:\SDK\FMOD\API\INC（リポジトリには含まれていません）
-C:\SDK\S3TC
-C:\SDK\STINGRAY STUDIO 2002\INCLUDE\TOOLKIT（リポジトリには含まれていません）
-C:\SDK\STINGRAY STUDIO 2002\INCLUDE（リポジトリには含まれていません）
-C:\SDK\STINGRAY STUDIO 2002\REGEX\INCLUDE（リポジトリには含まれていません）
-C:\SDK\Maya4.0\include
-```
+- Windows 10 または 11。
+- CMake 4.2 以降。
+- **C++ によるデスクトップ開発**ワークロードと Windows SDK を含む Visual Studio 2026。
+- Git と [vcpkg](https://github.com/microsoft/vcpkg)。`VCPKG_ROOT` を vcpkg のディレクトリに設定してください。
+- Windows 用 FMOD Engine 2.01.x。FMOD は別ライセンスであり、このリポジトリには含まれません。
 
-## Lib
-```
-C:\SDK\BINK（リポジトリには含まれていません）
-C:\SDK\FMOD\API\LIB（リポジトリには含まれていません）
-C:\SDK\S3TC
-C:\SDK\STINGRAY STUDIO 2002\LIB（リポジトリには含まれていません）
-C:\SDK\STINGRAY STUDIO 2002\REGEX\LIB（リポジトリには含まれていません）
-C:\SDK\Maya4.0\lib
+Direct3D 互換ソースは `Sources/sdk` に含まれています。FMOD SDK は空白を含まない次の構成で配置してください：
+
+```text
+Sources/sdk/FMOD/Include/fmod.hpp
+Sources/sdk/FMOD/lib/x86/fmod_vc.lib
+Sources/sdk/FMOD/lib/x86/fmod.dll
 ```
 
-また、**DirectX 8.1** 以上が必要です（自動的にパスへ追加されます）。
+`build.bat` を実行します。vcpkg マニフェストにより FFmpeg、libpng、libsquish、pugixml、zlib が自動的にインストールされます。同梱の `Sources/src/GameSpy` SDK はソースからビルドされるため、GameSpy を別途ダウンロードする必要はありません。現在のゲームターゲットでは Bink、STLPort、Stingray、旧 DirectX 8 SDK は不要です。
 
-### 重要な注意事項
+Release 実行ファイルは `build/bin/Release` に生成されます。インストール済み製品版のデータを使うには：
 
-- **Bink、FMOD、Stingray** ライブラリは、別途ライセンスが必要なため、このリポジトリには含まれていません。
-- **stlport** は必ず Visual C ディレクトリの `include` と同じ場所に配置してください。
-- パス `C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\STLPORT` は必ず**最初**に設定してください。そうでないとビルドに失敗します。
+```bat
+build\bin\Release\Game.exe -datadir "C:\path\to\Blitzkrieg"
+```
 
 ---
 

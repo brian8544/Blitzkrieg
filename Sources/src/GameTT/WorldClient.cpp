@@ -554,7 +554,7 @@ void FillActionsPriority( const char *pszRow, const char *pszEntry, CTableAccess
 			dst.push_back( 0 );
 	}
 	// remove all actions >= 64
-	dst.erase( std::remove_if(dst.begin(), dst.end(), std::bind2nd(std::greater_equal<int>(), 64)), dst.end() );
+	dst.erase( std::remove_if( dst.begin(), dst.end(), []( int value ) { return value >= 64; } ), dst.end() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CWorldClient::Init( ISingleton *pSingleton )
@@ -586,7 +586,7 @@ void CWorldClient::Init( ISingleton *pSingleton )
 	RegisterAction( USER_ACTION_INSTALL, SActionDesc::INSTANT, &CWorldClient::ActionInstallMsg );
 	RegisterAction( USER_ACTION_UNINSTALL, SActionDesc::INSTANT, &CWorldClient::ActionUnInstallMsg );
 
-	RegisterAction( USER_ACTION_CAPTURE_ARTILLERY, SActionDesc::AUTO, ActionCaptureArtilleryMsg );
+	RegisterAction( USER_ACTION_CAPTURE_ARTILLERY, SActionDesc::AUTO, &CWorldClient::ActionCaptureArtilleryMsg );
 	RegisterAction( USER_ACTION_HOOK_ARTILLERY, SActionDesc::AUTO | SActionDesc::FORCED, &CWorldClient::ActionHookArtilleryMsg );
 	RegisterAction( USER_ACTION_DEPLOY_ARTILLERY, SActionDesc::FORCED, &CWorldClient::ActionDeployArtilleryMsg );
 
@@ -1285,7 +1285,7 @@ void CWorldClient::AssignSelectionGroup( int nIndex )
 	// assign selection group index for all objects in this group
 	CCollectObjectsSelectiorVisitor visitor;
 	selunits.Visit( &visitor );
-	typedef std::hash_set<IMOUnit*, SDefaultPtrHash> CUnitsSet;
+	typedef std::unordered_set<IMOUnit*, SDefaultPtrHash> CUnitsSet;
 	CUnitsSet unitset;
 	for ( CMapObjectsList::iterator it = visitor.GetObjects().begin(); it != visitor.GetObjects().end(); ++it )
 	{

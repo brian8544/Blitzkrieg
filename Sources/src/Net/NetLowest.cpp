@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "NetLowest.h"
 #include "Streams.h"
+#include <ws2tcpip.h>
 using namespace std;
 namespace NNet
 {
@@ -24,14 +25,16 @@ bool CNodeAddress::SetInetName( const char *pszHost, int nDefaultPort )
 		szAddr = string( szAddr, 0, nIdx );
 	}
 	// determine host
-	nameRemote.sin_addr.S_un.S_addr = inet_addr( szAddr.c_str() ); 
-	if( nameRemote.sin_addr.S_un.S_addr == INADDR_NONE )  // not resolved?
+	if ( InetPtonA( AF_INET, szAddr.c_str(), &nameRemote.sin_addr ) != 1 )
 	{
-		hostent *he;
-		he = gethostbyname( szAddr.c_str() ); // m.b. it is string comp.domain
-		if( he == NULL )
+		addrinfo hints = {};
+		hints.ai_family = AF_INET;
+		hints.ai_socktype = SOCK_DGRAM;
+		addrinfo *pInfo = 0;
+		if ( getaddrinfo( szAddr.c_str(), 0, &hints, &pInfo ) != 0 || pInfo == 0 )
 			return false;
-		nameRemote.sin_addr.S_un.S_addr = *( unsigned long* )( he->h_addr_list[0] );
+		nameRemote.sin_addr = reinterpret_cast<sockaddr_in*>( pInfo->ai_addr )->sin_addr;
+		freeaddrinfo( pInfo );
 	}
 	nameRemote.sin_port = htons( nPort );
 	return true;
@@ -41,14 +44,13 @@ string CNodeAddress::GetName( bool bResolve ) const
 {
   sockaddr_in &nameRemote = *(sockaddr_in*)&addr;
 	
-	hostent *he = 0;
-	if ( bResolve )
-		he = gethostbyaddr( (const char*)&addr, sizeof(addr), AF_INET ); // m.b. it is string comp.domain
+	char szHost[NI_MAXHOST] = {};
+	const bool bResolved = bResolve && getnameinfo( reinterpret_cast<const sockaddr*>( &nameRemote ), sizeof(nameRemote), szHost, sizeof(szHost), 0, 0, NI_NAMEREQD ) == 0;
 	char szBuf[1024];
-	if( he == 0 || he->h_name == 0 )
+	if ( !bResolved )
 	{
 		in_addr &ia = nameRemote.sin_addr;
-		sprintf( szBuf, "%i.%i.%i.%i:%i", 
+		sprintf_s( szBuf, sizeof(szBuf), "%i.%i.%i.%i:%i",
 			(int) ia.S_un.S_un_b.s_b1,
 			(int) ia.S_un.S_un_b.s_b2,
 			(int) ia.S_un.S_un_b.s_b3,
@@ -57,8 +59,8 @@ string CNodeAddress::GetName( bool bResolve ) const
 	}
 	else
 	{
-		sprintf( szBuf, "%s:%i", 
-			(const char*) he->h_name,
+		sprintf_s( szBuf, sizeof(szBuf), "%s:%i",
+			szHost,
 			(int) ntohs( nameRemote.sin_port ) );
 	}
 	return szBuf;
@@ -80,7 +82,7 @@ bool CNodeAddressSet::GetAddress( int n, CNodeAddress *pRes ) const
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CLinksManager::CLinksManager()
 {
-	WORD wVersionRequested = MAKEWORD( 1, 1 );
+	WORD wVersionRequested = MAKEWORD( 2, 2 );
 	WSADATA wsaData;
  
 	int bRv = WSAStartup( wVersionRequested, &wsaData ) == 0;
@@ -94,9 +96,11 @@ CLinksManager::CLinksManager()
 		ASSERT(0);
 		return;
 	}
-	hostent *he;
-	he = gethostbyname( szHost ); // m.b. it is string comp.domain
-	if ( he == NULL )
+	addrinfo hints = {};
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_DGRAM;
+	addrinfo *pInfo = 0;
+	if ( getaddrinfo( szHost, 0, &hints, &pInfo ) != 0 || pInfo == 0 )
  	{
 		ASSERT(0);
 		return;
@@ -105,11 +109,8 @@ CLinksManager::CLinksManager()
 	CNodeAddress addr;
   sockaddr_in &name = *(sockaddr_in*)&addr;
 	name.sin_family = AF_INET;
-	// hostent are broken for some unknown reason, only one address is valid
-	unsigned long *pAddr = (unsigned long*)( he->h_addr_list[0] );
-	//for ( ; *pAddr; pAddr++ )
 	{
-		name.sin_addr.S_un.S_addr = pAddr[0];
+		name.sin_addr = reinterpret_cast<sockaddr_in*>( pInfo->ai_addr )->sin_addr;
 		unsigned char bClass = name.sin_addr.S_un.S_un_b.s_b1;
 		if ( bClass >= 1 && bClass <= 126 )
 		{
@@ -126,6 +127,7 @@ CLinksManager::CLinksManager()
 			name.sin_addr.S_un.S_un_b.s_b4 = 255;
 		broadcastAddr = addr;
 	}
+	freeaddrinfo( pInfo );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CLinksManager::~CLinksManager()
@@ -147,7 +149,7 @@ bool CLinksManager::Start( int nPort )
 	name.sin_port = htons( nPort );
 	if ( nPort > 0 )
 	{
-		if ( bind( s, (sockaddr*)&name, sizeof( name ) ) != 0 )
+		if ( ::bind( s, (sockaddr*)&name, sizeof( name ) ) != 0 )
 		{
 			closesocket( s );
 			s = INVALID_SOCKET;
@@ -225,7 +227,7 @@ bool CLinksManager::Send( const CNodeAddress &dst, CMemoryStream &pkt ) const
 	{
 		if ( rand() <= RAND_MAX * fLostRate )
 			return true;
-		pktQueue.push_back();
+		pktQueue.emplace_back();
 		pktQueue.back().addr = dst;
 		pktQueue.back().pkt = pkt;
 		while ( pktQueue.size() > 3 )
@@ -292,15 +294,19 @@ bool CLinksManager::GetSelfAddress( CNodeAddressSet *pRes ) const
 	pRes->nPort = addr.sin_port;
 	char szHostName[10000];
 	gethostname( szHostName, 9999 );
-	hostent *p = gethostbyname( szHostName );
-	if ( !p || p->h_addrtype != AF_INET || p->h_length != 4 )
+	addrinfo hints = {};
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_DGRAM;
+	addrinfo *pInfo = 0;
+	if ( getaddrinfo( szHostName, 0, &hints, &pInfo ) != 0 || pInfo == 0 )
 		return false;
-	for ( int k = 0; k < N_MAX_HOST_HOMES; ++k )
+	int k = 0;
+	for ( addrinfo *p = pInfo; p != 0 && k < N_MAX_HOST_HOMES; p = p->ai_next )
 	{
-		if ( !p->h_addr_list[k] )
-			break;
-		pRes->ips[k] = *(int*)p->h_addr_list[k];
+		if ( p->ai_family == AF_INET && p->ai_addrlen >= sizeof(sockaddr_in) )
+			pRes->ips[k++] = reinterpret_cast<sockaddr_in*>( p->ai_addr )->sin_addr.S_un.S_addr;
 	}
+	freeaddrinfo( pInfo );
 	return true;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

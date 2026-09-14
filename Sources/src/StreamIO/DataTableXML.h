@@ -1,55 +1,28 @@
 #ifndef __DATATABLEXML_H__
 #define __DATATABLEXML_H__
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma ONCE
+#pragma once
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#import "msxml.dll"
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-using namespace MSXML;
+#include <pugixml.hpp>
+#include <string>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CDataTableXML : public IDataTable
 {
 	OBJECT_MINIMAL_METHODS( CDataTableXML );
 	//
 	CPtr<IDataStream> pStream;						// stream, this table was open with
-	IXMLDOMDocumentPtr xmlDocument;				// открытый документ
-	IXMLDOMNodePtr xmlRootNode;						// root node
-	//
+	pugi::xml_document xmlDocument;			// открытый документ
+	pugi::xml_node xmlRootNode;				// root node
 	bool bModified;
-	// получить текстовый node по имени. Это либо атрибут текущего node, либо single node из текущего.
-	IXMLDOMNodePtr GetTextNode( const char *pszRow, const char *pszEntry )
-	{
-		IXMLDOMNodePtr xmlCurrNode = xmlRootNode->selectSingleNode( pszRow );
-		if ( xmlCurrNode == 0 )
-			return 0;
-		IXMLDOMNodePtr xmlNode = xmlCurrNode->attributes->getNamedItem( pszEntry );
-		if ( xmlNode == 0 )
-			xmlNode = xmlCurrNode->selectSingleNode( pszEntry );
-		return xmlNode;
-	}
 	//
 	inline void SetModified() { bModified = true; }
+	bool SaveDocument();
+	bool GetValue( const std::string &szName, std::string *pValue ) const;
+	pugi::xml_node FindNode( const std::string &szPath ) const;
+	pugi::xml_node EnsureNode( const std::string &szPath );
+	void SetValue( const char *pszRow, const char *pszEntry, const char *pszValue );
 	//
-	template <class TYPE>
-		inline void SetValue( const char *pszRow, const char *pszEntry, const TYPE &val )
-	{
-		if ( IXMLDOMElementPtr pElement = xmlRootNode->selectSingleNode( pszRow ) )
-			pElement->setAttribute( pszEntry, val );
-		else
-		{
-			IXMLDOMElementPtr pElement = xmlDocument->createElement( pszRow );
-			xmlRootNode->appendChild( pElement );
-			pElement->setAttribute( pszEntry, val );
-		}
-	}
-	//
-	IXMLDOMNodePtr GetNode( const std::string &szName );
-	const std::string MakeName( const char *pszRow, const char *pszEntry )
-	{
-		std::string szName = std::string( pszRow ) + "." + std::string( pszEntry );
-		std::replace_if( szName.begin(), szName.end(), std::bind2nd( std::equal_to<char>(), '.' ), '/' );
-		return szName;
-	}
+	std::string MakeName( const char *pszRow, const char *pszEntry ) const;
 public:
 	CDataTableXML();
 	virtual ~CDataTableXML();
@@ -60,7 +33,7 @@ public:
 	// получить имена колонок таблицы в данной строке. каждое имя заканчивается на '\0', с строка в целом на '\0\0'
 	virtual int STDCALL GetEntryNames( const char *pszRow, char *pszBuffer, int nBufferSize );
 	// очистка секции
-	virtual void STDCALL ClearRow( const char *pszRowName ) {  }
+	virtual void STDCALL ClearRow( const char *pszRowName );
 	// complete element access
 	// get
 	virtual int STDCALL GetInt( const char *pszRow, const char *pszEntry, int defval );

@@ -347,7 +347,7 @@ float SConsts::HP_PERCENT_TO_ESCAPE_FROM_BUILDING = 0.1f;
 
 int SConsts::SHOW_ALL_TIME_COEFF = 5;
 
-std::hash_map<int, SConsts::SRevealInfo> SConsts::REVEAL_INFO;
+std::unordered_map<int, SConsts::SRevealInfo> SConsts::REVEAL_INFO;
 
 float SConsts::REINFORCEMENT_GROUP_DISTANCE = 900.0f;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

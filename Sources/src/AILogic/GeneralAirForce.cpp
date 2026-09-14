@@ -396,7 +396,7 @@ void CGeneralAirForce::LaunchScoutFree( const int nPlayer )
 		}
 	}
 	SGeneralHelper::SRandomFunctor pr;
-	std::random_shuffle( points.begin(), points.end(), pr );
+	NAlgorithms::LegacyRandomShuffle( points.begin(), points.end(), pr );
 
 	const CVec2 vAppearPoint( theUnitCreation.GetRandomAppearPoint( nPlayer ) );
 	const float fFlyHeight( theUnitCreation.GetPlaneFlyHeight( nPlayer, SUCAviation::AT_SCOUT ) );

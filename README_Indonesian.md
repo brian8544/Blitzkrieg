@@ -17,37 +17,29 @@ Silakan baca dengan cermat syarat-syarat [perjanjian lisensi](LICENSE.md) sebelu
 
 # Persiapan
 
-Semua pustaka dari direktori SDK dibutuhkan untuk kompilasi. Jalurnya harus dimasukkan pada **Tools => Options => Directories** dengan urutan berikut:
+Persyaratan:
 
-## Include
-```
-C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\STLPORT
-C:\SDK\BINK (tidak termasuk dalam repositori)
-C:\SDK\FMOD\API\INC (tidak termasuk dalam repositori)
-C:\SDK\S3TC
-C:\SDK\STINGRAY STUDIO 2002\INCLUDE\TOOLKIT (tidak termasuk dalam repositori)
-C:\SDK\STINGRAY STUDIO 2002\INCLUDE (tidak termasuk dalam repositori)
-C:\SDK\STINGRAY STUDIO 2002\REGEX\INCLUDE (tidak termasuk dalam repositori)
-C:\SDK\Maya4.0\include
-```
+- Windows 10 atau 11.
+- CMake 4.2 atau lebih baru.
+- Visual Studio 2026 dengan workload **Desktop development with C++** dan Windows SDK.
+- Git dan [vcpkg](https://github.com/microsoft/vcpkg). Atur `VCPKG_ROOT` ke direktori vcpkg.
+- FMOD Engine 2.01.x untuk Windows. FMOD memiliki lisensi terpisah dan tidak disertakan dalam repositori ini.
 
-## Lib
-```
-C:\SDK\BINK (tidak termasuk dalam repositori)
-C:\SDK\FMOD\API\LIB (tidak termasuk dalam repositori)
-C:\SDK\S3TC
-C:\SDK\STINGRAY STUDIO 2002\LIB (tidak termasuk dalam repositori)
-C:\SDK\STINGRAY STUDIO 2002\REGEX\LIB (tidak termasuk dalam repositori)
-C:\SDK\Maya4.0\lib
+Sumber kompatibilitas Direct3D disertakan di `Sources/sdk`. Letakkan FMOD SDK dengan susunan direktori tanpa spasi berikut:
+
+```text
+Sources/sdk/FMOD/Include/fmod.hpp
+Sources/sdk/FMOD/lib/x86/fmod_vc.lib
+Sources/sdk/FMOD/lib/x86/fmod.dll
 ```
 
-Selain itu, dibutuhkan **DirectX 8.1** atau lebih tinggi (akan otomatis ditambahkan pada path).
+Jalankan `build.bat`. Manifest vcpkg akan memasang FFmpeg, libpng, libsquish, pugixml, dan zlib secara otomatis. SDK `Sources/src/GameSpy` yang disertakan dibangun dari sumber; GameSpy tidak perlu diunduh terpisah. Bink, STLPort, Stingray, dan SDK DirectX 8 lama tidak diperlukan untuk target game saat ini.
 
-### Catatan Penting
+Executable Release dibuat di `build/bin/Release`. Untuk memakai data dari instalasi game retail:
 
-- Library **Bink, FMOD, Stingray** tidak termasuk dalam repositori ini karena memerlukan lisensi terpisah.
-- **stlport** *harus* berada di direktori Visual C, berdampingan dengan `include`.
-- Path `C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\STLPORT` harus berada **paling atas**, jika tidak, proses build akan gagal.
+```bat
+build\bin\Release\Game.exe -datadir "C:\path\to\Blitzkrieg"
+```
 
 ---
 

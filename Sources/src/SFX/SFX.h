@@ -103,6 +103,10 @@ interface ISFX : public IRefCount
 	virtual bool STDCALL IsStreamPlaying() const =0;
 	virtual void STDCALL SetStreamVolume( const float fVolume ) = 0;
 	virtual float STDCALL GetStreamVolume() const = 0;
+	virtual bool STDCALL BeginMovieAudio( int nSampleRate, int nChannels ) = 0;
+	virtual void STDCALL SubmitMovieAudio( const float *pInterleavedSamples, unsigned int nFrames ) = 0;
+	virtual void STDCALL PauseMovieAudio( bool bPause ) = 0;
+	virtual void STDCALL EndMovieAudio() = 0;
 	//
 	// sample sounds
 	virtual int STDCALL PlaySample( ISound *pSound, bool bLooped = false, unsigned int nStartPos = 0 ) = 0;

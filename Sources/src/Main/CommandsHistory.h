@@ -5,7 +5,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "CommandsHistoryInterface.h"
 
-#include "..\zlib\zlib.h"
+#include <zlib.h>
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 interface IAILogicCommand;
 interface IRandomGenSeed;
@@ -16,7 +16,7 @@ class CCommandsHistory : public ICommandsHistory
 	OBJECT_COMPLETE_METHODS( CCommandsHistory );
 	DECLARE_SERIALIZE;
 
-	typedef std::hash_map<int, std::list< CPtr<IAILogicCommand> > > CHistory;
+	typedef std::unordered_map<int, std::list< CPtr<IAILogicCommand> > > CHistory;
 	CHistory savingHistory;
 	CHistory loadedHistory;
 

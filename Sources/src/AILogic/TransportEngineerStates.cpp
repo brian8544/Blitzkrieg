@@ -320,7 +320,7 @@ void CTransportResupplyHumanResourcesState::FindNotCompleteSquads( std::list< CP
 			}
 		}
 	}
-	std::unique( pSquads->begin(), pSquads->end() );
+	pSquads->erase( std::unique( pSquads->begin(), pSquads->end() ), pSquads->end() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ETryStateInterruptResult CTransportResupplyHumanResourcesState::TryInterruptState( class CAICommand *pCommand )

@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma ONCE
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include <imagehlp.h>
+#include <dbghelp.h>
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // dialog notification function retcodes
 enum EBSUReport
@@ -96,35 +96,25 @@ LPCTSTR STDCALL GetRegisterString( EXCEPTION_POINTERS *pExPtrs );
 // get source filename and line number at the requested depth
 bool STDCALL GetSourceLine( DWORD pointer, const char* &pszFileName, int &nLineNumber );
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// STLport debug message system
-#if defined( __STL_DEBUG_MESSAGE )
-extern void __stl_debug_message( const char *pszFormat, ... );
-#endif //  defined( __STL_DEBUG_MESSAGE )
-#if defined( __STL_DEBUG_TERMINATE )
-extern void __stl_debug_terminate();
-#endif // defined( __STL_DEBUG_TERMINATE )
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define DEBUG_BREAK { _asm { int 3 } }
-// macros for retrieving 5 callstack addresses for further use with 'GetSourceLine()' function
-// here we are using macro due to we need an 'clear' callstack, which is not corrupted by 'inline' function call
-#define GET_CALLSTACK_ADDRS( addresses, depth )							\
-{																														\
-	if ( IsBadWritePtr(addresses, depth*sizeof(DWORD)) == 0 )	\
-	{																													\
-		int *pBuf;																							\
-		_asm { mov pBuf, ebp }																	\
-		memset( addresses, 0, depth*sizeof(DWORD) );						\
-		for ( int i=0; i<depth; ++i )														\
-		{																												\
-			if ( IsBadReadPtr( pBuf, 8 ) )												\
-				break;																							\
-			addresses[i] = pBuf[1];																\
-			pBuf = (int*)pBuf[0];																	\
-		}																												\
-	}																													\
-	else																											\
-		DEBUG_BREAK;																						\
+#if defined(_MSC_VER)
+#define DEBUG_BREAK __debugbreak()
+#else
+#define DEBUG_BREAK DebugBreak()
+#endif
+
+inline void CaptureCallstackAddresses( DWORD *pAddresses, int depth )
+{
+	if ( !pAddresses || depth <= 0 )
+		return;
+	memset( pAddresses, 0, static_cast<size_t>(depth) * sizeof(DWORD) );
+	void *frames[64] = {};
+	const USHORT requested = static_cast<USHORT>( depth < 64 ? depth : 64 );
+	const USHORT captured = CaptureStackBackTrace( 0, requested, frames, nullptr );
+	for ( USHORT i = 0; i < captured; ++i )
+		pAddresses[i] = static_cast<DWORD>( reinterpret_cast<ULONG_PTR>(frames[i]) );
 }
+
+#define GET_CALLSTACK_ADDRS( addresses, depth ) CaptureCallstackAddresses( (addresses), (depth) )
 // ASSERT macros.
 // For showing calling stack when errors occur in major functions.
 // Meant to be enabled in release builds.

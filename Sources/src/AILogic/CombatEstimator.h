@@ -20,7 +20,7 @@ class CCombatEstimator
 			:time( time ), fDamage( fDamage ) { }
 	};
 
-	typedef std::hash_set<int> CRegisteredUnits;
+	typedef std::unordered_set<int> CRegisteredUnits;
 	CRegisteredUnits registeredMechUnits;			// вражескте юниты (не пехота)с ненулевой текущей скоростью
 	CRegisteredUnits registeredInfantry;			// вражескте юниты (пехота)с ненулевой текущей скоростью
 

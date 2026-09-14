@@ -274,7 +274,7 @@ class CWorldClient : public CWorldBase
 		USER_ACTION pfnAction;
 		DWORD flags;
 	};
-	typedef std::hash_map<int, SActionDesc> CActionsMap;
+	typedef std::unordered_map<int, SActionDesc> CActionsMap;
 	CActionsMap userActions;							// user action functions
 	//
 	typedef std::list<STerrainSelectionPoint> CTerrainPointsList;

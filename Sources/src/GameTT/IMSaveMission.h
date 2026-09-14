@@ -15,7 +15,7 @@ class CInterfaceIMSaveMission : public CInterfaceBaseList
 	// disable explicit destruction
 	virtual ~CInterfaceIMSaveMission();
 	
-	std::hash_map<int/*nUserData*/, std::string/*file name*/ > szSaves;
+	std::unordered_map<int/*nUserData*/, std::string/*file name*/ > szSaves;
 
 	void OnSelectionChanged();
 	void Save();

@@ -9,12 +9,9 @@
 namespace NFastSinCos
 {
 	// Copied from NVidia web site
-	inline void FloatToInt( int *int_pointer, const float f ) 
+	inline void FloatToInt( int *int_pointer, const float f )
 	{
-		__asm  fld  f
-		__asm  mov  edx,int_pointer
-		__asm  FRNDINT
-		__asm  fistp dword ptr [edx];
+		*int_pointer = static_cast<int>( std::lrintf( f ) );
 	}
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

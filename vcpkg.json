@@ -1,0 +1,18 @@
+{
+  "dependencies": [
+    {
+      "name": "ffmpeg",
+      "default-features": false,
+      "features": [
+        "avcodec",
+        "avformat",
+        "swresample",
+        "swscale"
+      ]
+    },
+    "libpng",
+    "libsquish",
+    "zlib",
+    "pugixml"
+  ]
+}

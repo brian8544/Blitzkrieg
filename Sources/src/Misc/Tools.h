@@ -6,6 +6,29 @@
 #endif // _MSC_VER > 1000
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include <math.h>
+#include <algorithm>
+#include <cstdlib>
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+namespace NAlgorithms
+{
+template <class TRandomIterator, class TRandom>
+inline void LegacyRandomShuffle( TRandomIterator first, TRandomIterator last, TRandom random )
+{
+	if ( first == last )
+		return;
+	for ( TRandomIterator it = first + 1; it != last; ++it )
+		std::iter_swap( it, first + random((it - first) + 1) );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class TRandomIterator>
+inline void LegacyRandomShuffle( TRandomIterator first, TRandomIterator last )
+{
+	if ( first == last )
+		return;
+	for ( TRandomIterator it = first + 1; it != last; ++it )
+		std::iter_swap( it, first + std::rand() % ((it - first) + 1) );
+}
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // square root of the 2 and 3
 #define SQRT_2		1.41421356237309504880
@@ -684,10 +707,12 @@ inline float fabs2( const float x )
 {
 	return x*x;
 }
+#if _MSC_VER < 1900
 inline float fabs( float x )
 {
 	return fabsf( x );
 }
+#endif
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <class TYPE> 
 inline bool Normalize( TYPE &x, TYPE &y )
@@ -752,10 +777,12 @@ inline void GetLineEq( const float x1, const float y1, const float x2, const flo
 	*pC = tc * rcsq;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#if _MSC_VER < 1900
 inline float cos( float fVal ) { return static_cast<float>( cos( double(fVal) ) ); }
 inline float sin( float fVal ) { return static_cast<float>( sin( double(fVal) ) ); }
 inline float acos( float fVal ) { return static_cast<float>( acos( double(fVal) ) ); }
 inline float asin( float fVal ) { return static_cast<float>( asin( double(fVal) ) ); }
+#endif
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define MINIMIZE_INT( nToMin, nHow )  \
 	_asm mov ecx, nToMin                \

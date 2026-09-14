@@ -237,7 +237,6 @@ bool STDCALL NMain::IsInitialized()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool STDCALL NMain::Finalize()
 {
-	GetSingleton<ISFX>()->Done();
 	GetSingleton<ITransceiver>()->Done();
 
 	UnloadAllModules();

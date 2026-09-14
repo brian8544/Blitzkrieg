@@ -529,7 +529,7 @@ void ProcessCommandLine( LPSTR lpCmdLine, SCmdParams *pCmdParams )
 	pCmdParams->nAutoSavePeriod = 0;
 	pCmdParams->eTextureQuality = ITextureManager::TEXTURE_QUALITY_HIGH;
 	pCmdParams->szMapName = "";
-	pCmdParams->szModName.c_str();
+	pCmdParams->szModName = "";
 	//
 	std::vector<std::string> szParams;
 	NStr::SplitStringWithMultipleBrackets( lpCmdLine, szParams, ' ' );
@@ -629,9 +629,24 @@ void ProcessCommandLine( LPSTR lpCmdLine, SCmdParams *pCmdParams )
 		}
 
 //#endif // _FINALRELEASE
-		else if ( szParams[i].compare( 0, 8, "-datadir") == 0 )
+		else if ( szParams[i] == "-datadir" )
 		{
-			std::string szDataDir = szParams[i].c_str() + 8;
+			// Modern command-line form: -datadir "C:\path with spaces"
+			// The original parser only supported the value glued directly to -datadir.
+			if ( i + 1 < szParams.size() )
+			{
+				std::string szDataDir = szParams[++i];
+				NStr::TrimBoth( szDataDir, '"' );
+				SetGlobalVar( "DataDir", szDataDir.c_str() );
+			}
+		}
+		else if ( szParams[i].compare( 0, 8, "-datadir" ) == 0 )
+		{
+			// Legacy forms: -datadirC:\path, -datadir=C:\path,
+			// or -datadir"C:\path with spaces".
+			std::string szDataDir = realStr.substr( 8 );
+			if ( !szDataDir.empty() && szDataDir[0] == '=' )
+				szDataDir.erase( 0, 1 );
 			NStr::TrimBoth( szDataDir, '"' );
 			SetGlobalVar( "DataDir", szDataDir.c_str() );
 		}

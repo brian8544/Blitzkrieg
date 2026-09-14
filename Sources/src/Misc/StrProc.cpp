@@ -1,15 +1,16 @@
 #include "StdAfx.h"
+#include <cctype>
 
 #include "StrProc.h"
 
-#include <hash_map>
+#include <unordered_map>
 #include <stack>
 #include <math.h>
 #include <stdlib.h>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 namespace NStr
 {
-	static std::hash_map<char, char> brackets;   // map with open bracket <=> close bracket respection
+	static std::unordered_map<char, char> brackets;   // map with open bracket <=> close bracket respection
 	static char cBracketTypes[8] = "({[\" ";     // all available brackets (open)
 	static const int NUM_BRACKET_TYPES = 4;      // number of available brackets
 	static int nCodePage = GetACP();
@@ -218,12 +219,13 @@ void NStr::ToDotString( std::string *pDst, int nVal, const char cSeparator )
   while ( nOrderVal > 1 )
   {
     int nVal1 = nVal / nOrderVal;
-		sprintf( buff2, "%d%c", nVal1, cSeparator );
-		strcat( buff, buff2 );
+		sprintf_s( buff2, "%d%c", nVal1, cSeparator );
+		strcat_s( buff, buff2 );
     nVal -= nVal1 * nOrderVal;
     nOrderVal /= 1000;
   }
-	strcat( buff, _itoa(nVal, buff2, 10) );
+	_itoa_s( nVal, buff2, sizeof(buff2), 10 );
+	strcat_s( buff, buff2 );
   *pDst = buff;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -234,7 +236,7 @@ const char* __cdecl NStr::Format( const char *pszFormat, ... )
   va_list va;
 	// 
   va_start( va, pszFormat );
-  vsprintf( buff, pszFormat, va );
+  vsprintf_s( buff, pszFormat, va );
   va_end( va );
 	//
 	return buff;
@@ -245,7 +247,7 @@ void __cdecl NStr::DebugTrace( const char *pszFormat, ... )
   va_list va;
 	// 
   va_start( va, pszFormat );
-  vsprintf( buff, pszFormat, va );
+  vsprintf_s( buff, pszFormat, va );
   va_end( va );
 	//
 	OutputDebugString( buff );
@@ -346,25 +348,25 @@ bool NStr::IsHexNumber( const std::string &szString )
 int NStr::ToInt( const char *pszString )
 {
 	int nNumber = 0;
-	sscanf( pszString, "%i", &nNumber );
+	sscanf_s( pszString, "%i", &nNumber );
 	return nNumber;
 }
 float NStr::ToFloat( const char *pszString )
 {
 	float fNumber = 0;
-	sscanf( pszString, "%f", &fNumber );
+	sscanf_s( pszString, "%f", &fNumber );
 	return fNumber;
 }
 double NStr::ToDouble( const char *pszString )
 {
 	double fNumber = 0;
-	sscanf( pszString, "%lf", &fNumber );
+	sscanf_s( pszString, "%lf", &fNumber );
 	return fNumber;
 }
 unsigned long NStr::ToULong( const char *pszString )
 {
 	unsigned long ulNumber = 0;
-	sscanf( pszString, "%ul", &ulNumber );
+	sscanf_s( pszString, "%lu", &ulNumber );
 	return ulNumber;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -413,10 +415,10 @@ inline int MSVCMustDie_tolower( int a ) { return tolower(a); }
 inline int MSVCMustDie_toupper( int a ) { return toupper(a); }
 void NStr::ToLower( std::string &szString ) 
 { 
-	std::transform( szString.begin(), szString.end(), szString.begin(), std::ptr_fun(MSVCMustDie_tolower) ); 
+	std::transform( szString.begin(), szString.end(), szString.begin(), []( unsigned char c ) { return static_cast<char>( std::tolower(c) ); } );
 }
 void NStr::ToUpper( std::string &szString ) 
 { 
-	std::transform( szString.begin(), szString.end(), szString.begin(), std::ptr_fun(MSVCMustDie_toupper) ); 
+	std::transform( szString.begin(), szString.end(), szString.begin(), []( unsigned char c ) { return static_cast<char>( std::toupper(c) ); } );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -151,11 +151,11 @@ class CPlaneShturmovikShootEstimator : public IShootEstimator
 	STargetInfo bestForGuns;
 	STargetInfo bestForBombs;
 	STargetInfo bestAviation;
-	typedef std::hash_set< int/*unique id of building*/ >  CBuildings;
+	typedef std::unordered_set< int/*unique id of building*/ >  CBuildings;
 	CBuildings buildings;
 	CPtr<CBuilding> pBestBuilding;
 
-	const float CPlaneShturmovikShootEstimator::CalcTimeToOpenFire( CAIUnit *pEnemy ) const;
+	const float CalcTimeToOpenFire( CAIUnit *pEnemy ) const;
 	void CollectTarget( CPlaneShturmovikShootEstimator::STargetInfo * pInfo, class CAIUnit *pTarget, const DWORD dwPossibleGuns );
 	const float CalcRating( CAIUnit *pEnemy, const DWORD dwPossibleGuns ) const;
 public:

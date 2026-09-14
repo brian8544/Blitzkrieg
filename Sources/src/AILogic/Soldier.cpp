@@ -684,7 +684,7 @@ const int CSoldier::GetNTurrets() const
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSoldier::GetShootAreas( SShootAreas *pShootAreas, int *pnAreas ) const
 {
-	std::construct( pShootAreas );
+	std::construct_at( pShootAreas );
 	
 	if ( IsFree() || IsInBuilding() && GetTurret( 0 ) != 0 || IsInEntrenchment() && IsInFirePlace() )
 		CAIUnit::GetShootAreas( pShootAreas, pnAreas );
@@ -1120,7 +1120,7 @@ void CSniper::Segment()
 		lastVisibilityCheck = curTime;
 		bVisible = false;
 		const float fMaxVisRadius = 30 * SConsts::TILE_SIZE;
-		std::hash_set<SVector, STilesHash> visitedTiles;
+		std::unordered_set<SVector, STilesHash> visitedTiles;
 
 		SSniperTrace sniperTracer( this );
 		const SVector curCenterTile( GetTile() );

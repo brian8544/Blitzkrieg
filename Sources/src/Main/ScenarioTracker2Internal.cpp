@@ -391,7 +391,7 @@ int ScriptErrorOut( struct lua_State *state )
 static int Sqrt( struct lua_State *pState )
 {
 	Script script( pState );
-	script.PushNumber(  sqrt( script.GetObject(1) ) );
+	script.PushNumber( sqrt( script.GetObject( 1 ).GetNumber() ) );
 	return 1;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -859,7 +859,7 @@ std::string CScenarioTracker2::GetBestPersonalName( const std::string &szRPGStat
 					std::list<SNameUsageStats> usages;
 					for ( std::vector<std::string>::const_iterator name = it->names.begin(); name != it->names.end(); ++name )
 					{
-						usages.push_back();
+						usages.emplace_back();
 						usages.back().szName = *name;
 						CNamesUsageMap::const_iterator posNameUsage = personalNamesUsage.find( *name );
 						if ( posNameUsage != personalNamesUsage.end() ) 

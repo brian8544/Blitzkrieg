@@ -211,7 +211,8 @@ bool CRandomGenSeed::RecFindFile( LPSTR pszFindedName, LPCSTR pszBaseMask, int n
 		{
 			if ( fileFind.GetLength() >= N_FROM_START + sizeof(rnd.randrsl) )
 			{
-				strcpy( pszFindedName, fileFind.GetFilePath().c_str() );
+				const std::string &path = fileFind.GetFilePath();
+				memcpy( pszFindedName, path.c_str(), path.size() + 1 );
 				return true;
 			}
 			( *pnTotFinded )--;
@@ -237,8 +238,8 @@ void CRandomGenSeed::FillRandRsl()
 		i += strlen( pDrive ) + 1;
 		if ( GetDriveType(pDrive) == DRIVE_FIXED || GetDriveType(pDrive) == DRIVE_REMOTE )
 		{
-			strcpy( pszMaskToFindFiles, pDrive );
-			strcat( pszMaskToFindFiles, "*.*" );
+			strcpy_s( pszMaskToFindFiles, pDrive );
+			strcat_s( pszMaskToFindFiles, "*.*" );
 			break;
 		}
 	}

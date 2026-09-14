@@ -13,8 +13,8 @@ class CAckManager
 	DECLARE_SERIALIZE;
 
 	typedef std::pair<CPtr<CAIUnit>, bool> CUnitBoredPresence;
-	typedef std::hash_map< int/*unit unique ID */, CUnitBoredPresence> CBoredPresence;
-	typedef std::hash_map<int, CBoredPresence> CAckTypeBoredPrecence;
+	typedef std::unordered_map< int/*unit unique ID */, CUnitBoredPresence> CBoredPresence;
+	typedef std::unordered_map<int, CBoredPresence> CAckTypeBoredPrecence;
 	CAckTypeBoredPrecence bored;
 
 	typedef std::vector<SAIAcknowledgment> CAcknowledgments;

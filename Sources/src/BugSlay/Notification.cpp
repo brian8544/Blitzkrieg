@@ -1,4 +1,5 @@
 #include "StdAfx.h"
+#include <cstring>
 static const char LOCAL_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "Notification.h"
@@ -43,10 +44,10 @@ public:
 			buff[0] = 0;
       for ( std::list<std::string>::const_iterator pos = szErrors.begin(); pos != szErrors.end(); ++pos )
 			{
-				strcat( buff, pos->c_str() );
-				strcat( buff, " <= " );
+				strcat_s( buff, pos->c_str() );
+				strcat_s( buff, " <= " );
 			}
-			strcat( buff, "WinMain" );
+			strcat_s( buff, "WinMain" );
       szErrorString = buff;
       bStringChanged = false;
     }
@@ -58,7 +59,7 @@ public:
     va_list va;
 	  // compose error string
     va_start( va, pszFormat );
-    vsprintf( buffer, pszFormat, va );
+    vsprintf_s( buffer, pszFormat, va );
     va_end( va );
     //
     szErrors.push_back( buffer );
@@ -129,19 +130,19 @@ int ShowReport( const char *pszString )
 	return nRetVal;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void ThrowExceptionHR( HRESULT dxrval, const char *pszFormat, ... ) throw ( ICommonException* )
+void ThrowExceptionHR( HRESULT dxrval, const char *pszFormat, ... )
 {
   char buffer[512], buff1[32];
   va_list va;
 	// compose error string
   va_start( va, pszFormat );
-  vsprintf( buffer, pszFormat, va );
+  vsprintf_s( buffer, pszFormat, va );
   va_end( va );
 	//
-	sprintf( buff1, "(0x%X) ", dxrval );
-	strcat( buffer, "\n" );
-	strcat( buffer, buff1 );
-	strcat( buffer, DXErrorToString(dxrval) );
+	sprintf_s( buff1, "(0x%X) ", dxrval );
+	strcat_s( buffer, "\n" );
+	strcat_s( buffer, buff1 );
+	strcat_s( buffer, DXErrorToString(dxrval) );
 	//
 	CCommonException* pException = new CCommonException( buffer, dxrval );
 	int nRetCode = ShowError( buffer );
@@ -153,13 +154,13 @@ void ThrowExceptionHR( HRESULT dxrval, const char *pszFormat, ... ) throw ( ICom
 	throw pException;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void ThrowException( const char *pszFormat, ... ) throw ( ICommonException* )
+void ThrowException( const char *pszFormat, ... )
 {
   char buffer[512];
   va_list va;
 	// compose error string
   va_start( va, pszFormat );
-  vsprintf( buffer, pszFormat, va );
+  vsprintf_s( buffer, pszFormat, va );
   va_end( va );
 	//
 	CCommonException* pException = new CCommonException( buffer );
@@ -172,13 +173,13 @@ void ThrowException( const char *pszFormat, ... ) throw ( ICommonException* )
 	throw pException;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void ThrowGuardException( const char *pszFormat, ... ) throw ( IGuardException* )
+void ThrowGuardException( const char *pszFormat, ... )
 {
   char buffer[512];
   va_list va;
 	// compose error string
   va_start( va, pszFormat );
-  vsprintf( buffer, pszFormat, va );
+  vsprintf_s( buffer, pszFormat, va );
   va_end( va );
 	//
 	CGuardException* pException = new CGuardException( buffer );
@@ -192,13 +193,13 @@ bool ReportErrorHR( HRESULT dxrval, const char *pszFormat, ... )
   va_list va;
 	// compose error string
   va_start( va, pszFormat );
-  vsprintf( buffer, pszFormat, va );
+  vsprintf_s( buffer, pszFormat, va );
   va_end( va );
 	//
-	sprintf( buff1, "(0x%X) ", dxrval );
-	strcat( buffer, "\n" );
-	strcat( buffer, buff1 );
-	strcat( buffer, DXErrorToString(dxrval) );
+	sprintf_s( buff1, "(0x%X) ", dxrval );
+	strcat_s( buffer, "\n" );
+	strcat_s( buffer, buff1 );
+	strcat_s( buffer, DXErrorToString(dxrval) );
 	//
 	int nRetCode = ShowError( buffer );
 	if ( nRetCode == IDRETRY )
@@ -214,7 +215,7 @@ bool ReportError( const char *pszFormat, ... )
   va_list va;
 	// compose error string
   va_start( va, pszFormat );
-  vsprintf( buffer, pszFormat, va );
+  vsprintf_s( buffer, pszFormat, va );
   va_end( va );
 	//
 	int nRetCode = ShowError( buffer );
@@ -233,13 +234,13 @@ bool ReportWarningHR( HRESULT dxrval, const char *pszFormat, ... )
   va_list va;
 	// compose error string
   va_start( va, pszFormat );
-  vsprintf( buffer, pszFormat, va );
+  vsprintf_s( buffer, pszFormat, va );
   va_end( va );
 	//
-	sprintf( buff1, "(0x%X) ", dxrval );
-	strcat( buffer, "\n" );
-	strcat( buffer, buff1 );
-	strcat( buffer, DXErrorToString(dxrval) );
+	sprintf_s( buff1, "(0x%X) ", dxrval );
+	strcat_s( buffer, "\n" );
+	strcat_s( buffer, buff1 );
+	strcat_s( buffer, DXErrorToString(dxrval) );
 	//
 	ShowWarning( buffer );
 
@@ -251,7 +252,7 @@ bool ReportWarning( const char *pszFormat, ... )
   va_list va;
 	// compose error string
   va_start( va, pszFormat );
-  vsprintf( buffer, pszFormat, va );
+  vsprintf_s( buffer, pszFormat, va );
   va_end( va );
 	//
 	ShowWarning( buffer );
@@ -266,13 +267,13 @@ bool ReportInfoHR( HRESULT dxrval, const char *pszFormat, ... )
   va_list va;
 	// compose error string
   va_start( va, pszFormat );
-  vsprintf( buffer, pszFormat, va );
+  vsprintf_s( buffer, pszFormat, va );
   va_end( va );
 	//
-	sprintf( buff1, "(0x%X) ", dxrval );
-	strcat( buffer, "\n" );
-	strcat( buffer, buff1 );
-	strcat( buffer, DXErrorToString(dxrval) );
+	sprintf_s( buff1, "(0x%X) ", dxrval );
+	strcat_s( buffer, "\n" );
+	strcat_s( buffer, buff1 );
+	strcat_s( buffer, DXErrorToString(dxrval) );
 	//
 	ShowReport( buffer );
 
@@ -284,7 +285,7 @@ bool ReportInfo( const char *pszFormat, ... )
   va_list va;
 	// compose error string
   va_start( va, pszFormat );
-  vsprintf( buffer, pszFormat, va );
+  vsprintf_s( buffer, pszFormat, va );
   va_end( va );
 	//
 	ShowReport( buffer );
@@ -295,53 +296,24 @@ bool ReportInfo( const char *pszFormat, ... )
 // converts DirectX error code to the string
 const char* DXErrorToString( HRESULT hErrorCode )
 {
-	switch( hErrorCode )
+	static thread_local char message[512] = {};
+	message[0] = '\0';
+	const DWORD length = FormatMessageA(
+		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		nullptr,
+		static_cast<DWORD>( hErrorCode ),
+		0,
+		message,
+		static_cast<DWORD>( sizeof(message) ),
+		nullptr );
+	if ( length == 0 )
+		return "Unrecognized HRESULT.";
+	while ( message[0] != '\0' )
 	{
-		case D3D_OK:
-		  return "No error occurred.";
-		case D3DERR_CONFLICTINGRENDERSTATE:
-		  return "The currently set render states cannot be used together.";
-		case D3DERR_CONFLICTINGTEXTUREFILTER:
-		  return "The current texture filters cannot be used together.";
-		case D3DERR_CONFLICTINGTEXTUREPALETTE: 
-		  return "The current textures cannot be used simultaneously.\nThis generally occurs when a multitexture device requires that all palletized textures simultaneously enabled also share the same palette.";
-		case D3DERR_DEVICELOST:
-		  return "The device is lost and cannot be restored at the current time, so rendering is not possible.";
-		case D3DERR_DEVICENOTRESET:
-		  return "The device cannot be reset.";
-		case D3DERR_DRIVERINTERNALERROR:
-		  return "Internal driver error.";
-		case D3DERR_INVALIDCALL:
-		  return "The method call is invalid. For example, a method's parameter may have an invalid value.";
-		case D3DERR_INVALIDDEVICE:
-		  return "The requested device type is not valid.";
-		case D3DERR_MOREDATA:
-		  return "There is more data available than the specified buffer size can hold.";
-		case D3DERR_NOTAVAILABLE:
-		  return "The queried technique is not supported by this device.";
-		case D3DERR_NOTFOUND:
-		  return "The requested item was not found.";
-		case D3DERR_OUTOFVIDEOMEMORY:
-		  return "Direct3D does not have enough display memory to perform the operation.";
-		case D3DERR_TOOMANYOPERATIONS: 
-		  return "The application is requesting more texture-filtering operations than the device supports.";
-		case D3DERR_UNSUPPORTEDALPHAARG:
-		  return "The device does not support a specified texture-blending arguments for the alpha channel.";
-		case D3DERR_UNSUPPORTEDALPHAOPERATION:
-		  return "The device does not support a specified texture-blending operations for the alpha channel.";
-		case D3DERR_UNSUPPORTEDCOLORARG:
-		  return "The device does not support a specified texture-blending arguments for color values.";
-		case D3DERR_UNSUPPORTEDCOLOROPERATION:
-		  return "The device does not support a specified texture-blending operations for color values.";
-		case D3DERR_UNSUPPORTEDFACTORVALUE:
-		  return "The specified texture factor value is not supported by the device.";
-		case D3DERR_UNSUPPORTEDTEXTUREFILTER: 
-		  return "The specified texture filter is not supported by the device.";
-		case D3DERR_WRONGTEXTUREFORMAT:
-		  return "The pixel format of the texture surface is not valid.";
-  	default:
-     	return "Unrecognized error value.";
-  }
- 	return "Unrecognized error value.";
+		const std::size_t n = std::strlen( message );
+		if ( n == 0 || (message[n - 1] != '\r' && message[n - 1] != '\n') )
+			break;
+		message[n - 1] = '\0';
+	}
+	return message;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

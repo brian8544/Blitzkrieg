@@ -2,7 +2,7 @@
 
 #include "ZipFile.h"
 
-#include "..\zlib\zlib.h"
+#include <zlib.h>
 #include "StreamAdaptor.h"
 #include "MemFileSystem.h"
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,7 +174,7 @@ bool CZipFile::Init( IDataStream *pZipStream )
 		{
 			pfh += sizeof( fh );
 			// Convert UNIX slashes to DOS backlashes.
-			std::replace_if( pfh, pfh + fh.wFileNameLen, std::bind2nd( std::equal_to<char>(), '/' ), '\\' );
+			std::replace( pfh, pfh + fh.wFileNameLen, '/', '\\' );
 			// Skip name, extra and comment fields.
 			pfh += fh.wFileNameLen + fh.wExtraLen + fh.wCommentLen;
 		}
@@ -238,6 +238,7 @@ bool CZipFile::ReadFile( IDataStream *pStream, int nIndex, void *pBuf )
 {
 	NI_ASSERT_SLOW_TF( (nIndex >= 0) && (nIndex < m_nEntries), NStr::Format("index %d out of range", nIndex), return false );
 	NI_ASSERT_SLOW_TF( pBuf != 0, "NULL pointer to uncompress file", return false );
+	const SZipFileHeader &fileHeader = *m_papDir[nIndex];
 
 	// Quick'n dirty read, the whole file at once.
 	// Ungood if the ZIP has huge files inside
@@ -253,32 +254,33 @@ bool CZipFile::ReadFile( IDataStream *pStream, int nIndex, void *pBuf )
 	pStream->Seek( hdr.wFileNameLen + hdr.wExtraLen, STREAM_SEEK_CUR );
 
 	// in the STORE case, just simply read in raw stored data
-	if ( hdr.wCompression == SZipLocalFileHeader::COMP_STORE ) 
-		return pStream->Read( pBuf, hdr.dwCSize ) == hdr.dwCSize;
+	if ( fileHeader.wCompression == SZipLocalFileHeader::COMP_STORE )
+		return pStream->Read( pBuf, fileHeader.dwCSize ) == static_cast<int>( fileHeader.dwCSize );
 	// process DEFLAT unpacking
-	NI_ASSERT_TF( hdr.wCompression == SZipLocalFileHeader::COMP_DEFLAT, "Can support STORE and DEFLAT now", return false );
+	NI_ASSERT_TF( fileHeader.wCompression == SZipLocalFileHeader::COMP_DEFLAT, "Can support STORE and DEFLAT now", return false );
 
 	// Alloc compressed data buffer and read the whole stream
-	char *pcData = new char[hdr.dwCSize];
-	pStream->Read( pcData, hdr.dwCSize );
+	char *pcData = new char[fileHeader.dwCSize];
+	if ( pStream->Read( pcData, fileHeader.dwCSize ) != static_cast<int>( fileHeader.dwCSize ) )
+	{
+		delete []pcData;
+		return false;
+	}
 
 	// Setup the inflate stream.
-	z_stream stream;
+	z_stream stream = {};
 	stream.next_in = (Bytef*)pcData;
-	stream.avail_in = (uInt)hdr.dwCSize;
+	stream.avail_in = (uInt)fileHeader.dwCSize;
 	stream.next_out = (Bytef*)pBuf;
-	stream.avail_out = hdr.dwUSize;
-	stream.zalloc = (alloc_func)0;
-	stream.zfree = (free_func)0;
+	stream.avail_out = fileHeader.dwUSize;
 
 	// Perform inflation. wbits < 0 indicates no zlib header inside the data.
 	int err = inflateInit2( &stream, -MAX_WBITS );
 	if ( err == Z_OK )
 	{
 		err = inflate( &stream, Z_FINISH );
-		inflateEnd( &stream );
 		// CRAP{ почему-то иногда при распаковке возвращается "buffer error" всесто "stream end"...
-		if ( (err == Z_STREAM_END) || (err == Z_BUF_ERROR) )
+		if ( (err == Z_STREAM_END) || ((err == Z_BUF_ERROR) && (stream.total_out == fileHeader.dwUSize)) )
 			err = Z_OK;
 		// CRAP}
 		inflateEnd( &stream );
@@ -292,6 +294,7 @@ bool CZipFile::ReadFile( IDataStream *pStream, int nIndex, void *pBuf )
 IDataStream* CZipFile::ReadFile( IDataStream *pStream, int nIndex )
 {
 	NI_ASSERT_SLOW_TF( (nIndex >= 0) && (nIndex < m_nEntries), NStr::Format("index %d out of range", nIndex), return false );
+	const SZipFileHeader &fileHeader = *m_papDir[nIndex];
 
 	// Quick'n dirty read, the whole file at once.
 	// Ungood if the ZIP has huge files inside
@@ -302,32 +305,31 @@ IDataStream* CZipFile::ReadFile( IDataStream *pStream, int nIndex )
 	SZipLocalFileHeader hdr;
 	pStream->Read( &hdr, sizeof(hdr) );
 	NI_ASSERT_TF( hdr.dwSignature == SZipLocalFileHeader::SIGNATURE, "can't recognize zip local header", return false );
-
 	// Skip extra fields
 	pStream->Seek( hdr.wFileNameLen + hdr.wExtraLen, STREAM_SEEK_CUR );
 
 	// in the STORE case, just simply read in raw stored data
-	if ( hdr.wCompression == SZipLocalFileHeader::COMP_STORE ) 
+	if ( fileHeader.wCompression == SZipLocalFileHeader::COMP_STORE )
 	{
 		std::string szName;
 		GetFileName( nIndex, &szName );
 		int nBeginPos = pStream->GetPos();
-		if ( nBeginPos + hdr.dwCSize > pStream->GetSize() )
+		if ( nBeginPos + fileHeader.dwCSize > static_cast<DWORD>( pStream->GetSize() ) )
 			return 0;
 		SStorageElementStats stats;
-		stats.nSize = hdr.dwUSize;
+		stats.nSize = fileHeader.dwUSize;
 		stats.pszName = 0;
 		stats.type = SET_STREAM;
 		stats.mtime = stats.atime = stats.ctime = GetModDateTime( nIndex );
-		return new CStreamRangeAdaptor( pStream, nBeginPos, nBeginPos + hdr.dwCSize, szName.c_str(), &stats );
+		return new CStreamRangeAdaptor( pStream, nBeginPos, nBeginPos + fileHeader.dwCSize, szName.c_str(), &stats );
 	}
 	// create new memory stream and setup stats
-	CMemFileStream *pDstStream = new CMemFileStream( hdr.dwUSize, 0 );
+	CMemFileStream *pDstStream = new CMemFileStream( fileHeader.dwUSize, 0 );
 	{
 		std::string szName;
 		GetFileName( nIndex, &szName );
 		SStorageElementStats stats;
-		stats.nSize = hdr.dwUSize;
+		stats.nSize = fileHeader.dwUSize;
 		stats.pszName = szName.c_str();
 		stats.type = SET_STREAM;
 		stats.mtime = stats.atime = stats.ctime = GetModDateTime( nIndex );
@@ -335,29 +337,32 @@ IDataStream* CZipFile::ReadFile( IDataStream *pStream, int nIndex )
 	}
 	void *pBuf = pDstStream->GetBuffer();
 	// proceed with DEFLAT unpacking
-	NI_ASSERT_TF( hdr.wCompression == SZipLocalFileHeader::COMP_DEFLAT, "Can support STORE and DEFLAT now", return false );
+	NI_ASSERT_TF( fileHeader.wCompression == SZipLocalFileHeader::COMP_DEFLAT, "Can support STORE and DEFLAT now", return false );
 
 	// Alloc compressed data buffer and read the whole stream
-	char *pcData = new char[hdr.dwCSize];
-	pStream->Read( pcData, hdr.dwCSize );
+	char *pcData = new char[fileHeader.dwCSize];
+	if ( pStream->Read( pcData, fileHeader.dwCSize ) != static_cast<int>( fileHeader.dwCSize ) )
+	{
+		delete []pcData;
+		pDstStream->AddRef();
+		pDstStream->Release();
+		return 0;
+	}
 
 	// Setup the inflate stream.
-	z_stream stream;
+	z_stream stream = {};
 	stream.next_in = (Bytef*)pcData;
-	stream.avail_in = (uInt)hdr.dwCSize;
+	stream.avail_in = (uInt)fileHeader.dwCSize;
 	stream.next_out = (Bytef*)pBuf;
-	stream.avail_out = hdr.dwUSize;
-	stream.zalloc = (alloc_func)0;
-	stream.zfree = (free_func)0;
+	stream.avail_out = fileHeader.dwUSize;
 
 	// Perform inflation. wbits < 0 indicates no zlib header inside the data.
 	int err = inflateInit2( &stream, -MAX_WBITS );
 	if ( err == Z_OK )
 	{
 		err = inflate( &stream, Z_FINISH );
-		inflateEnd( &stream );
 		// CRAP{ почему-то иногда при распаковке возвращается "buffer error" всесто "stream end"...
-		if ( (err == Z_STREAM_END) || (err == Z_BUF_ERROR) )
+		if ( (err == Z_STREAM_END) || ((err == Z_BUF_ERROR) && (stream.total_out == fileHeader.dwUSize)) )
 			err = Z_OK;
 		// CRAP}
 		inflateEnd( &stream );

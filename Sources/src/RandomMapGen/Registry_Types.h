@@ -30,7 +30,7 @@ class CRegistrySection
 			LONG result = LoadString( pszRegistryKey, &szBuffer, "" );
 			if ( ( result == ERROR_SUCCESS ) && ( !szBuffer.empty() ) )
 			{
-				if ( sscanf( szBuffer.c_str(), pszMask, pLoadValue ) < 1 )
+				if ( sscanf_s( szBuffer.c_str(), pszMask, pLoadValue ) < 1 )
 				{
 					( *pLoadValue ) = rDefaultValue;
 					result = ERROR_INVALID_DATA;
@@ -63,7 +63,7 @@ class CRegistrySection
 			LONG result = LoadString( pszRegistryKey, &szBuffer, "" );
 			if ( ( result == ERROR_SUCCESS ) && ( !szBuffer.empty() ) )
 			{
-				if ( sscanf( szBuffer.c_str(),
+				if ( sscanf_s( szBuffer.c_str(),
 										 NStr::Format( "%s %s %s %s", pszMask, pszMask, pszMask, pszMask ),
 										 &( pLoadValue->minx ),
 										 &( pLoadValue->miny ),

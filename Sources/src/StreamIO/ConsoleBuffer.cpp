@@ -110,7 +110,9 @@ bool CConsoleBuffer::DumpLog( int nStreamID )
 	bool bLogFileCreated = false;
 	if ( nStreamID != -1 )								// dump particular stream
 	{
-		FILE *file = szLogFileName.empty() ? 0 : fopen( szLogFileName.c_str(), "at" );
+		FILE *file = 0;
+		if ( !szLogFileName.empty() )
+			fopen_s( &file, szLogFileName.c_str(), "at" );
 		// check for empty log
 		CStringsList &stream = logs[nStreamID];
 		if ( stream.empty() )

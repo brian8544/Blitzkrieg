@@ -17,37 +17,29 @@
 
 # तैयारी
 
-संकलन (कंपाइल) के लिए SDK डायरेक्टरी की सभी लाइब्रेरीज़ जरूरी हैं। इनके पथ निम्नलिखित क्रम में **Tools => Options => Directories** में दर्ज करें:
+आवश्यकताएँ:
 
-## Include
-```
-C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\STLPORT
-C:\SDK\BINK (रिपॉज़िटरी में शामिल नहीं)
-C:\SDK\FMOD\API\INC (रिपॉज़िटरी में शामिल नहीं)
-C:\SDK\S3TC
-C:\SDK\STINGRAY STUDIO 2002\INCLUDE\TOOLKIT (रिपॉज़िटरी में शामिल नहीं)
-C:\SDK\STINGRAY STUDIO 2002\INCLUDE (रिपॉज़िटरी में शामिल नहीं)
-C:\SDK\STINGRAY STUDIO 2002\REGEX\INCLUDE (रिपॉज़िटरी में शामिल नहीं)
-C:\SDK\Maya4.0\include
-```
+- Windows 10 या 11।
+- CMake 4.2 या नया संस्करण।
+- Visual Studio 2026, जिसमें **Desktop development with C++** वर्कलोड और Windows SDK स्थापित हों।
+- Git और [vcpkg](https://github.com/microsoft/vcpkg)। `VCPKG_ROOT` को vcpkg फ़ोल्डर पर सेट करें।
+- Windows के लिए FMOD Engine 2.01.x। FMOD का लाइसेंस अलग है और यह रिपॉज़िटरी में शामिल नहीं है।
 
-## Lib
-```
-C:\SDK\BINK (रिपॉज़िटरी में शामिल नहीं)
-C:\SDK\FMOD\API\LIB (रिपॉज़िटरी में शामिल नहीं)
-C:\SDK\S3TC
-C:\SDK\STINGRAY STUDIO 2002\LIB (रिपॉज़िटरी में शामिल नहीं)
-C:\SDK\STINGRAY STUDIO 2002\REGEX\LIB (रिपॉज़िटरी में शामिल नहीं)
-C:\SDK\Maya4.0\lib
+Direct3D संगतता स्रोत `Sources/sdk` में शामिल हैं। FMOD SDK को बिना स्पेस वाले इस ढाँचे में रखें:
+
+```text
+Sources/sdk/FMOD/Include/fmod.hpp
+Sources/sdk/FMOD/lib/x86/fmod_vc.lib
+Sources/sdk/FMOD/lib/x86/fmod.dll
 ```
 
-इसके अलावा, **DirectX 8.1** या उससे ऊँचा वर्शन आवश्यक है (ये अपने आप पथों में जुड़ जाएगा)।
+`build.bat` चलाएँ। vcpkg manifest FFmpeg, libpng, libsquish, pugixml और zlib अपने आप स्थापित करता है। शामिल `Sources/src/GameSpy` SDK स्रोत से बनता है; GameSpy को अलग से डाउनलोड करने की आवश्यकता नहीं है। वर्तमान गेम लक्ष्य के लिए Bink, STLPort, Stingray और पुराना DirectX 8 SDK आवश्यक नहीं हैं।
 
-### महत्वपूर्ण नोट्स
+Release executable `build/bin/Release` में बनता है। स्थापित retail game data का उपयोग करने के लिए:
 
-- **Bink, FMOD, Stingray** लाइब्रेरीज़ इस रिपॉज़िटरी में शामिल नहीं हैं, क्योंकि इनको अलग लाइसेंसिंग की आवश्यकता होती है।
-- **stlport** *जरूरी* है कि Visual C डायरेक्टरी में `include` के साथ मौजूद हो।
-- `C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\STLPORT` पथ सबसे **ऊपर** होना चाहिए, अन्यथा बिल्ड असफल हो जाएगी।
+```bat
+build\bin\Release\Game.exe -datadir "C:\path\to\Blitzkrieg"
+```
 
 ---
 

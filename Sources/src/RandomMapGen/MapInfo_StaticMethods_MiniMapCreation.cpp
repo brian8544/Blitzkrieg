@@ -116,7 +116,7 @@ bool CMapInfo::CreateMiniMapImage( const SLoadMapInfo &rLoadMapInfo, const CRMIm
 		CImageAccessor layerImageAccessor = layers[SRMMiniMapCreateParameter::MML_TERRAIN];
 
 		//запоминаем сформированные цвета
-		std::hash_map<int, SColor> terrainColorsHashMap;
+		std::unordered_map<int, SColor> terrainColorsHashMap;
 		for ( int nYIndex = 0; nYIndex < rLoadMapInfo.terrain.tiles.GetSizeY(); ++nYIndex )
 		{
 			for ( int nXIndex = 0; nXIndex < rLoadMapInfo.terrain.tiles.GetSizeX(); ++nXIndex )
@@ -343,7 +343,7 @@ bool CMapInfo::CreateMiniMapImage( const SLoadMapInfo &rLoadMapInfo, const CRMIm
 	
 	//Forests && Buildings && Bridges
 	//Инвертрованный доступ по оси Y
-	std::hash_map<int, SMapObjectInfo> nLinkID2BridgesHashMap;
+	std::unordered_map<int, SMapObjectInfo> nLinkID2BridgesHashMap;
 	{
 		SSetColorFunctional forestSetColorFunctional( layers[SRMMiniMapCreateParameter::MML_FORESTS], createParameter.layers[SRMMiniMapCreateParameter::MML_FORESTS].color, imageRect );
 		SSetColorWithoutCheckPointFunctional buildingSetColorFunctional( layers[SRMMiniMapCreateParameter::MML_BUILDINGS], createParameter.layers[SRMMiniMapCreateParameter::MML_BUILDINGS].color, imageRect );

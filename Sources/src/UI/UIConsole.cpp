@@ -716,7 +716,8 @@ int Exec( struct lua_State *state )
 	szFileName += script.GetObject( 1 );
 //	IStream *pStream = OpenFileStream( szFileName, STREAM_ACCESS_READ );
 	
-	FILE *pFile = fopen( szFileName.c_str(), "r" );
+	FILE *pFile = 0;
+	 fopen_s( &pFile, szFileName.c_str(), "r" );
 	if ( !pFile )
 	{
 		szFileName = "Error opening file: " + szFileName;

@@ -183,7 +183,7 @@ class CUIMiniMap : public CSimpleWindow
 	std::list<SMiniMapCircle> circles;
 	
 	//список позиций, обозначаемых флажком
-	std::hash_map<std::string, STextureMarker> markersTypes;
+	std::unordered_map<std::string, STextureMarker> markersTypes;
 	std::list<SMiniMapMarker> markers;
 
 	bool isWarFogNeedUpdate;

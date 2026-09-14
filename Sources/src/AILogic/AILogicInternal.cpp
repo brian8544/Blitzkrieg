@@ -139,10 +139,10 @@ void CAILogic::LoadAvailableTrucks()
 		SRMContext context;
 		if ( LoadDataResource( pChapterStats->szContextName, "", false, 0, RMGC_CONTEXT_NAME, context ) )
 		{
-			std::hash_set<std::string> availiableUnits;
+			std::unordered_set<std::string> availiableUnits;
 			if ( context.GetAvailiableUnits( 0, RPG_TYPE_TRN_CARRIER, &availiableUnits ) > 0 )
 			{
-				for ( std::hash_set<std::string>::const_iterator unitIterator = availiableUnits.begin(); unitIterator != availiableUnits.end(); ++unitIterator )
+				for ( std::unordered_set<std::string>::const_iterator unitIterator = availiableUnits.begin(); unitIterator != availiableUnits.end(); ++unitIterator )
 				{
 					availableTrucks.insert( ( NGDB::GetRPGStats<SMechUnitRPGStats>( unitIterator->c_str() ) ) );
 				}
@@ -458,7 +458,7 @@ void CAILogic::InitLinks( LinkInfo &linksInfo )
 {
 	std::set<int> locomotives;
 	// вагон, который прицеплен к этому
-	std::hash_map<int, int> nextCarriages;
+	std::unordered_map<int, int> nextCarriages;
 	
 	for ( LinkInfo::iterator iter = linksInfo.begin(); iter != linksInfo.end(); ++iter )
 	{
@@ -666,7 +666,7 @@ void CAILogic::InitStartCommands()
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CAILogic::InitStartCommands( const LinkInfo &linksInfo, std::hash_map<int, int> &old2NewLinks )
+void CAILogic::InitStartCommands( const LinkInfo &linksInfo, std::unordered_map<int, int> &old2NewLinks )
 {
 	for ( SLoadMapInfo::TStartCommandsList::const_iterator iter = startCmds.begin(); iter != startCmds.end(); ++iter )
 	{
@@ -714,7 +714,7 @@ void CAILogic::InitReservePositions()
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CAILogic::InitReservePositions( std::hash_map<int, int> &old2NewLinks )
+void CAILogic::InitReservePositions( std::unordered_map<int, int> &old2NewLinks )
 {
 	for ( SLoadMapInfo::TReservePositionsList::const_iterator iter = reservePositions.begin(); iter != reservePositions.end(); ++iter )
 	{

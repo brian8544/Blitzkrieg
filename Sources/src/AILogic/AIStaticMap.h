@@ -33,7 +33,7 @@ class CStaticMap
 	// по номеру тайла terrain - его тип
 	std::vector<BYTE> terrSubTypes;
 
-	std::hash_map<int, SRect> unitsRects;
+	std::unordered_map<int, SRect> unitsRects;
 
 	// высоты по узлам визуальной сетки сетки
 	CArray2D<float> heights;

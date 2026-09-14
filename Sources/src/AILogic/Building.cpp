@@ -63,7 +63,7 @@ void CBuildingStorage::AddSoldier( CSoldier *pUnit )
 void CBuildingStorage::ChangePlayer( const int _nPlayer )
 {
 	const CVec2 vCenter = GetCenter();
-	const DWORD dwParam = int(vCenter.x) << 32 | int( vCenter.y);
+	const DWORD dwParam = MAKELONG( static_cast<WORD>( vCenter.x ), static_cast<WORD>( vCenter.y ) );
 
 	if ( EDI_ENEMY == theDipl.GetDiplStatus( _nPlayer, nPlayer ) )
 	{
@@ -1212,7 +1212,7 @@ void CBuilding::SetHitPoints( const float fNewHP )
 	}	
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CBuilding::DriveOut( CSoldier *pSoldier, std::hash_set<int> *pFormations )
+void CBuilding::DriveOut( CSoldier *pSoldier, std::unordered_set<int> *pFormations )
 {
 	CFormation *pFormation = pSoldier->GetFormation();
 	const int nFormationID = pSoldier->GetFormation()->GetID();
@@ -1244,7 +1244,7 @@ void CBuilding::TakeDamage( const float fDamage, const bool bFromExplosion, cons
 			bEscaped = GetHitPoints() <= GetEscapeHitPoints() && bShouldEscape;
 			if ( bEscaped )
 			{
-				std::hash_set<int> formations;
+				std::unordered_set<int> formations;
 				for ( int i = 0; i < fire.Size(); ++i )
 					DriveOut( fire[i], &formations );
 				for ( int i = 0; i < medical.Size(); ++i )

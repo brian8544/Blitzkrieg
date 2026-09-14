@@ -18,7 +18,7 @@ extern CDiplomacy theDipl;
 extern CUpdater updater;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // нумераци€ - по update, который может быть отложен, его пор€дковый номер
-std::hash_map< int, int > numeration;
+std::unordered_map< int, int > numeration;
 
 const int N_CELL_SIZE = 8;
 const int N_SUSPENDED_ACTIONS = 7;
@@ -204,9 +204,9 @@ void CSuspendedUpdates::GetRecalled( const EActionNotify &eAction, SSuspendedUpd
 	recalledUpdates[nNumeration].pop_back();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CSuspendedUpdates::UpdateVisibleTiles( const std::hash_set<SVector, STilesHash> &tilesSet, std::hash_set<SVector, STilesHash> *pCoverTiles )
+void CSuspendedUpdates::UpdateVisibleTiles( const std::unordered_set<SVector, STilesHash> &tilesSet, std::unordered_set<SVector, STilesHash> *pCoverTiles )
 {
-	for ( std::hash_set< SVector, STilesHash >::const_iterator visTilesIter = tilesSet.begin(); visTilesIter != visibleTiles.end(); ++visTilesIter )
+	for ( std::unordered_set< SVector, STilesHash >::const_iterator visTilesIter = tilesSet.begin(); visTilesIter != tilesSet.end(); ++visTilesIter )
 	{
 		const SVector tile = *visTilesIter;
 		const int nCellX = tile.x / N_CELL_SIZE;
@@ -241,7 +241,7 @@ void CSuspendedUpdates::UpdateVisibleTiles( const std::hash_set<SVector, STilesH
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSuspendedUpdates::Segment()
 {
-	std::hash_set<SVector, STilesHash> coveredTiles;
+	std::unordered_set<SVector, STilesHash> coveredTiles;
 	UpdateVisibleTiles( visibleTiles, &coveredTiles);
 	visibleTiles.clear();
 	UpdateVisibleTiles( coveredTiles, 0 );
@@ -263,7 +263,7 @@ void CSuspendedUpdates::Segment()
 void CSuspendedUpdates::DeleteObjectInfo( IUpdatableObj *pObj )
 {
 	// убрать объект из €чеек
-	for ( std::hash_set<SVector, STilesHash>::iterator tilesOfObjIter = tilesOfObj[pObj->GetUniqueId()].begin(); tilesOfObjIter != tilesOfObj[pObj->GetUniqueId()].end(); ++tilesOfObjIter )
+	for ( std::unordered_set<SVector, STilesHash>::iterator tilesOfObjIter = tilesOfObj[pObj->GetUniqueId()].begin(); tilesOfObjIter != tilesOfObj[pObj->GetUniqueId()].end(); ++tilesOfObjIter )
 		objectsByCells.RemoveFromPosition( pObj, *tilesOfObjIter );
 
 	// убрать все тайлы дл€ видимости объекта

@@ -9,10 +9,10 @@ class CGlobalVars : public IGlobalVars
 {
 	OBJECT_NORMAL_METHODS( CGlobalVars );
 	//
-	typedef std::hash_map<std::string, std::string> CValuesMap;
+	typedef std::unordered_map<std::string, std::string> CValuesMap;
 	CValuesMap values;
 	
-	typedef std::hash_map<std::string, std::wstring> CWValuesMap;
+	typedef std::unordered_map<std::string, std::wstring> CWValuesMap;
 	CWValuesMap wValues;
 public:
 	virtual const char* STDCALL GetVar( const char *pszValueName ) const

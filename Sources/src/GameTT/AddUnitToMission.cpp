@@ -222,7 +222,7 @@ bool CInterfaceAddUnitToMission::AddDefaultSlotsToST()
 	if ( !bRes )
 		return false;
 
-	typedef std::hash_map<int, int> CMissionAIClasses;
+	typedef std::unordered_map<int, int> CMissionAIClasses;
 	CMissionAIClasses missionAIClasses;
 	for ( int i=0; i<mapObjects.size(); i++ )
 	{
@@ -260,7 +260,7 @@ bool CInterfaceAddUnitToMission::AddDefaultSlotsToST()
 			}
 		}
 		
-		nNumTypes = min( nActiveType, nNumTypes );
+		nNumTypes = std::min( nActiveType, nNumTypes );
 		for ( int k=nActiveType; k<nNumTypes; k++ )
 		{
 			//добавим пустой item

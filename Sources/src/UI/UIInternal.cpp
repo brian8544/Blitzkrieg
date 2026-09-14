@@ -563,7 +563,8 @@ void SaveSound( CTreeAccessor *pFile, ISound *pSound, DTChunkID sName )
 	
 	if ( pSound == 0 )
 	{
-		pFile->Add( sName, "" );
+		char szEmpty[] = "";
+		 pFile->Add( sName, szEmpty );
 		return;
 	}
 	

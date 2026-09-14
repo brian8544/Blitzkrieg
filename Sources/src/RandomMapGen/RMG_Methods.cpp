@@ -140,7 +140,7 @@ int SRMContainer::GetSupportedSettings( std::list<std::string> *pSupportedSettin
 								NStr::Format(	"SRMContainer::GetSupportedSettings() Invalid Parameter pSupportedSettingsList: %x", pSupportedSettingsList ),
 								return 0 );
 
-	std::hash_map<std::string, std::vector<int> > settings;
+	std::unordered_map<std::string, std::vector<int> > settings;
 	
 	std::string szAnySettingName( RMGC_ANY_SETTING_NAME );
 	NStr::ToLower( szAnySettingName );
@@ -185,7 +185,7 @@ int SRMContainer::GetSupportedSettings( std::list<std::string> *pSupportedSettin
 	}
 
 	int nSupportedSettings = 0;
-	for ( std::hash_map<std::string, std::vector<int> >::const_iterator settingIterator = settings.begin(); settingIterator != settings.end(); ++ settingIterator )
+	for ( std::unordered_map<std::string, std::vector<int> >::const_iterator settingIterator = settings.begin(); settingIterator != settings.end(); ++ settingIterator )
 	{
 		const std::vector<int> &rCounts = settingIterator->second;
 		if ( ( ( rCounts[ANGLE_0] > 0 ) || ( rAnySettingCounts[ANGLE_0] > 0 ) ) &&
@@ -315,7 +315,7 @@ int SRMGraph::GetSupportedSettings( std::list<std::string> *pSupportedSettingsLi
 								NStr::Format(	"SRMGraph::GetSupportedSettings() Invalid Parameter pSupportedSettingsList: %x", pSupportedSettingsList ),
 								return 0 );
 
-	std::hash_map<std::string, int> settings;
+	std::unordered_map<std::string, int> settings;
 
 	std::string szAnySettingName( RMGC_ANY_SETTING_NAME );
 	NStr::ToLower( szAnySettingName );
@@ -370,7 +370,7 @@ int SRMGraph::GetSupportedSettings( std::list<std::string> *pSupportedSettingsLi
 		return 1;
 	}
 	int nSupportedSettings = 0;
-	for ( std::hash_map<std::string, int>::const_iterator settingIterator = settings.begin(); settingIterator != settings.end(); ++ settingIterator )
+	for ( std::unordered_map<std::string, int>::const_iterator settingIterator = settings.begin(); settingIterator != settings.end(); ++ settingIterator )
 	{
 		if ( settingIterator->second >= ( nNodesCount - nAnyNodesCount ) )
 		{
@@ -633,7 +633,7 @@ int SRMTemplate::GetSupportedSettings( std::list<std::string> *pSupportedSetting
 								NStr::Format(	"SRMGraph::GetSupportedSettings() Invalid Parameter pSupportedSettingsList: %x", pSupportedSettingsList ),
 								return 0 );
 
-	std::hash_map<std::string, int> settings;
+	std::unordered_map<std::string, int> settings;
 
 	std::string szAnySettingName( RMGC_ANY_SETTING_NAME );
 	NStr::ToLower( szAnySettingName );
@@ -691,7 +691,7 @@ int SRMTemplate::GetSupportedSettings( std::list<std::string> *pSupportedSetting
 		return 1;
 	}
 	int nSupportedSettings = 0;
-	for ( std::hash_map<std::string, int>::const_iterator settingIterator = settings.begin(); settingIterator != settings.end(); ++ settingIterator )
+	for ( std::unordered_map<std::string, int>::const_iterator settingIterator = settings.begin(); settingIterator != settings.end(); ++ settingIterator )
 	{
 		if ( settingIterator->second >= ( nGraphsCount - nAnyGraphsCount ) )
 		{
@@ -1320,7 +1320,7 @@ bool SRMContext::IsValid( int nLevelsCount, int nPlayersCount )
 																				nLevelIndex,
 																				nPlayerIndex,
 																				nUnitsTableEntriesCount,
-																				SRMTemplateUnitsTable::UNIT_RPG_TYPE_COUNT ), );
+																				SRMTemplateUnitsTable::UNIT_RPG_TYPE_COUNT ) );
 					bValid = false;
 				}
 				if ( unitsIterator->second.size() <= 0 )

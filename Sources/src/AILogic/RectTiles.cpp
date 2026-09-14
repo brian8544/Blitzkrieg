@@ -179,7 +179,7 @@ struct SVectorHash
 		return (v.x * 65535) + v.y;
 	}
 };
-typedef std::hash_map<SVector, bool, SVectorHash> CSVectorHash;
+typedef std::unordered_map<SVector, bool, SVectorHash> CSVectorHash;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void GetTilesNextToRect( const SRect &rect, CTilesSet *pTiles )

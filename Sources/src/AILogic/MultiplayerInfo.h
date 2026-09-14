@@ -36,7 +36,7 @@ class CMultiplayerInfo
 	int nAttackingParty;
 	int nFlagsAtTheMap;
 
-	std::vector< std::hash_set<int> > capturedByPartyFlags;
+	std::vector< std::unordered_set<int> > capturedByPartyFlags;
 
 	//
 	void CheckWinConditions();

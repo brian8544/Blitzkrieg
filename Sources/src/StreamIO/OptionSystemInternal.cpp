@@ -215,14 +215,14 @@ void COptionSystem::InnerSet( const std::string &szVarName, const variant_t &var
 			ISFX * pSFX = GetSingleton<ISFX>();
 			short nVolume = short(var) * GetGlobalVar( "Sound.StreamMasterVolume", 1.0f );
 			pSFX->SetStreamMasterVolume( nVolume / 100.0f );
-			SetGlobalVar( ("Options." + szVarName).c_str(), var );
+			SetGlobalVar( ("Options." + szVarName).c_str(), int(long(var)) );
 		}
 		else if ( pOpt->szAction == "SetSFXVolume" )
 		{
 			ISFX * pSFX = GetSingleton<ISFX>();
 			short nVolume = short(var) * GetGlobalVar( "Sound.SFXMasterVolume", 1.0f );
 			pSFX->SetSFXMasterVolume( nVolume / 100.0f );
-			SetGlobalVar( ("Options." + szVarName).c_str(), var );
+			SetGlobalVar( ("Options." + szVarName).c_str(), int(long(var)) );
 		}
 		else if ( pOpt->szAction == "SetDifficulty" )
 		{
@@ -308,7 +308,7 @@ void COptionSystem::InnerSet( const std::string &szVarName, const variant_t &var
 		}
 		else 
 		{
-			SetGlobalVar( ("Options." + szVarName).c_str(), var );
+			SetGlobalVar( ("Options." + szVarName).c_str(), int(long(var)) );
 		}
 	}
 }

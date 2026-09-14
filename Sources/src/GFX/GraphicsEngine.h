@@ -25,7 +25,7 @@ class CStateChangesTracker
 		DWORD dwNeedValue;									// value to setup
 	};
 	//
-	std::hash_map<DWORD, SState> allstates;
+	std::unordered_map<DWORD, SState> allstates;
 	std::list<SState*> changedstates;
 public:
 	// iterating
@@ -49,7 +49,7 @@ public:
 	}
 	void ClearStates()
 	{
-		for ( std::hash_map<DWORD, SState>::iterator it = allstates.begin(); it != allstates.end(); ++it )
+		for ( std::unordered_map<DWORD, SState>::iterator it = allstates.begin(); it != allstates.end(); ++it )
 			it->second.dwNeedValue = it->second.dwCurrValue = -1;
 		changedstates.clear();
 	}
@@ -77,7 +77,7 @@ class CGraphicsEngine : public IGFX
 	SAdapterDesc adapter;									// selected adapter description
 	D3DDISPLAYMODE displaymode;						// current display mode
 	D3DDISPLAYMODE desktopmode;						// windows desctop mode
-	D3DPRESENT_PARAMETERS pp;							// presentation parameters
+	D3DPRESENT_PARAMETERS8 pp;							// presentation parameters
 	RECT rcScreen;												// screen placement
 	int nStencilBPP;											// current stencil BPP
 	int nDepthBPP;												// depth buffer BPP
@@ -101,14 +101,14 @@ class CGraphicsEngine : public IGFX
 	CPtr2<CStaticVB> pSVB;								// solid vertex buffer with static allocator
 	CPtr2<CStaticIB> pSIB;								// solid index buffer with static allocator
 	// temp buffers
-	std::hash_map<DWORD, CPtr2<CTempVB> > tempVBs;
+	std::unordered_map<DWORD, CPtr2<CTempVB> > tempVBs;
 	CPtr2<CTempVB> pTVB;
-	std::hash_map<DWORD, CPtr2<CTempIB> > tempIBs;
+	std::unordered_map<DWORD, CPtr2<CTempIB> > tempIBs;
 	CPtr2<CTempIB> pTIB;
 	bool bUseOptimizedBuffers;
 	// dynamic buffers
-	typedef std::hash_multimap< DWORD, CPtr2<CDynamicVB> > CDynamicVBMap;
-	typedef std::hash_multimap< DWORD, CPtr2<CDynamicIB> > CDynamicIBMap;
+	typedef std::unordered_multimap< DWORD, CPtr2<CDynamicVB> > CDynamicVBMap;
+	typedef std::unordered_multimap< DWORD, CPtr2<CDynamicIB> > CDynamicIBMap;
 	CDynamicVBMap dynVBs;
 	CDynamicIBMap dynIBs;
 	// last formats for flushing
@@ -119,7 +119,7 @@ class CGraphicsEngine : public IGFX
 	// textures tracker
 	std::vector<IGFXBaseTexture*> usedtextures;
 	// CRAP{ for shaders testing
-	typedef std::hash_map<int, CShader> CShadersMap;
+	typedef std::unordered_map<int, CShader> CShadersMap;
 	CShadersMap shaders;
 	// CRAP}
 	// fonts
@@ -144,7 +144,7 @@ class CGraphicsEngine : public IGFX
 	void ReCreateAllObjects();
 	bool SetViewTransform( const CVec3 &ptX, const CVec3 &ptY, const CVec3 &ptZ, const CVec3 &ptO );
 	void SetRenderState( D3DRENDERSTATETYPE state, int nValue );
-	void SetTextureStageState( DWORD stage, D3DTEXTURESTAGESTATETYPE type, int value );
+	void SetTextureStageState( DWORD stage, int type, int value );
 	void ApplyRenderStates();
 	void ApplyTextureStageStates();
 	void ApplyStates() { ApplyRenderStates(); ApplyTextureStageStates(); }
@@ -221,9 +221,9 @@ class CGraphicsEngine : public IGFX
 	}
 	// dynamic IBs and VBs functions
 	template <class TBuffer, class TD3DBuffer, class TCreator>
-	TBuffer* GetDynamicBuffer( int nNumElements, DWORD dwFormat, std::hash_multimap< DWORD, CPtr2<TBuffer> > &buffers, TD3DBuffer*, TCreator* )
+	TBuffer* GetDynamicBuffer( int nNumElements, DWORD dwFormat, std::unordered_multimap< DWORD, CPtr2<TBuffer> > &buffers, TD3DBuffer*, TCreator* )
 	{
-		typedef std::hash_multimap< DWORD, CPtr2<TBuffer> > CDynBuffersMap;
+		typedef std::unordered_multimap< DWORD, CPtr2<TBuffer> > CDynBuffersMap;
 		typedef std::pair<CDynBuffersMap::iterator, CDynBuffersMap::iterator> CDynBuffersRange;
 		CDynBuffersRange range = buffers.equal_range( dwFormat );
 		for ( CDynBuffersMap::iterator it = range.first; it != range.second; ++it )

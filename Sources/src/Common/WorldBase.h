@@ -14,8 +14,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CComplexObjects
 {
-	typedef std::hash_map<IRefCount*, CMapObjectsList, SDefaultPtrHash> CAIVisMap;
-	typedef std::hash_map<SMapObject*, CPtr<IRefCount>, SDefaultPtrHash> CVisAIMap;
+	typedef std::unordered_map<IRefCount*, CMapObjectsList, SDefaultPtrHash> CAIVisMap;
+	typedef std::unordered_map<SMapObject*, CPtr<IRefCount>, SDefaultPtrHash> CVisAIMap;
 	CAIVisMap aivis;
 	CVisAIMap visai;
 public:
@@ -100,10 +100,10 @@ class CWorldBase
 		WORD wLoopedSoundID;
 		SObjectSounds() : wSoundID( 0 ), wLoopedSoundID( 0 ) {  }
 	};
-	typedef std::hash_map< CPtr<SMapObject>, SObjectSounds, SPtrHash > ObjectsSounds;
+	typedef std::unordered_map< CPtr<SMapObject>, SObjectSounds, SPtrHash > ObjectsSounds;
 	ObjectsSounds objectsSounds;						// у некогорых объектов есть звуки, которые нужно убрать
 	//
-	typedef std::hash_map< CPtr<IRefCount>, CPtr<IRefCount>, SDefaultPtrHash> CLinksMap;
+	typedef std::unordered_map< CPtr<IRefCount>, CPtr<IRefCount>, SDefaultPtrHash> CLinksMap;
 	
 	// update check values
 	CVec3 vLastAnchor;										// последн€€ позици€ камеры
@@ -122,7 +122,7 @@ class CWorldBase
 	std::list< CPtr<IMOUnit> > updatable;	// units, which require update
 	//
 	bool bEnableAIInfo;										// enable to show (and retrieve from AI) info for the current screen
-	//std::hash_map<int, bool> showicons;
+	//std::unordered_map<int, bool> showicons;
 	// CRAP{ дл€ принудительного вращени€ моделек в процессе отладки
 	bool bForceRotation;
 	// CRAP}

@@ -163,7 +163,7 @@ void CTexture::Init( IDirect3DTexture8 *_pTexture, const int _nMemUsage )
 	//
 	if ( (nSizeX == -1) || (nSizeY == -1) ) 
 	{
-		D3DSURFACE_DESC desc;
+		D3DSURFACE_DESC8 desc;
 		pTexture->GetLevelDesc( 0, &desc );
 		nSizeX = desc.Width;
 		nSizeY = desc.Height;
@@ -225,7 +225,7 @@ void CRenderTargetTexture::Init( IDirect3DTexture8 *_pTexture, IDirect3DSurface8
 	//
 	if ( (nSizeX == -1) || (nSizeY == -1) ) 
 	{
-		D3DSURFACE_DESC desc;
+		D3DSURFACE_DESC8 desc;
 		pTexture->GetLevelDesc( 0, &desc );
 		nSizeX = desc.Width;
 		nSizeY = desc.Height;
@@ -253,7 +253,7 @@ void CSurface::Init( IDirect3DSurface8 *_pSurface )
 {
 	NI_ASSERT_T( _pSurface != 0, "Can't init surface from NULL D3D object" );
 	pSurface = _pSurface;
-	D3DSURFACE_DESC desc;
+	D3DSURFACE_DESC8 desc;
 	pSurface->GetDesc( &desc );
 	nSizeX = desc.Width;
 	nSizeY = desc.Height;

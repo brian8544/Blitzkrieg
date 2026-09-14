@@ -27,7 +27,5 @@ MemSystemRegister					@18
 MemSystemFree						@19
 MemSystemAddIgnoredPath				@20
 MemSystemDumpStats					@21
-__stl_debug_terminate				@22
-__stl_debug_message					@23
 FastDumbAlloc						@24
 FastDumbFree						@25

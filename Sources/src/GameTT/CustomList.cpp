@@ -29,7 +29,7 @@ void CInterfaceCustomList::FillListFromCurrentDir()
 	
 	IFilesInspectorEntryCollector *pCollector = checked_cast<IFilesInspectorEntryCollector *>( GetSingleton<IFilesInspector>()->GetEntry( szCollectorName.c_str() ) );
 	const std::vector<std::string> &tutorialFiles = pCollector->GetCollected();
-	std::hash_set<std::string> setOfDirs;		//здесь я сохраняю все директории
+	std::unordered_set<std::string> setOfDirs;		//здесь я сохраняю все директории
 	
 	for ( int i=0; i<tutorialFiles.size(); i++ )
 	{
@@ -48,12 +48,12 @@ void CInterfaceCustomList::FillListFromCurrentDir()
 		}
 	}
 	
-	for ( std::hash_set<std::string>::iterator it = setOfDirs.begin(); it != setOfDirs.end(); ++it )
+	for ( std::unordered_set<std::string>::iterator it = setOfDirs.begin(); it != setOfDirs.end(); ++it )
 	{
 		//найдем все непустые поддиректории внутри данной директории
 		std::string szCmpDir = szCurrentDir + *it;
 		szCmpDir += '\\';
-		std::hash_set<std::string> setOfSubDirs;
+		std::unordered_set<std::string> setOfSubDirs;
 		for ( int i=0; i<tutorialFiles.size(); i++ )
 		{
 			std::string szCurrentName = tutorialFiles[i];
@@ -88,7 +88,7 @@ void CInterfaceCustomList::FillListFromCurrentDir()
 			}
 		}
 
-		for ( std::hash_set<std::string>::iterator it=setOfSubDirs.begin(); it!=setOfSubDirs.end(); ++it )
+		for ( std::unordered_set<std::string>::iterator it=setOfSubDirs.begin(); it!=setOfSubDirs.end(); ++it )
 		{
 			dirs.push_back( *it );
 		}

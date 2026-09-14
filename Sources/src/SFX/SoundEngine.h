@@ -1,140 +1,155 @@
 #ifndef __SOUNDENGINE_H__
 #define __SOUNDENGINE_H__
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma once
+
 #include "SampleSounds.h"
 #include "StreamFadeOff.h"
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef std::hash_map<ISound*, int, SDefaultPtrHash> CSoundChannelMap;
-typedef std::hash_map<int, CPtr<ISound> > CChannelSoundMap;
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include <mutex>
+#include <unordered_map>
+#include <vector>
+
+FMOD::System* GetFMODSystem();
+FMOD::Channel* GetFMODChannel( int nChannel );
+bool IsFMODChannelPlaying( int nChannel, FMOD::Sound *pExpectedSound = nullptr );
+
 class CSoundEngine : public ISFX
 {
 	OBJECT_NORMAL_METHODS( CSoundEngine );
 	DECLARE_SERIALIZE;
-	//
+
 	struct SDriverInfo
 	{
 		std::string szDriverName;
-		bool isHardware3DAccelerated;				// this driver supports hardware accelerated 3d sound.
-		bool supportEAXReverb;							// this driver supports EAX reverb
-		bool supportA3DOcclusions;					// this driver supports (A3D) geometry occlusions
-		bool supportA3DReflections;					// this driver supports (A3D) geometry reflections
-		bool supportReverb;									// this driver supports EAX2/A3D3 reverb  
+		bool isHardware3DAccelerated;
+		bool supportEAXReverb;
+		bool supportA3DOcclusions;
+		bool supportA3DReflections;
+		bool supportReverb;
 	};
+
 	struct SMelodyInfo
 	{
 		DECLARE_SERIALIZE;
 	public:
 		std::string szName;
 		bool bLooped;
-		void Clear() { szName.clear(); } 
+		SMelodyInfo() : bLooped( false ) {}
+		void Clear() { szName.clear(); bLooped = false; }
 		bool IsValid() const { return !szName.empty(); }
-		//
 	};
-	// initialization info - drivers
+
 	typedef std::vector<SDriverInfo> CDriversInfo;
-	CDriversInfo drivers;									// [0] is default driver
-	//
+	typedef std::unordered_map<ISound*, int, SDefaultPtrHash> CSoundChannelMap;
+	typedef std::unordered_map<int, CPtr<ISound> > CChannelSoundMap;
+	typedef std::unordered_map<int, FMOD::Channel*> CNativeChannelMap;
+
+	CDriversInfo drivers;
 	NTimer::STime timeLastUpdate;
-	//
-	// streams
 	SMelodyInfo curMelody;
-	SMelodyInfo nextMelody;								// to fade melodies
-	FSOUND_STREAM *pStreamingSound;				// current streaming sound
-	int nStreamingChannel;								// channel of this streaming sound
-	NTimer::STime timeStreamFinished;			// time, last stream finished
-	//
-	// channels management
-	CSoundChannelMap channelsMap;					// sound => channel map
-	CChannelSoundMap soundsMap;						// channel => sound map
-	//
-	float fListenerDistance;							// listener distance from anchor
+	SMelodyInfo nextMelody;
+
+	FMOD::System *pSystem;
+	FMOD::ChannelGroup *pSFXGroup;
+	FMOD::ChannelGroup *pMusicGroup;
+	FMOD::ChannelGroup *pMovieGroup;
+	FMOD::Sound *pStreamingSound;
+	FMOD::Channel *pStreamingChannel;
+	int nStreamingChannel;
+	NTimer::STime timeStreamFinished;
+
+	CSoundChannelMap channelsMap;
+	CChannelSoundMap soundsMap;
+	CNativeChannelMap nativeChannels;
+
+	float fListenerDistance;
+	float fDistanceFactor;
+	float fRolloffFactor;
 	CVec3 vLastListenerPos;
 	bool bInited;
-	bool bEnableSFX;											// enable SFXes playing
-	bool bEnableStreaming;								// enable streaming playing
-	bool bSoundCardPresent;								
-	bool bPaused;													// is all SFX sounds paused?
-	bool bStreamingPaused;								// is streaming sound paused
-	//
-	BYTE cSFXMasterVolume;								// SFXes volume
-	BYTE cStreamMasterVolume;							// streams volume
-	float fStreamCurrentVolume;						// for fade streams ( 0.0f ... 1.0f )
+	bool bEnableSFX;
+	bool bEnableStreaming;
+	bool bSoundCardPresent;
+	bool bPaused;
+	bool bStreamingPaused;
+	BYTE cSFXMasterVolume;
+	BYTE cStreamMasterVolume;
+	float fStreamCurrentVolume;
 	bool bStreamPlaying;
-	
 	CStreamFadeOff streamFadeOff;
-	//
+
+	// FFmpeg movie audio is decoded to interleaved float PCM and consumed by an FMOD user stream.
+	std::mutex movieAudioMutex;
+	std::vector<float> movieAudioBuffer;
+	std::size_t movieAudioReadOffset;
+	int movieAudioChannels;
+	int movieAudioSampleRate;
+	bool movieAudioActive;
+	FMOD::Sound *pMovieSound;
+	FMOD::Channel *pMovieChannel;
+
 	void ClearChannels();
-	//
 	bool SearchDevices();
-	// streaming
 	void CloseStreaming();
-	//
 	void ReEnableSounds();
-	//
+	void UpdateGroupVolumes();
+	FMOD::Channel* ResolveChannel( int nChannel ) const;
+	int RegisterSound( CBaseSound *pSound, FMOD::Channel *pChannel, bool b3D );
+	FMOD_RESULT ReadMoviePCM( void *pData, unsigned int nBytes );
+
 	CSoundEngine();
 	virtual ~CSoundEngine() { Done(); }
-	
 	void UpdateCameraPos( const CVec3 &vPos );
 
 public:
-	// internal-use service functions
 	bool PlayNextMelody();
 	void NotifyMelodyFinished();
-	void MapSound( ISound *pSound, int nChannel );
-	//
+	int PlayNativeSample( CBaseSound *pSound, bool b3D, const CVec3 *pPosition );
+	void MapSound( ISound *pSound, int nChannel, FMOD::Channel *pNativeChannel );
+
 	virtual BYTE STDCALL GetSFXMasterVolume() const { return cSFXMasterVolume; }
 	virtual BYTE STDCALL GetStreamMasterVolume() const { return cStreamMasterVolume; }
-	//
 	virtual IRefCount* STDCALL QI( int nInterfaceTypeID );
-	// init and close sound system
 	virtual bool STDCALL IsInitialized();
 	virtual bool STDCALL Init( HWND hWnd, int nDriver, ESFXOutputType output, int nMixRate, int nMaxChannels );
 	virtual void STDCALL Done();
-	//
-	// enable SFXes and streaming
+
 	virtual void STDCALL EnableSFX( bool bEnable ) { bEnableSFX = bEnable; ReEnableSounds(); }
 	virtual void STDCALL EnableStreaming( bool bEnable ) { bEnableStreaming = bEnable; ReEnableSounds(); }
 	virtual bool STDCALL IsSFXEnabled()const { return bEnableSFX && bSoundCardPresent; }
 	virtual bool STDCALL IsStreamingEnabled()const { return bEnableStreaming && bSoundCardPresent; }
-	//
-	// setup
+
 	virtual void STDCALL SetDistanceFactor( float fFactor );
 	virtual void STDCALL SetRolloffFactor( float fFactor );
-	// set SFX master volume. valid range [0..1]
-	virtual void STDCALL SetSFXMasterVolume( float fVolume )
-	{
-		Clamp( fVolume, 0.0f, 1.0f );
-		cSFXMasterVolume = BYTE( fVolume * 255.0f );
-	}
-	// set streams master volume. valid range [0..1]
+	virtual void STDCALL SetSFXMasterVolume( float fVolume );
 	virtual void STDCALL SetStreamMasterVolume( float fVolume );
-	//
-	// streaming sound
+
 	virtual void STDCALL PlayStream( const char *pszFileName, bool bLooped = false, const unsigned int nTimeToFadePrevious = 0 );
 	virtual void STDCALL StopStream( const unsigned int nTimeToFade = 0 );
 	virtual bool STDCALL IsStreamPlaying() const;
 	virtual void STDCALL SetStreamVolume( const float fVolume );
 	virtual float STDCALL GetStreamVolume() const;
 
-	//
-	// sample sounds
+	virtual bool STDCALL BeginMovieAudio( int nSampleRate, int nChannels );
+	virtual void STDCALL SubmitMovieAudio( const float *pInterleavedSamples, unsigned int nFrames );
+	virtual void STDCALL PauseMovieAudio( bool bPause );
+	virtual void STDCALL EndMovieAudio();
+
 	virtual int STDCALL PlaySample( ISound *pSound, bool bLooped = false, unsigned int nStartPos=0 );
 	virtual void STDCALL StopSample( ISound *pSound );
 	virtual void STDCALL UpdateSample( ISound *pSound );
 	virtual void STDCALL StopChannel( int nChannel );
-
-	// Update sounds ( that is needed for 3D sounds )
 	virtual void STDCALL Update( interface ICamera *pCamera );
-	//
 	virtual bool STDCALL Pause( bool bPause );
 	virtual bool STDCALL PauseStreaming( bool bPause );
 	virtual bool STDCALL IsPaused();
 	virtual bool STDCALL IsPlaying( ISound *pSound );
+	virtual unsigned int STDCALL GetCurrentPosition( ISound *pSound );
+	virtual void STDCALL SetCurrentPosition( ISound *pSound, unsigned int pos );
 
-	unsigned int STDCALL GetCurrentPosition( ISound * pSound );
-	virtual void STDCALL SetCurrentPosition( ISound * pSound, unsigned int pos );
-
+	friend FMOD::System* GetFMODSystem();
+	friend FMOD::Channel* GetFMODChannel( int nChannel );
+	friend bool IsFMODChannelPlaying( int nChannel, FMOD::Sound *pExpectedSound );
+	friend FMOD_RESULT F_CALLBACK BlitzMoviePCMReadCallback( FMOD_SOUND *pSound, void *pData, unsigned int nDataLen );
 };
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #endif // __SOUNDENGINE_H__

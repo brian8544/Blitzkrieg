@@ -13,7 +13,7 @@ class CLinkObject : public IUpdatableObj
 	static std::list<int> deletedObjects;
 	static std::list<int> deletedUniqueObjects;
 
-	static std::hash_map< int, CPtr<CLinkObject> > unitsID2object;
+	static std::unordered_map< int, CPtr<CLinkObject> > unitsID2object;
 	static int nCurUniqueID;
 
 	int nLink;

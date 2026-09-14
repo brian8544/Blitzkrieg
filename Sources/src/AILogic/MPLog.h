@@ -18,7 +18,7 @@ inline void MPLog( const char *pszInfo, ... )
 		va_list va;
 		// 
 		va_start( va, pszInfo );
-		vsprintf( buff, pszInfo, va );
+		vsprintf_s( buff, sizeof(buff), pszInfo, va );
 		va_end( va );
 		
 		GetSingleton<IConsoleBuffer>()->WriteASCII( 10, buff, 0, true );

@@ -3,7 +3,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma ONCE
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include "..\zlib\zlib.h"
+#include <zlib.h>
+#include <memory>
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <int N> struct SGenericNumber { int operator()() const { return N; } };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,7 +29,7 @@ interface IRefCount
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef _DO_ASSERT_SLOW
 #define ADD_REF_PREGUARD( ref ) const int __nOldRef = ref
-#define ADD_REF_POSTGUARD( ref ) if ( (__nOldRef & (~nMask)) != (ref & (~(nMask))) ) { _asm { int 3 } }
+#define ADD_REF_POSTGUARD( ref ) if ( (__nOldRef & (~nMask)) != (ref & (~(nMask))) ) { DebugBreak(); }
 #else
 #define ADD_REF_PREGUARD( ref )
 #define ADD_REF_POSTGUARD( ref )
@@ -416,7 +417,7 @@ private:
 template <class TContainer>
 inline void EraseInvalidRefs( TContainer *pData )
 {
-	for ( TContainer::iterator it = pData->begin(); it != pData->end(); )
+	for ( typename TContainer::iterator it = pData->begin(); it != pData->end(); )
 	{
 		if ( (*it)->IsValid() )
 			++it;
@@ -429,7 +430,7 @@ inline void EraseInvalidRefs( TContainer *pData )
 template <class TContainer>
 void ClearContainer( TContainer &container )
 {
-	for ( TContainer::iterator it = container.begin(); it != container.end(); ++it )
+	for ( typename TContainer::iterator it = container.begin(); it != container.end(); ++it )
 	{
 		if ( *it )
 			delete *it;
@@ -440,7 +441,7 @@ void ClearContainer( TContainer &container )
 template <class TContainer>
 void ClearComplexContainer( TContainer &container )
 {
-	for ( TContainer::iterator it = container.begin(); it != container.end(); ++it )
+	for ( typename TContainer::iterator it = container.begin(); it != container.end(); ++it )
 	{
 		if ( it->second )
 			delete it->second;
@@ -522,8 +523,8 @@ namespace NRefCount
 	};
 	struct SRefMFunc
 	{
-		void AddRef( IRefCount *pObj ) { pObj->AddRef( REF_ADD_MOBJ ); }
-		void Release( IRefCount *pObj ) { pObj->Release( REF_ADD_MOBJ, REF_MASK_MOBJ ); }
+		static void AddRef( IRefCount *pObj ) { pObj->AddRef( REF_ADD_MOBJ ); }
+		static void Release( IRefCount *pObj ) { pObj->Release( REF_ADD_MOBJ, REF_MASK_MOBJ ); }
 	};
 };
 // base ref pointer
@@ -566,16 +567,19 @@ public:																																								\
 	TPtrName() {}																																				\
 	TPtrName( TUserObj *_ptr ): TBase( _ptr ) {  }																			\
 	TPtrName( const TPtrName &a ): TBase( a ) {  }																			\
-	TPtrName& operator=( TUserObj *_ptr ) { Set( _ptr ); return *this; }								\
-	TPtrName& operator=( const TPtrName &a ) { Set( a.GetPtr() ); return *this; }				\
-	bool operator==( const TPtrName &a ) const { return GetPtr() == a.GetPtr(); }				\
-	bool operator==( const TUserObj *a ) const { return GetPtr() == a; }								\
-	bool operator!=( const TPtrName &a ) const { return GetPtr() != a.GetPtr(); }				\
-	bool operator!=( const TUserObj *a ) const { return GetPtr() != a; }								\
-	bool operator< ( const TUserObj *a ) const { return GetPtr() < a; }									\
-	bool operator> ( const TUserObj *a ) const { return GetPtr() > a; }									\
-	bool operator<=( const TUserObj *a ) const { return GetPtr() <= a; }								\
-	bool operator>=( const TUserObj *a ) const { return GetPtr() >= a; }								\
+	TPtrName& operator=( TUserObj *_ptr ) { this->Set( _ptr ); return *this; }								\
+	TPtrName& operator=( const TPtrName &a ) { this->Set( a.GetPtr() ); return *this; }				\
+	bool operator==( const TPtrName &a ) const { return this->GetPtr() == a.GetPtr(); }				\
+	template <class TOther> bool operator==( TOther *a ) const { return this->GetPtr() == a; }				\
+	bool operator==( const TUserObj *a ) const { return this->GetPtr() == a; }								\
+	bool operator!=( const TPtrName &a ) const { return this->GetPtr() != a.GetPtr(); }				\
+	template <class TOther> bool operator!=( TOther *a ) const { return this->GetPtr() != a; }				\
+	bool operator!=( const TUserObj *a ) const { return this->GetPtr() != a; }								\
+	bool operator< ( const TPtrName &a ) const { return this->GetPtr() < a.GetPtr(); }				\
+	bool operator< ( const TUserObj *a ) const { return this->GetPtr() < a; }									\
+	bool operator> ( const TUserObj *a ) const { return this->GetPtr() > a; }									\
+	bool operator<=( const TUserObj *a ) const { return this->GetPtr() <= a; }								\
+	bool operator>=( const TUserObj *a ) const { return this->GetPtr() >= a; }								\
 };
 // ptr specialization
 BASIC_PTR_DECLARE( CPtr, NRefCount::SRefPtrFunc );
@@ -610,7 +614,7 @@ inline TOut const_cast_ptr( const CPtrBase<TUserObj, TRefFunc> &ptr )
 template <class TOut, class TUserObj, class TRefFunc>
 inline TOut checked_cast_ptr( const CPtrBase<TUserObj, TRefFunc> &ptr )
 {
-	if ( dynamic_cast_ptr<TOut, TUserObj, TRefFunc>(ptr) == 0 ) { _asm { int 3 } }
+	if ( dynamic_cast_ptr<TOut, TUserObj, TRefFunc>(ptr) == 0 ) { DebugBreak(); }
 	
 	return static_cast_ptr<TOut, TUserObj, TRefFunc>(ptr);
 }

@@ -35,12 +35,12 @@ class CScripts
 	std::string szScriptFile;
 	
 	// активные скрипты
-	std::hash_map<int, SScriptInfo> activeScripts;
+	std::unordered_map<int, SScriptInfo> activeScripts;
 	// по именя скрипта - он сам
-	std::hash_map<std::string, int> name2script;
+	std::unordered_map<std::string, int> name2script;
 
 	// номер группы - юниты
-	std::hash_map<int, std::list<CPtr<IUpdatableObj> > > groups;
+	std::unordered_map<int, std::list<CPtr<IUpdatableObj> > > groups;
 	// номер reinforcement - reinforcement object
 	struct SReinforcementObject
 	{
@@ -55,21 +55,21 @@ class CScripts
 			: mapObject( _mapObject ), pStats( _pStats ), pScenarioUnit( _pScenarioUnit ) { }
 	};
 	typedef std::list<SReinforcementObject> CReinfList;
-	std::hash_map<int, CReinfList> reinforcs;
+	std::unordered_map<int, CReinfList> reinforcs;
 	// отложенные (некуда поставить) подкрепления
 	CReinfList suspendedReinforcs;
 	CReinfList::iterator reinforcsIter;
 	NTimer::STime lastTimeToCheckSuspendedReinforcs;
 
-	std::hash_map<int, int> reservePositions;
+	std::unordered_map<int, int> reservePositions;
 
 	// юнит - номер скриптовой группы
-	std::hash_map< int, int> groupUnits;
+	std::unordered_map< int, int> groupUnits;
 	
 	// для сегмента
-	std::hash_map<int, SScriptInfo>::iterator segmIter;
+	std::unordered_map<int, SScriptInfo>::iterator segmIter;
 
-	std::hash_map<std::string, SScriptArea> areas;
+	std::unordered_map<std::string, SScriptArea> areas;
 
 	bool bKill;
 
@@ -88,7 +88,7 @@ class CScripts
 	void OutScriptError( const char *pszString );
 
 	// проставить новые линки подкреплению
-	void SetNewLinksToReinforcement( CReinfList *pReinf, std::hash_map<int, int> *pOld2NewLinks );
+	void SetNewLinksToReinforcement( CReinfList *pReinf, std::unordered_map<int, int> *pOld2NewLinks );
 	//
 	bool CanLandWithShift( const SMapObjectInfo &mapObject, IObjectsDB *pIDB, CVec2 *pvShift );
 	bool CanFormationLand( const SMapObjectInfo &mapObject, IObjectsDB *pIDB, const CVec2 &vShift = VNULL2 );

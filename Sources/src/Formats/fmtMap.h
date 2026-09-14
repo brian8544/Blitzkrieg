@@ -22,7 +22,7 @@ const int nNumRoadTypes = 4;
 // **
 // ************************************************************************************************************************ //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//static std::hash_map<std::string, EActionCommand> logics;
+//static std::unordered_map<std::string, EActionCommand> logics;
 struct SMapObjectInfo
 {
 	// visualization information
@@ -323,10 +323,10 @@ struct SReinforcementGroupInfo
 		int operator&( IStructureSaver &ss );
 	};
 
-	std::hash_map< int, SGroupsVector > groups;
+	std::unordered_map< int, SGroupsVector > groups;
 	int GetGroupById( const int scriptID ) const
 	{
-		for( std::hash_map< int, SGroupsVector >::const_iterator it = groups.begin(); it != groups.end(); ++it )
+		for( std::unordered_map< int, SGroupsVector >::const_iterator it = groups.begin(); it != groups.end(); ++it )
 		{
 			int i = 0;
 			while ( i < it->second.ids.size() && it->second.ids[i] != scriptID )
@@ -366,7 +366,7 @@ struct SScriptArea
 /**
 struct SUnitsLogics
 {
-	std::hash_map<std::string, EActionCommand> logics;
+	std::unordered_map<std::string, EActionCommand> logics;
 
 	SUnitsLogics()
 	{

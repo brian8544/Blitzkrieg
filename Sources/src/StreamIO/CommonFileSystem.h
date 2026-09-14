@@ -19,7 +19,7 @@ class CCommonFileSystemEnumerator : public IStorageEnumerator
 	std::string szFileName;								// current enumerated file name
 	SStorageElementStats stats;						// temporary data storage to fill each call
 	//
-	typedef std::hash_map<std::string, SCommonFileInfo> CFilesMap;
+	typedef std::unordered_map<std::string, SCommonFileInfo> CFilesMap;
 	const CFilesMap &files;
 	CFilesMap::const_iterator itCurrFile;
 	bool bReset;
@@ -37,7 +37,7 @@ class CCommonFileSystem : public IDataStorage
 	//
 	CPtr<IDataStorage> pZipStorage;				// zip file system
 	CPtr<IDataStorage> pFileStorage;			// open file system
-	typedef std::hash_map<std::string, SCommonFileInfo> CFilesMap;
+	typedef std::unordered_map<std::string, SCommonFileInfo> CFilesMap;
 	CFilesMap files;											// соответствие имени файла и информации, необходимой для его получени
 	//
 	std::string szBase;

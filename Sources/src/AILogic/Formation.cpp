@@ -1024,7 +1024,7 @@ const TResult GetLoadInfo( CAICommand *pCommand, T &functor, TResult* )
 					default: NI_ASSERT_T( false, NStr::Format( "Can't enter to object of type %d", pObj->GetObjectType() ) );
 				}
 			}
-		default: NI_ASSERT_T( false, NStr::Format( "Unknown load command (%d)", cmd.cmdType ) ); TResult res; return res;
+		default: NI_ASSERT_T( false, NStr::Format( "Unknown load command (%d)", cmd.cmdType ) ); return TResult();
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1042,8 +1042,8 @@ void CFormation::ProcessLoadCommand( CAICommand *pCommand, bool bPlaceInQueue )
 		}
 		
 		std::set<int> objects;
-		std::hash_map<int, CAICommand*> object2Command;
-		std::hash_set<int> formations;
+		std::unordered_map<int, CAICommand*> object2Command;
+		std::unordered_set<int> formations;
 
 		const int nGroup = GetNGroup();
 		bool bPushFront = false;
@@ -1093,7 +1093,7 @@ void CFormation::ProcessLoadCommand( CAICommand *pCommand, bool bPlaceInQueue )
 		}
 
 		std::vector<SEdge> edges( objects.size() * formations.size() );
-		std::hash_map<int, int> availableSeats;
+		std::unordered_map<int, int> availableSeats;
 		int cnt = 0;
 		for ( std::set<int>::iterator iterObjects = objects.begin(); iterObjects != objects.end(); ++iterObjects )
 		{
@@ -1101,7 +1101,7 @@ void CFormation::ProcessLoadCommand( CAICommand *pCommand, bool bPlaceInQueue )
 			availableSeats[*iterObjects] = GetLoadInfo( object2Command[*iterObjects], availSeatsFunctor, (int*)0 );
 			
 			SGetLoadPoint loadPointFunctor;
-			for ( std::hash_set<int>::iterator iterForms = formations.begin(); iterForms != formations.end(); ++iterForms )
+			for ( std::unordered_set<int>::iterator iterForms = formations.begin(); iterForms != formations.end(); ++iterForms )
 			{
 				NI_ASSERT_T( cnt < edges.size(), NStr::Format( "Wrong cnt (%d), size (%d)", cnt, edges.size() ) );
 				edges[cnt].pFormation = ::GetObjectByUniqueIdSafe<CFormation>( *iterForms );

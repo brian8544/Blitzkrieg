@@ -17,37 +17,29 @@
 
 # 准备工作
 
-编译时需要 SDK 目录下的所有库文件。需按如下顺序在 **Tools => Options => Directories** 中填写路径：
+要求：
 
-## Include
-```
-C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\STLPORT
-C:\SDK\BINK（仓库未包含）
-C:\SDK\FMOD\API\INC（仓库未包含）
-C:\SDK\S3TC
-C:\SDK\STINGRAY STUDIO 2002\INCLUDE\TOOLKIT（仓库未包含）
-C:\SDK\STINGRAY STUDIO 2002\INCLUDE（仓库未包含）
-C:\SDK\STINGRAY STUDIO 2002\REGEX\INCLUDE（仓库未包含）
-C:\SDK\Maya4.0\include
-```
+- Windows 10 或 11。
+- CMake 4.2 或更高版本。
+- Visual Studio 2026，并安装 **使用 C++ 的桌面开发**工作负载和 Windows SDK。
+- Git 和 [vcpkg](https://github.com/microsoft/vcpkg)。将 `VCPKG_ROOT` 指向 vcpkg 目录。
+- Windows 版 FMOD Engine 2.01.x。FMOD 需要单独授权，本仓库不包含该 SDK。
 
-## Lib
-```
-C:\SDK\BINK（仓库未包含）
-C:\SDK\FMOD\API\LIB（仓库未包含）
-C:\SDK\S3TC
-C:\SDK\STINGRAY STUDIO 2002\LIB（仓库未包含）
-C:\SDK\STINGRAY STUDIO 2002\REGEX\LIB（仓库未包含）
-C:\SDK\Maya4.0\lib
+Direct3D 兼容层源代码已包含在 `Sources/sdk` 中。请按以下不含空格的目录结构放置 FMOD SDK：
+
+```text
+Sources/sdk/FMOD/Include/fmod.hpp
+Sources/sdk/FMOD/lib/x86/fmod_vc.lib
+Sources/sdk/FMOD/lib/x86/fmod.dll
 ```
 
-此外，需要安装 **DirectX 8.1** 或更高版本（会自动添加到路径中）。
+运行 `build.bat`。vcpkg 清单会自动安装 FFmpeg、libpng、libsquish、pugixml 和 zlib。仓库内的 `Sources/src/GameSpy` SDK 会从源代码构建，无需另行下载 GameSpy。当前游戏目标不再需要 Bink、STLPort、Stingray 或旧版 DirectX 8 SDK。
 
-### 重要说明
+Release 可执行文件位于 `build/bin/Release`。要使用已安装的零售版游戏数据，请运行：
 
-- **Bink、FMOD、Stingray** 库未包含在本仓库内，需要单独授权。
-- **stlport** *必须* 放在 Visual C 目录下，与 `include` 文件夹同级。
-- 路径 `C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\STLPORT` 必须放在**最前面**，否则编译无法通过。
+```bat
+build\bin\Release\Game.exe -datadir "C:\path\to\Blitzkrieg"
+```
 
 ---
 

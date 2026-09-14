@@ -4,8 +4,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include <winsock.h>
-#include <hash_map>
+#include <winsock2.h>
+#include <unordered_map>
 #include "Streams.h"
 #include "NetAcks.h"
 /////////////////////////////////////////////////////////////////////////////////////
@@ -100,7 +100,7 @@ private:
 	CHANNEL_DATA_OFFSET nChannelOutputOffset, nChannelInputOffset;
 	typedef std::list<SChannelBlock> SChannelBlockList;
 	SChannelBlockList channelOutFlyList, channelOutList, channelInList;
-	std::hash_map< PACKET_ID, PACKET_ID > reassign;
+	std::unordered_map< PACKET_ID, PACKET_ID > reassign;
 
 	static bool IsBefore( CHANNEL_DATA_OFFSET border, CHANNEL_DATA_OFFSET test );
 };

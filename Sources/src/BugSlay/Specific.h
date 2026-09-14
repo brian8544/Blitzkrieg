@@ -7,5 +7,4 @@
 #include <crtdbg.h>
 #include "PSAPI.h"
 
-#include <d3d8.h>
 //#include "WarningsOn.h"

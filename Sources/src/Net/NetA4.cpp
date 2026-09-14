@@ -105,7 +105,7 @@ static bool CanReadPacket( CRingBuffer<N_STREAM_BUFFER> &buf )
 static void WritePacket( std::list<CMemoryStream> *pDst, CMemoryStream &pkt )
 {
 	NI_ASSERT_T( pkt.GetSize() < N_STREAM_BUFFER - 1000, NStr::Format( "Wrong memory stream size (%d)", pkt.GetSize() ) );
-	pDst->push_back();
+	pDst->emplace_back();
 	CMemoryStream &b = pDst->back();
 	int nSize = pkt.GetSize();
 	if ( nSize >= 128 )
@@ -280,7 +280,7 @@ CNetDriver::SPeer* CNetDriver::GetClient( CP2PTracker::UCID nID )
 /////////////////////////////////////////////////////////////////////////////////////
 void CNetDriver::AddClient( const SClientAddressInfo &addr, CP2PTracker::UCID clientID )
 {
-	clients.push_back();
+	clients.emplace_back();
 	SPeer &peer = clients.back();
 	peer.currentAddr = addr.inetAddress;
 	peer.clientID = clientID;
@@ -688,7 +688,7 @@ void CNetDriver::AddOutputMessage( EMessage msg, const CP2PTracker::UCID &_from,
 	NI_ASSERT_T( pPeer != 0, "NULL peer" );
 	if ( !pPeer )
 		return;
-	msgQueue.push_back();
+	msgQueue.emplace_back();
 	SMessage &res = msgQueue.back();
 	res.msg = msg;
 	res.pkt = data;
@@ -1054,7 +1054,7 @@ void CNetDriver::ResizeArrays( const int nNewSize )
 	existingChannels.resize( nNewSize );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CNetDriver::AddChannel( const int nChannelID, const std::hash_set<BYTE> &channelMessages )
+void CNetDriver::AddChannel( const int nChannelID, const std::unordered_set<BYTE> &channelMessages )
 {
 	{
 		CCriticalSectionLock criticalSectionLock( criticalSection );
@@ -1118,7 +1118,7 @@ void CNetDriver::StepMultiChannel()
 		}
 		pkt->Seek( nCurStreamPosition, STREAM_SEEK_SET );
 
-		channelMsgs[i].push_back();
+		channelMsgs[i].emplace_back();
 		channelMsgs[i].back().msg = eMsgID;
 		channelMsgs[i].back().nClientID = nClientID;
 		channelMsgs[i].back().pPkt = CreateObject<IDataStream>( STREAMIO_MEMORY_STREAM );

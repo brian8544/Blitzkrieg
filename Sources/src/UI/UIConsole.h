@@ -46,7 +46,7 @@ private:
 	void ParseCommand( const std::wstring &szCommand );
 	void InitConsoleScript();
 	bool RunScriptFile( const std::string &szScriptFileName );
-	typedef std::hash_map< std::string, int > CConsoleFunctions;
+	typedef std::unordered_map< std::string, int > CConsoleFunctions;
 	CConsoleFunctions consoleFunctions;
 
 public:

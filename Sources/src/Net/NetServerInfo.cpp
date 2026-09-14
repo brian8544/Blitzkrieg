@@ -56,7 +56,7 @@ CServerInfoSupport::SServerInfo& CServerInfoSupport::GetInfo( const CNodeAddress
 		if ( i->addr == addr )
 			return *i;
 	}
-	servers.push_back();
+	servers.emplace_back();
 	servers.size(); // guard from optimization bug
 	SServerInfo &b = servers.back();
 	b.addr = addr;

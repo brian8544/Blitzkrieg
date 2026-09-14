@@ -461,6 +461,8 @@ void CSimpleWindow::SetWindowText( int nState, const WORD *pszText )
 const WORD* CSimpleWindow::GetWindowText( int nState )
 {
 	NI_ASSERT_T( nState < states.size(), NStr::Format("Can't get text from state %d (max %d states)", nState, states.size()) );
+	if ( nState < 0 || nState >= states.size() )
+		return 0;
 	IText *pText = states[nState].pGfxText->GetText();
 	return pText->GetString();
 }
@@ -1414,7 +1416,7 @@ void CMultipleWindow::InitDependentInfoMW()
 	
 	// —читываю поддержку LUA
 #if defined( _DO_ASSERT ) || defined( _DO_ASSERT_SLOW )
-			std::hash_map<int, int> mapa;
+			std::unordered_map<int, int> mapa;
 			
 			//провер€ем, чтобы не было чайлдов с повтор€ющимис€ ID
 			for ( CWindowList::iterator it = childList.begin(); it != childList.end(); ++it )
@@ -1423,7 +1425,7 @@ void CMultipleWindow::InitDependentInfoMW()
 					mapa[(*it)->GetWindowID()]++;
 			}
 			
-			for ( std::hash_map<int, int>::iterator it = mapa.begin(); it != mapa.end(); ++it )
+			for ( std::unordered_map<int, int>::iterator it = mapa.begin(); it != mapa.end(); ++it )
 			{
 				NI_ASSERT_T( it->second == 1, NStr::Format("Duplicate window id %d", it->first) );
 			}

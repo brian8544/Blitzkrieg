@@ -3,7 +3,7 @@
 #include <time.h>
 
 #include "..\Misc\FileUtils.h"
-#include "..\zlib\zlib.h"
+#include <zlib.h>
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //#define _DO_BETA_CHECK
 //#define _SET_BETA_KEY_USER
@@ -70,7 +70,10 @@ bool CheckBetaKey()
 	// check expiry date
 	time_t ltime;
 	time( &ltime );
-	tm *pTime = localtime( &ltime );
+	tm localTime;
+	if ( localtime_s(&localTime, &ltime) != 0 )
+		return false;
+	tm *pTime = &localTime;
 	const int nCurrYear = pTime->tm_year + 1900;
 	const int nCurrMonth = pTime->tm_mon + 1;
 	const int nCurrDay = pTime->tm_mday;

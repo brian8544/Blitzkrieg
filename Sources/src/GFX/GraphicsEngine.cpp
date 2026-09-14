@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 
 #include "GraphicsEngine.h"
+#include "D3D8Runtime.h"
 
 #include "..\Image\Image.h"
 
@@ -69,8 +70,8 @@ bool EnumAdapters( std::list<SAdapterDesc> *pAdapters )
 {
 	pAdapters->clear();
 	// создадим временный D3D для перечисления необходимых параметров
-	NWin32Helper::com_ptr<IDirect3D8> pD3D = Direct3DCreate8( D3D_SDK_VERSION );
-	NI_ASSERT_TF( pD3D != 0, NStr::Format("Can't create Direct3D8 of build %d. Pls, install latest DX", D3D_SDK_VERSION), return false );
+	NWin32Helper::com_ptr<IDirect3D8> pD3D = ND3D8Runtime::Create();
+	NI_ASSERT_TF( pD3D != 0, NStr::Format("Can't initialize the bundled D3D8-to-D3D11 renderer shim"), return false );
 	pD3D->Release();
 	//
 	for ( int i = 0; i < pD3D->GetAdapterCount(); ++i )
@@ -225,8 +226,8 @@ EGFXVideoCard CGraphicsEngine::GetVideoCard()
 		dxrval = pD3D->GetAdapterIdentifier( D3DADAPTER_DEFAULT, 0, &sID );
 	else
 	{
-		NWin32Helper::com_ptr<IDirect3D8> pD3DTemp = Direct3DCreate8( D3D_SDK_VERSION );
-		NI_ASSERT_TF( pD3DTemp != 0, NStr::Format("Can't create Direct3D8 of build %d. Pls, install latest DX", D3D_SDK_VERSION), return GFXVC_DEFAULT );
+		NWin32Helper::com_ptr<IDirect3D8> pD3DTemp = ND3D8Runtime::Create();
+		NI_ASSERT_TF( pD3DTemp != 0, NStr::Format("Can't initialize the bundled D3D8-to-D3D11 renderer shim"), return GFXVC_DEFAULT );
 		pD3DTemp->Release();
 		dxrval = pD3DTemp->GetAdapterIdentifier( D3DADAPTER_DEFAULT, 0, &sID );
 	}
@@ -239,6 +240,7 @@ EGFXVideoCard CGraphicsEngine::GetVideoCard()
 		if ( (sID.VendorId == sType.dwVendorID) && ((sID.DeviceId & sType.dwDeviceIDMask) == (sType.dwDeviceID & sType.dwDeviceIDMask)) )
 			return sType.eType;
 	}
+	return GFXVC_DEFAULT;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CGraphicsEngine::SetMode( int nSizeX, int nSizeY, int nBpp, int nStencilBPP, EGFXFullscreen eFullscreen, int nFreq )
@@ -252,7 +254,8 @@ bool CGraphicsEngine::SetMode( int nSizeX, int nSizeY, int nBpp, int nStencilBPP
 	if ( !FillPresentationParams( nSizeX, nSizeY, nBpp, nStencilBPP, eFullscreen, nFreq ) )
 		return false;
 	SetRect( &rcScreen, 0, 0, displaymode.Width, displaymode.Height );
-	ResetDevice();
+	if ( !ResetDevice() )
+		return false;
 	return true;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -346,6 +349,24 @@ bool CGraphicsEngine::FillPresentationParams( int nWidth, int nHeight, int nBPP,
 				break;
 			}
 		}
+
+		// modern drivers may not expose legacy 16-bit fullscreen modes
+		if ( !bModeFound && nBPP != 32 )
+		{
+			for ( int i=0; i<2; ++i )
+			{
+				displaymode.Format = bpp32[i];
+				std::list<D3DDISPLAYMODE>::const_iterator pos =
+					std::find_if( adapter.modes.begin(), adapter.modes.end(), CD3DDisplayModeMatchFunctional(displaymode) );
+				if ( pos != adapter.modes.end() )
+				{
+					displaymode.RefreshRate = pos->RefreshRate;
+					nRenderSurfaceBPP = 32;
+					bModeFound = true;
+					break;
+				}
+			}
+		}
 		//
 		if ( bModeFound == false )
 			return false;
@@ -394,8 +415,9 @@ bool CGraphicsEngine::FillPresentationParams( int nWidth, int nHeight, int nBPP,
 	}
 	else
 	{
-		pp.EnableAutoDepthStencil = false;
-		pp.AutoDepthStencilFormat = D3DFMT_UNKNOWN;
+		// d3d8to11 requires a depth surface even for the legacy -1 request
+		pp.EnableAutoDepthStencil = true;
+		pp.AutoDepthStencilFormat = D3DFMT_D24S8;
 		this->nStencilBPP = -1;
 	}
 	//
@@ -477,12 +499,14 @@ bool CGraphicsEngine::Init( const char *pszAdapterName, HWND hWnd )
 		return false;
 	const SAdapterDesc *pAdapter = FindAdapter( szAdapterName.c_str(), adapters );
 	NI_ASSERT_TF( pAdapter != 0, "Can't find adapter by name", return false );
+	if ( pAdapter == 0 )
+		return false;
 	adapter = *pAdapter;
 	// assign window handle
 	hWindow = hWnd;
 	// create D3D
-	pD3D.Create( Direct3DCreate8(D3D_SDK_VERSION) );
-	NI_ASSERT_TF( pD3D != 0, NStr::Format("Can't create Direct3D8 of build %d. Pls, install latest DX", D3D_SDK_VERSION), return false );
+	pD3D.Create( ND3D8Runtime::Create() );
+	NI_ASSERT_TF( pD3D != 0, NStr::Format("Can't initialize the bundled D3D8-to-D3D11 renderer shim"), return false );
 	// 
 	// CRAP{ for shaders testing
 	SetupShaders();
@@ -559,7 +583,7 @@ const SGFXDisplayMode* CGraphicsEngine::GetDisplayModes() const
 			//
 			if ( (enumode.nBPP <= nMaxModeBPP) /*&& (float(it->Height)/float(it->Width) == 3.0f/4.0f)*/ ) 
 			{
-				std::remove( adapter.extmodes.begin(), adapter.extmodes.end(), enumode );
+				adapter.extmodes.erase( std::remove( adapter.extmodes.begin(), adapter.extmodes.end(), enumode ), adapter.extmodes.end() );
 				adapter.extmodes.push_back( enumode );
 			}
 		}
@@ -1055,10 +1079,10 @@ void CGraphicsEngine::SetRenderState( D3DRENDERSTATETYPE state, int nValue )
 	*/
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CGraphicsEngine::SetTextureStageState( DWORD stage, D3DTEXTURESTAGESTATETYPE type, int value )
+void CGraphicsEngine::SetTextureStageState( DWORD stage, int type, int value )
 {
 	//sctTSS[stage].SetState( type, value );
-	pD3DDevice->SetTextureStageState( stage, type, value );
+	pD3DDevice->SetTextureStageState( stage, static_cast<D3DTEXTURESTAGESTATETYPE>( type ), value );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGraphicsEngine::ApplyRenderStates()
@@ -1270,9 +1294,9 @@ bool CGraphicsEngine::EndScene()
 	/*
 	// call frame reset for all dynamic containers
 	for ( CVerticesMap::iterator pos1 = vertices.begin(); pos1 != vertices.end(); ++pos1 )
-		std::for_each( pos1->second.begin(), pos1->second.end(), std::mem_fun(CDynamicVertexContainer::FrameReset) );
+		std::for_each( pos1->second.begin(), pos1->second.end(), []( CDynamicVertexContainer *p ) { p->FrameReset(); } );
 	for ( CIndicesMap::iterator pos2 = indices.begin(); pos2 != indices.end(); ++pos2 )
-		std::for_each( pos2->second.begin(), pos2->second.end(), std::mem_fun(CDynamicIndexContainer::FrameReset) );
+		std::for_each( pos2->second.begin(), pos2->second.end(), []( CDynamicIndexContainer *p ) { p->FrameReset(); } );
 	*/
 	// end scene
 	HRESULT dxrval = pD3DDevice->EndScene();
@@ -1283,9 +1307,9 @@ bool CGraphicsEngine::EndScene()
 void CGraphicsEngine::ForceFlushTempBuffers()
 {
 	// force flush for all temp buffers
-	for ( std::hash_map<DWORD, CPtr2<CTempVB> >::iterator it = tempVBs.begin(); it != tempVBs.end(); ++it )
+	for ( std::unordered_map<DWORD, CPtr2<CTempVB> >::iterator it = tempVBs.begin(); it != tempVBs.end(); ++it )
 		it->second->ForceFlush();
-	for ( std::hash_map<DWORD, CPtr2<CTempIB> >::iterator it = tempIBs.begin(); it != tempIBs.end(); ++it )
+	for ( std::unordered_map<DWORD, CPtr2<CTempIB> >::iterator it = tempIBs.begin(); it != tempIBs.end(); ++it )
 		it->second->ForceFlush();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1414,9 +1438,9 @@ IGFXIndices* CGraphicsEngine::CreateIndices( int nNumElements, DWORD dwFormat, E
 void CGraphicsEngine::SetOptimizedBuffers( bool bEnable )
 {
 	bUseOptimizedBuffers = bEnable;
-	for ( std::hash_map<DWORD, CPtr2<CTempVB> >::iterator it = tempVBs.begin(); it != tempVBs.end(); ++it )
+	for ( std::unordered_map<DWORD, CPtr2<CTempVB> >::iterator it = tempVBs.begin(); it != tempVBs.end(); ++it )
 		it->second->UseOptimized( bEnable );
-	for ( std::hash_map<DWORD, CPtr2<CTempIB> >::iterator it = tempIBs.begin(); it != tempIBs.end(); ++it )
+	for ( std::unordered_map<DWORD, CPtr2<CTempIB> >::iterator it = tempIBs.begin(); it != tempIBs.end(); ++it )
 		it->second->UseOptimized( bEnable );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

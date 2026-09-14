@@ -17,37 +17,29 @@
 
 # Подготовка
 
-Все библиотеки из директории SDK нужны для компиляции. Пути к ним необходимо внести в **Tools => Options => Directories** в следующем порядке:
+Требования:
 
-## Include
-```
-C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\STLPORT
-C:\SDK\BINK (не включена в репозиторий)
-C:\SDK\FMOD\API\INC (не включена в репозиторий)
-C:\SDK\S3TC
-C:\SDK\STINGRAY STUDIO 2002\INCLUDE\TOOLKIT (не включена в репозиторий)
-C:\SDK\STINGRAY STUDIO 2002\INCLUDE (не включена в репозиторий)
-C:\SDK\STINGRAY STUDIO 2002\REGEX\INCLUDE (не включена в репозиторий)
-C:\SDK\Maya4.0\include
-```
+- Windows 10 или 11.
+- CMake 4.2 или новее.
+- Visual Studio 2026 с компонентами **Разработка классических приложений на C++** и Windows SDK.
+- Git и [vcpkg](https://github.com/microsoft/vcpkg). Задайте в `VCPKG_ROOT` путь к vcpkg.
+- FMOD Engine 2.01.x для Windows. FMOD лицензируется отдельно и не входит в этот репозиторий.
 
-## Lib
-```
-C:\SDK\BINK (не включена в репозиторий)
-C:\SDK\FMOD\API\LIB (не включена в репозиторий)
-C:\SDK\S3TC
-C:\SDK\STINGRAY STUDIO 2002\LIB (не включена в репозиторий)
-C:\SDK\STINGRAY STUDIO 2002\REGEX\LIB (не включена в репозиторий)
-C:\SDK\Maya4.0\lib
+Исходный код совместимости Direct3D включён в `Sources/sdk`. Разместите FMOD SDK по следующим путям без пробелов:
+
+```text
+Sources/sdk/FMOD/Include/fmod.hpp
+Sources/sdk/FMOD/lib/x86/fmod_vc.lib
+Sources/sdk/FMOD/lib/x86/fmod.dll
 ```
 
-Кроме того, необходим **DirectX 8.1** или выше (он сам включится в пути автоматически).
+Запустите `build.bat`. Манифест vcpkg автоматически установит FFmpeg, libpng, libsquish, pugixml и zlib. Включённый в репозиторий SDK `Sources/src/GameSpy` собирается из исходного кода; отдельно загружать GameSpy не нужно. Bink, STLPort, Stingray и старый DirectX 8 SDK для текущей цели игры не требуются.
 
-### Важные примечания
+Исполняемый файл Release создаётся в `build/bin/Release`. Чтобы использовать данные установленной розничной версии игры:
 
-- Библиотеки **Bink, FMOD, Stringray** не включены в этот репозиторий, так как требуют отдельного лицензирования.
-- **stlport** *должен* находиться в директории Visual C, рядом с `include`.
-- Путь `C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\STLPORT` должен стоять **первым**, иначе сборка не пройдет.
+```bat
+build\bin\Release\Game.exe -datadir "C:\path\to\Blitzkrieg"
+```
 
 ---
 

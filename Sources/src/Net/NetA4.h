@@ -109,7 +109,7 @@ private:
 
 	//
 	// multichannel
-	std::vector< std::hash_set<BYTE> > channelMsgTypes;
+	std::vector< std::unordered_set<BYTE> > channelMsgTypes;
 
 	struct SChannelMessage
 	{
@@ -199,7 +199,7 @@ public:
 	virtual sockaddr* STDCALL GetSockAddr();
 
 	//
-	virtual void STDCALL AddChannel( const int nChannelID, const std::hash_set<BYTE> &channelMessages );
+	virtual void STDCALL AddChannel( const int nChannelID, const std::unordered_set<BYTE> &channelMessages );
 	virtual void STDCALL RemoveChannel( const int nChannelID );
 	// received не заполняется!
 	virtual bool STDCALL GetChannelMessage( EMessage *pMsg, int *pClientID, int *received, IDataStream *pPkt, const int nChannel );

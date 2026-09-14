@@ -6,7 +6,7 @@
 #include "resource.h"
 #include "DialogMemory.h"
 #include "WndUtils.h"
-#include <hash_map>
+#include <unordered_map>
 
 /*
 BOOL CALLBACK DlgProcMemory( HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam );
@@ -58,29 +58,29 @@ int CDialogMemory::OnWndMsg( HWND hwndDlg, UINT message, WPARAM wParam, LPARAM l
 			ListView_AddColumn( hwndListFull, "Frees", nPart10 );
 			ListView_AddColumn( hwndListFull, "AllocMem", nPart10 );
 			ListView_AddColumn( hwndListFull, "FreedMem", nPart10 );
-			std::hash_map<std::string, SExternalDebugAllocStat> mapSumm;
+			std::unordered_map<std::string, SExternalDebugAllocStat> mapSumm;
 			for( const SExternalDebugAllocStat *it = m_pAllocStatBegin; it != m_pAllocStatEnd; ++it )
 			{
 				int nNewLine = ListView_AddItem( hwndListFull, it->pszFileName, LPARAM(it), 2000000 );
 				char buff[100];
 
-				itoa( it->uLineNumber, buff, 10 );
+				_itoa_s( it->uLineNumber, buff, sizeof(buff), 10 );
 				ListView_SetItemText( hwndListFull, nNewLine, 1, buff );
 				mapSumm[it->pszFileName].uLineNumber += it->uLineNumber;
 
-				itoa( it->uNumAllocs, buff, 10 );
+				_itoa_s( it->uNumAllocs, buff, sizeof(buff), 10 );
 				ListView_SetItemText( hwndListFull, nNewLine, 2, buff );
 				mapSumm[it->pszFileName].uNumAllocs += it->uNumAllocs;
 
-				itoa( it->uNumFrees, buff, 10 );
+				_itoa_s( it->uNumFrees, buff, sizeof(buff), 10 );
 				ListView_SetItemText( hwndListFull, nNewLine, 3, buff );
 				mapSumm[it->pszFileName].uNumFrees += it->uNumFrees;
 
-				itoa( it->uAllocatedMemory, buff, 10 );
+				_itoa_s( it->uAllocatedMemory, buff, sizeof(buff), 10 );
 				ListView_SetItemText( hwndListFull, nNewLine, 4, buff );
 				mapSumm[it->pszFileName].uAllocatedMemory += it->uAllocatedMemory;
 
-				itoa( it->uFreedMemory, buff, 10 );
+				_itoa_s( it->uFreedMemory, buff, sizeof(buff), 10 );
 				ListView_SetItemText( hwndListFull, nNewLine, 5, buff );
 				mapSumm[it->pszFileName].uFreedMemory += it->uFreedMemory;
 			}
@@ -93,25 +93,25 @@ int CDialogMemory::OnWndMsg( HWND hwndDlg, UINT message, WPARAM wParam, LPARAM l
 			ListView_AddColumn( hwndListSumm, "Frees", nPart10 );
 			ListView_AddColumn( hwndListSumm, "AllocMem", nPart10 );
 			ListView_AddColumn( hwndListSumm, "FreedMem", nPart10 );
-			for( std::hash_map<std::string, SExternalDebugAllocStat>::const_iterator i = mapSumm.begin();
+			for( std::unordered_map<std::string, SExternalDebugAllocStat>::const_iterator i = mapSumm.begin();
 					i != mapSumm.end(); ++i )
 			{
 				int nNewLine = ListView_AddItem( hwndListSumm, const_cast<char*>(i->first.c_str()), 0, 2000000 );
 				char buff[100];
 
-				itoa( i->second.uLineNumber, buff, 10 );
+				_itoa_s( i->second.uLineNumber, buff, sizeof(buff), 10 );
 				ListView_SetItemText( hwndListSumm, nNewLine, 1, buff );
 
-				itoa( i->second.uNumAllocs, buff, 10 );
+				_itoa_s( i->second.uNumAllocs, buff, sizeof(buff), 10 );
 				ListView_SetItemText( hwndListSumm, nNewLine, 2, buff );
 
-				itoa( i->second.uNumFrees, buff, 10 );
+				_itoa_s( i->second.uNumFrees, buff, sizeof(buff), 10 );
 				ListView_SetItemText( hwndListSumm, nNewLine, 3, buff );
 
-				itoa( i->second.uAllocatedMemory, buff, 10 );
+				_itoa_s( i->second.uAllocatedMemory, buff, sizeof(buff), 10 );
 				ListView_SetItemText( hwndListSumm, nNewLine, 4, buff );
 
-				itoa( i->second.uFreedMemory, buff, 10 );
+				_itoa_s( i->second.uFreedMemory, buff, sizeof(buff), 10 );
 				ListView_SetItemText( hwndListSumm, nNewLine, 5, buff );
 			}
 		}

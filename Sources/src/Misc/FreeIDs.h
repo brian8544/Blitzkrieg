@@ -12,7 +12,7 @@ class CFreeIds
 	enum { NUM_OF_ELEMENTS = 200 };
 
 	//CRAP{ for testing
-	std::hash_set<int> givenIDs;
+	std::unordered_set<int> givenIDs;
 	//CRAP}
 	
 	std::vector<int> nexts;
@@ -42,7 +42,7 @@ public:
 	int GetFreeId();
 	void AddToFreeId( int id );
 
-	inline int CFreeIds::operator&( IStructureSaver &ss )
+	inline int operator&( IStructureSaver &ss )
 	{
 		CSaverAccessor saver = &ss;
 		
@@ -54,7 +54,7 @@ public:
 		{
 			std::vector<WORD> nextsWord;
 			std::vector<WORD> predsWord;
-			std::hash_set<WORD> givenIDsWord;
+			std::unordered_set<WORD> givenIDsWord;
 
 			saver.Add( 1, &nextsWord );
 			saver.Add( 2, &predsWord );

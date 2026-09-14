@@ -143,6 +143,7 @@ struct SGFXVertex
 		};
 	};
 	//
+	SGFXVertex() { }
 	void Setup( float _x, float _y, float _z, float _nx, float _ny, float _nz, float _tu, float _tv )
 	{
 		x = _x;
@@ -182,6 +183,7 @@ struct SGFXVertex2
 		};
 	};
 	//
+	SGFXVertex2() { }
 	void Setup( float _x, float _y, float _z, float _nx, float _ny, float _nz, float _tu, float _tv, float _tu1, float _tv1 )
 	{
 		x = _x;
@@ -222,6 +224,7 @@ struct SGFXLVertex
 		};
 	};
 	//
+	SGFXLVertex() { }
 	void Setup( float _x, float _y, float _z, DWORD _color, DWORD _specular, float _tu, float _tv )
 	{
 		x = _x;
@@ -278,6 +281,7 @@ struct SGFXLVertex2
 		};
 	};
 	//
+	SGFXLVertex2() { }
 	void Setup( float _x, float _y, float _z, DWORD _color, DWORD _specular, float _tu, float _tv, float _tu1, float _tv1 )
 	{
 		x = _x;
@@ -339,6 +343,7 @@ struct SGFXTLVertex
 		};
 	};
 	//
+	SGFXTLVertex() { }
 	void Setup( float _sx, float _sy, float _sz, float _rhw, DWORD _color, DWORD _specular, float _tu, float _tv )
 	{
 		x = _sx;
@@ -379,6 +384,7 @@ struct SGFXTLVertex2
 		};
 	};
 	//
+	SGFXTLVertex2() { }
 	void Setup( float _x, float _y, float _z, float _rhw, DWORD _color, DWORD _specular, float _tu, float _tv, float _tu1, float _tv1 )
 	{
 		x = _x;
@@ -419,6 +425,7 @@ struct SGFXTLPoint
 		};
 	};
 	//
+	SGFXTLPoint() { }
 	void Setup( float _sx, float _sy, float _sz, float _rhw, DWORD _color )
 	{
 		x = _sx;
@@ -451,6 +458,7 @@ struct SGFXLineVertex
 		};
 	};
 	//
+	SGFXLineVertex() { }
 	void Setup( float _x, float _y, float _z, DWORD _color )
 	{
 		x = _x;

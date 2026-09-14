@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 std::vector< CPtr<CLinkObject> > CLinkObject::link2object;
 std::list<int> CLinkObject::deletedObjects;
-std::hash_map< int, CPtr<CLinkObject> > CLinkObject::unitsID2object;
+std::unordered_map< int, CPtr<CLinkObject> > CLinkObject::unitsID2object;
 std::list<int> CLinkObject::deletedUniqueObjects;
 int CLinkObject::nCurUniqueID = 0;
 

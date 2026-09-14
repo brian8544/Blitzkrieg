@@ -32,8 +32,8 @@ bool CIniFile::Open( const char *pszIniFileName, DWORD _dwAccessMode )
 	szIniFileName = pszIniFileName;
 	dwAccessMode = _dwAccessMode;
 	//
-	FILE *file = fopen( pszIniFileName, "rt" );
-	if ( file == 0 )
+	FILE *file = 0;
+	if ( fopen_s(&file, pszIniFileName, "rt") != 0 )
 		return false;
 	int nLength = _filelength( _fileno( file ) );
 	std::string szString;
@@ -87,8 +87,8 @@ CIniFile::~CIniFile()
 		return;
 	NI_ASSERT_TF( !szIniFileName.empty(), "Trying to save changed Ini-file with empty file name", return );
 	//
-	FILE *file = fopen( szIniFileName.c_str(), "wt" );
-	if ( file == 0 )
+	FILE *file = 0;
+	if ( fopen_s(&file, szIniFileName.c_str(), "wt") != 0 )
 		return;
 	for ( STable::CValList::const_iterator row = table.elist.begin(); row != table.elist.end(); ++row )
 	{
@@ -146,9 +146,9 @@ const char* CIniFile::GetString( const char *pszRow, const char *pszEntry, const
 	NI_ASSERT( CanRead() );
 	const SEntry *pEntry = GetEntry( pszRow, pszEntry );
 	if ( pEntry == 0 )
-		strcpy( pszBuffer, defval );
+		strcpy_s( pszBuffer, nBufferSize, defval );
 	else
-		strcpy( pszBuffer, table[pszRow][pszEntry].val.c_str() );
+		strcpy_s( pszBuffer, nBufferSize, table[pszRow][pszEntry].val.c_str() );
 	return pszBuffer;
 }
 int CIniFile::GetRawData( const char *pszRow, const char *pszEntry, void *pBuffer, int nBufferSize )
@@ -161,14 +161,14 @@ void CIniFile::SetInt( const char *pszRow, const char *pszEntry, int val )
 {
 	NI_ASSERT( CanWrite() );
 	char buff[64];
-	sprintf( buff, "%d", val );
+	sprintf_s( buff, "%d", val );
 	SetString( pszRow, pszEntry, buff );
 }
 void CIniFile::SetDouble( const char *pszRow, const char *pszEntry, double val )
 {
 	NI_ASSERT( CanWrite() );
 	char buff[128];
-	sprintf( buff, "%g", val );
+	sprintf_s( buff, "%g", val );
 	SetString( pszRow, pszEntry, buff );
 }
 void CIniFile::SetString( const char *pszRow, const char *pszEntry, const char *val )

@@ -8,6 +8,7 @@ CONDITIONAL COMPILATION :
 ----------------------------------------------------------------------*/
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "StdAfx.h"
+#include <cctype>
 #include "CallStack.h"
 // The project internal header file.
 #include "Internal.h"
@@ -63,7 +64,7 @@ void STDCALL AddIgnoreModule( const char *pszModuleName )
 {
 	ignoremodules.push_back( pszModuleName );
 	std::string &szString = ignoremodules.back();
-	std::transform( szString.begin(), szString.end(), szString.begin(), std::ptr_fun(MSVCMustDie_tolower) );
+	std::transform( szString.begin(), szString.end(), szString.begin(), []( unsigned char c ) { return static_cast<char>( std::tolower(c) ); } );
 }
 /*//////////////////////////////////////////////////////////////////////
                     File Scope Function Declarations
@@ -1080,7 +1081,7 @@ void InitSymEng()
 			{
 				std::string szName = szModName;
 				szName = szName.substr( szName.rfind( '\\' ) + 1 );
-				std::transform( szName.begin(), szName.end(), szName.begin(), std::ptr_fun(MSVCMustDie_tolower) );
+				std::transform( szName.begin(), szName.end(), szName.begin(), []( unsigned char c ) { return static_cast<char>( std::tolower(c) ); } );
 				if ( std::find( ignoremodules.begin(), ignoremodules.end(), szName ) != ignoremodules.end() )
 					continue;
 			}

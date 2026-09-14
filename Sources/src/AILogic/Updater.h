@@ -33,10 +33,10 @@ public:
 		virtual int STDCALL operator&( interface IStructureSaver &ss ) { 	CSaverAccessor saver = &ss; saver.Add( 1, &pObj ); saver.Add( 2, &nParam ); return 0; }
 	};
 private:
-	typedef std::hash_map< int, int> CAnimationSet;
+	typedef std::unordered_map< int, int> CAnimationSet;
 
-	typedef std::hash_map< int, SSimpleUpdate> CSimpleUpdatesSet;
-	typedef std::hash_map< int, CObj<IUpdatableObj> > CComplexUpdatesSet;
+	typedef std::unordered_map< int, SSimpleUpdate> CSimpleUpdatesSet;
+	typedef std::unordered_map< int, CObj<IUpdatableObj> > CComplexUpdatesSet;
 
 	// simpleUpdate - те actions, у которых на конце 1, complexUpdates - те actions, у которых на конце 0
 	std::vector<CSimpleUpdatesSet> simpleUpdates;

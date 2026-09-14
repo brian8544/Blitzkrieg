@@ -17,37 +17,29 @@ Please review the terms of the [license agreement](LICENSE.md) carefully before 
 
 # Preparation
 
-All libraries from the SDK directory are needed for compilation. The paths to them must be entered in **Tools => Options => Directories** in the following order:
+Requirements:
 
-## Include
-```
-C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\STLPORT
-C:\SDK\BINK (not included in the repository)
-C:\SDK\FMOD\API\INC (not included in the repository)
-C:\SDK\S3TC
-C:\SDK\STINGRAY STUDIO 2002\INCLUDE\TOOLKIT (not included in the repository)
-C:\SDK\STINGRAY STUDIO 2002\INCLUDE (not included in the repository)
-C:\SDK\STINGRAY STUDIO 2002\REGEX\INCLUDE (not included in the repository)
-C:\SDK\Maya4.0\include
-```
+- Windows 10 or 11.
+- CMake 4.2 or newer.
+- Visual Studio 2026 with the **Desktop development with C++** workload and a Windows SDK.
+- Git and [vcpkg](https://github.com/microsoft/vcpkg). Set `VCPKG_ROOT` to the vcpkg checkout.
+- FMOD Engine 2.01.x for Windows. FMOD is separately licensed and is not included in this repository.
 
-## Lib
-```
-C:\SDK\BINK (not included in the repository)
-C:\SDK\FMOD\API\LIB (not included in the repository)
-C:\SDK\S3TC
-C:\SDK\STINGRAY STUDIO 2002\LIB (not included in the repository)
-C:\SDK\STINGRAY STUDIO 2002\REGEX\LIB (not included in the repository)
-C:\SDK\Maya4.0\lib
+The Direct3D compatibility sources are included under `Sources/sdk`. Place the FMOD SDK files in this no-whitespace layout:
+
+```text
+Sources/sdk/FMOD/Include/fmod.hpp
+Sources/sdk/FMOD/lib/x86/fmod_vc.lib
+Sources/sdk/FMOD/lib/x86/fmod.dll
 ```
 
-In addition, **DirectX 8.1** or higher is required (it will automatically be added to the paths).
+Run `build.bat`. The vcpkg manifest installs FFmpeg, libpng, libsquish, pugixml, and zlib automatically. The bundled `Sources/src/GameSpy` SDK is built from source; no separate GameSpy download is needed. Bink, STLPort, Stingray, and the legacy DirectX 8 SDK are not required for the current game target.
 
-### Important Notes
+The Release executable is written to `build/bin/Release`. To use an installed copy of the retail data:
 
-- **Bink, FMOD, Stingray** libraries are not included in this repository as they require separate licensing.
-- **stlport** *must* be located in the Visual C directory, alongside `include`.
-- The path `C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\STLPORT` must be **first**, otherwise, the build will fail.
+```bat
+build\bin\Release\Game.exe -datadir "C:\path\to\Blitzkrieg"
+```
 
 ---
 

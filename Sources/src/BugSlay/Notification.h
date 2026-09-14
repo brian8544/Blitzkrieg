@@ -23,9 +23,9 @@ struct IGuardException : public ICommonException
 const char* DXErrorToString( HRESULT hErrorCode );
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // бросить exception с соответствующим форматированием и HRESULT-to-string convertion
-void ThrowExceptionHR( HRESULT dxrval, const char *pszFormat, ... ) throw ( ICommonException* );
-void ThrowException( const char *pszFormat, ... ) throw ( ICommonException* );
-void ThrowGuardException( const char *pszFormat, ... ) throw ( IGuardException* );
+void ThrowExceptionHR( HRESULT dxrval, const char *pszFormat, ... );
+void ThrowException( const char *pszFormat, ... );
+void ThrowGuardException( const char *pszFormat, ... );
 // error notification
 bool ReportErrorHR( HRESULT dxrval, const char *pszFormat, ... );
 bool ReportError( const char *pszFormat, ... );

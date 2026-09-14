@@ -143,7 +143,7 @@ void CInterfaceChapter::IncrementChapterVisited()
 		int nNumberOfFinishedMissions = GetGlobalVar( "Mission.Finished.Counter", 0 );
 		int nTotalProbability = 0;			//для выбора миссии с учетом вероятности
 		
-		std::hash_map< std::string, int > missionFinishTimes;		//в этой таблице будут соответствия имени миссии и когда она пройдена последний раз
+		std::unordered_map< std::string, int > missionFinishTimes;		//в этой таблице будут соответствия имени миссии и когда она пройдена последний раз
 		//заполняем табличку
 		for ( int i=0; i<nNumberOfFinishedMissions; i++ )
 		{
@@ -166,7 +166,7 @@ void CInterfaceChapter::IncrementChapterVisited()
 			
 			//определим, когда была пройдена последний раз эта миссия
 			int nFinishTime = 0;
-			std::hash_map< std::string, int >::iterator findIt = missionFinishTimes.find( temp.szName );
+			std::unordered_map< std::string, int >::iterator findIt = missionFinishTimes.find( temp.szName );
 			if ( findIt != missionFinishTimes.end() )
 				nFinishTime = findIt->second;			//миссия присутствует в табличке, значит когда-то проходилась
 
@@ -278,7 +278,7 @@ struct SMissionInfo
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef std::hash_map< std::string, std::vector<SMissionInfo> > CTemplateInfos;
+typedef std::unordered_map< std::string, std::vector<SMissionInfo> > CTemplateInfos;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CInterfaceChapter::Init()

@@ -309,7 +309,7 @@ void CGroupLogic::EraseFromAmbushGroups( const SAIUnitCmd &command, const WORD w
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGroupLogic::CreateAmbushGroup( const WORD wGroup )
 {
-	ambushGroups.push_front();
+	ambushGroups.emplace_front();
 	for ( int i = groupUnits.begin( wGroup ); i != groupUnits.end(); i = groupUnits.GetNext( i ) )
 	{
 		CCommonUnit *pUnit = groupUnits.GetEl( i );
@@ -368,7 +368,7 @@ void CGroupLogic::ProcessAmbushGroups()
 	if ( lastAmbushCheck + 5000 < curTime )
 	{
 		lastAmbushCheck = curTime;
-		std::hash_set<int> checkedUnits;
+		std::unordered_set<int> checkedUnits;
 
 		CAmbushGroups::iterator iter = ambushGroups.begin();
 		while ( iter != ambushGroups.end() )
@@ -507,7 +507,7 @@ void CGroupLogic::GroupCommand( const SAIUnitCmd &command, const WORD wGroup, bo
 			ProcessGridCommand( command.vPos, CVec2( NTrg::Cos(command.fNumber), NTrg::Sin(command.fNumber) ), wGroup, bPlaceInQueue );
 		else
 		{
-			std::hash_set<int> memFormationIDs;
+			std::unordered_set<int> memFormationIDs;
 			for ( std::vector<CCommonUnit*>::iterator iter = groups.begin(); iter != groups.end(); ++iter )
 			{
 				CCommonUnit *pUnit = *iter;

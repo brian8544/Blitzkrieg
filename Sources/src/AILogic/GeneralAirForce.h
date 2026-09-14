@@ -27,7 +27,7 @@ class CGeneralAirForce : public IRefCount, public IEnemyEnumerator
 
 	bool bReservedByFighters;							// ждем, пока отрегенерит авиация, чтобы послать истребители
 
-	typedef std::hash_map< int, CPtr<CEnemyRememberer> > AntiAviation;
+	typedef std::unordered_map< int, CPtr<CEnemyRememberer> > AntiAviation;
 	AntiAviation antiAviation;
 
 	struct SSupportInfo
@@ -47,7 +47,7 @@ class CGeneralAirForce : public IRefCount, public IEnemyEnumerator
 	NTimer::STime checkPeriod;						// следующая проверка для всей авиации, кроме истребителей
 	NTimer::STime fighterCheckPeriod;			// следующая проверка для истребителей
 public:
-	typedef std::hash_map< int /*request ID*/, SSupportInfo > Requests;
+	typedef std::unordered_map< int /*request ID*/, SSupportInfo > Requests;
 	typedef std::vector<Requests> RequestsByForceType;
 private:
 

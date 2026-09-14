@@ -52,7 +52,7 @@ const char * CInterfaceUnitsEncyclopediaBase::GetUnitNameByWindowID( const int n
 {
 	if ( nID >= E_START_WINDOW_ID && nID < E_START_WINDOW_ID + 9000 )
 	{
-		std::hash_map< int/*nWindowID*/, const SGDBObjectDesc * >::const_iterator it = gdbByWindowID.find( nID - E_START_WINDOW_ID );
+		std::unordered_map< int/*nWindowID*/, const SGDBObjectDesc * >::const_iterator it = gdbByWindowID.find( nID - E_START_WINDOW_ID );
 		if ( it != gdbByWindowID.end() )
 			return it->second->szKey.c_str();
 	}
@@ -477,7 +477,7 @@ void CInterfaceWarehouse::CUnitClassInfo::Expand( IUIShortcutBar *pSB, const boo
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CInterfaceWarehouse::CUnitClassInfo::ApplyUpgrades()
 {
-	std::for_each( units.begin(), units.end(), std::mem_fun( CUnitInfoItem::ApplyUpgrades ) );
+	std::for_each( units.begin(), units.end(), []( CUnitInfoItem *pUnit ) { pUnit->ApplyUpgrades(); } );
 	// fuck
 	return 0;
 }
@@ -763,7 +763,7 @@ void CInterfaceWarehouse::CPlayerUnitsPane::SetUpgrade( const std::string &szNew
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CInterfaceWarehouse::CPlayerUnitsPane::ApplyUpgrades()
 {
-	std::for_each( classes.begin(), classes.end(), std::mem_fun( CUnitClassInfo::ApplyUpgrades ) );
+	std::for_each( classes.begin(), classes.end(), []( CUnitClassInfo *pClass ) { pClass->ApplyUpgrades(); } );
 	return 0;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

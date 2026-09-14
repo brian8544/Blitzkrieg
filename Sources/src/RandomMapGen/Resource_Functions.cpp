@@ -271,7 +271,7 @@ void EnumFilesInDataStorage( std::vector<SEnumFilesInDataStorageParameter> *pPar
 bool ExecuteProcess( const std::string &szCommand, const std::string &szCmdLine, const std::string &szDirectory, bool bWait )
 {
 	char pszCommandLine[2048];
-	strcpy( pszCommandLine, szCmdLine.c_str() );
+	strcpy_s( pszCommandLine, sizeof(pszCommandLine), szCmdLine.c_str() );
 	//
 	STARTUPINFO startinfo;
 	PROCESS_INFORMATION procinfo;

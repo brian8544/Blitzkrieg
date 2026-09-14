@@ -333,7 +333,7 @@ IRefCount* CStructureSaver2::LoadObject()
 bool CStructureSaver2::StartChunk( const SSChunkID idChunk )
 {
 	CChunkLevel &last = chunks.back();
-	chunks.push_back();
+	chunks.emplace_back();
 	if ( IsReading() ) 
 	{
 		bool bRes = GetShortChunk( last, idChunk, chunks.back(), last.nChunkNumber );
@@ -384,7 +384,7 @@ void CStructureSaver2::Start( IStructureSaver::EAccessMode eAccessMode, IProgres
 	chunks.clear();
 	obj.Clear();
 	data.Clear();
-	chunks.push_back();
+	chunks.emplace_back();
 	bIsReading = eAccessMode == IStructureSaver::READ;
 	if ( IsReading() )
 	{
@@ -523,7 +523,8 @@ void CStructureSaver2::Start( IStructureSaver::EAccessMode eAccessMode, IProgres
 				szModuleName += "savedump.txt";
 			}
 			*/
-			if ( FILE *file = fopen(szModuleName.c_str(), "wt") ) 
+			FILE *file = 0;
+			if ( fopen_s(&file, szModuleName.c_str(), "wt") == 0 )
 			{
 				for ( std::vector<SObjectInfo>::iterator it = objinfos.begin(); it != objinfos.end(); ++it )
 				{
@@ -544,7 +545,7 @@ void CStructureSaver2::Start( IStructureSaver::EAccessMode eAccessMode, IProgres
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// std::hash_map<int, std::string> type2name;
+// std::unordered_map<int, std::string> type2name;
 // std::map<int, int> type2size;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CStructureSaver2::Finish()

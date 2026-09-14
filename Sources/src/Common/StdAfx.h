@@ -10,38 +10,20 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-// STLport configuration defines
-#define _NOTHREADS 1
-#define _STLP_DEBUG_TERMINATE 1
-#define _STLP_DEBUG_MESSAGE 1
 //
-#ifndef __AFX__
-#define WIN32_LEAN_AND_MEAN							// Exclude rarely-used stuff from Windows headers
-#include "stl_user_config.h"
-#include <stl/_config.h>
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
 
 #include <comutil.h>
 #include <assert.h>
-// undef some Windows API defines, like GetObject and CreateObject
+// Undefine Windows API macros that collide with engine method names.
 #ifdef GetObject
 #undef GetObject
-#endif // GetObject
+#endif
 #ifdef CreateObject
 #undef CreateObject
-#endif // CreateObject
-#else
-#define _STLP_USE_MFC 1
-#include "stl_user_config.h"
-#include <stl/_config.h>
-
-#include <afxwin.h>											// MFC core and standard components
-#include <afxext.h>											// MFC extensions
-#include <afxdtctl.h>										// MFC support for Internet Explorer 4 Common Controls
-#ifndef _AFX_NO_AFXCMN_SUPPORT
-#include <afxcmn.h>											// MFC support for Windows Common Controls
-#endif // _AFX_NO_AFXCMN_SUPPORT
-#include <comutil.h>
-#endif // __AFX__
+#endif
 
 //#include <stdlib.h>
 #include <math.h>
@@ -52,14 +34,13 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <hash_map>
-#include <hash_set>
+#include <unordered_map>
+#include <unordered_set>
 #include <set>
 #include <queue>
 //
 typedef __int64 int64;									// due to lack of 'long long' type support
 typedef unsigned __int64 QWORD;					// quadra word
-#define for if(false); else for					// to achive standard variable scope resolving, declared inside 'for'
 #define STDCALL __stdcall								// to use with interface function calls
 // define 'interface' keyword
 #ifndef interface

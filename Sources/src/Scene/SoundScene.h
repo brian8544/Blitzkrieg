@@ -66,7 +66,7 @@ class CMapSounds
 		{
 			DECLARE_SERIALIZE;
 		public:
-			std::hash_map<WORD,CVec2> instanceIDs;
+			std::unordered_map<WORD,CVec2> instanceIDs;
 			int nCount;
 			SMapSounds() : nCount( 0 ) {  }
 		};
@@ -90,7 +90,7 @@ class CMapSounds
 		SPlaying playingSound;										// текущий незацикленный звук
 
 		// по типам звука списки
-		typedef std::hash_map<WORD, SMapSounds> CellSounds;
+		typedef std::unordered_map<WORD, SMapSounds> CellSounds;
 		CellSounds cellSounds;
 		CellSounds cellLoopedSounds;
 		NTimer::STime timeNextRun;			// время следующего проигрыша звука
@@ -111,7 +111,7 @@ class CMapSounds
 	// 2d map of sound cells
 	CArray2D< CMapSoundCell > mapCells;
 	// cell - sound instance id
-	std::hash_map<WORD, SIntPair > cells;
+	std::unordered_map<WORD, SIntPair > cells;
 
 	CSoundScene * pSoundScene; 
 	NTimer::STime timeNextUpdate;
@@ -255,7 +255,7 @@ private:
 				return 0;
 			}
 		};
-		typedef std::hash_map< std::string/*Party Name*/, SMusicSettings > CMusicSettingsList;
+		typedef std::unordered_map< std::string/*Party Name*/, SMusicSettings > CMusicSettingsList;
 
 		enum EStreamingSoundsState
 		{
@@ -498,13 +498,13 @@ public:
 	
 	typedef std::list< CPtr<ISound> > CSamplesList;
 	typedef std::list< CPtr<CSound> > CSoundsList;
-	typedef std::hash_map< std::string/*subst name*/, CSoundsList > CHearableSounds;
-	typedef std::hash_map< std::string/*sound name*/, std::string/*subst name*/ > CSoundSubstTable;
+	typedef std::unordered_map< std::string/*subst name*/, CSoundsList > CHearableSounds;
+	typedef std::unordered_map< std::string/*sound name*/, std::string/*subst name*/ > CSoundSubstTable;
 	
-	//typedef std::hash_map< SIntPair, CSoundCell, SIntPairHash > CSoundCells;
+	//typedef std::unordered_map< SIntPair, CSoundCell, SIntPairHash > CSoundCells;
 	typedef CArray2D< CPtr<CSoundCell> > CSoundCellsInBounds;
-	typedef std::hash_map< SIntPair, CPtr<CSoundCell>, SIntPairHash > CSoundCellsOutOfBounds;
-	typedef std::hash_map< SIntPair, CPtr<CSoundCell>, SIntPairHash > CSoundCellsWithSound;
+	typedef std::unordered_map< SIntPair, CPtr<CSoundCell>, SIntPairHash > CSoundCellsOutOfBounds;
+	typedef std::unordered_map< SIntPair, CPtr<CSoundCell>, SIntPairHash > CSoundCellsWithSound;
 
 	// для сбора звуков, которые слышны в клетке и сортировки их по
 	// звукам их заменяющим
@@ -526,7 +526,7 @@ public:
 private:
 	enum ESoundSceneMode eSoundSceneMode;
 	CFreeIds freeIDs;											// таблица ID звуков
-	std::hash_map< WORD, SIntPair >				soundIDs;			// в какой клетке находится звук.
+	std::unordered_map< WORD, SIntPair >				soundIDs;			// в какой клетке находится звук.
 
 	ISFX * pSFX;
 	ISoundManager * pSoundManager;
@@ -544,8 +544,8 @@ private:
 	CStreamingSounds streamingSounds;
 	
 	CHearableSounds interfaceSounds;					// звуки от интерфейса
-	std::hash_set<int> finishedInterfaceSounds;
-	std::hash_set<int> deletedInterfaceSounds;
+	std::unordered_set<int> finishedInterfaceSounds;
+	std::unordered_set<int> deletedInterfaceSounds;
 
 	CTerrainSounds terrainSounds;
 	CMapSounds mapSounds;

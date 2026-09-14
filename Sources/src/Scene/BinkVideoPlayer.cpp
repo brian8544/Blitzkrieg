@@ -1,473 +1,669 @@
 #include "StdAfx.h"
-
 #include "BinkVideoPlayer.h"
 
 #include "..\SFX\SFX.h"
 #include "..\GFX\GFXHelper.h"
-#include "..\Misc\Intersection.h"
-#include <mmreg.h>
-#include <dsound.h>
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CBinkVideoPlayer::CBinkVideoPlayer()
+
+extern "C"
 {
-	dwCopyFlags = 0;
-	hBink = 0;
-	rcDstRect.SetEmpty();
-	bMaintainAspect = true;
-	nLastPlayedFrame = -1;
-	bLooped = false;
-	nShadingEffectStart = 17;
-	nShadingEffectFinish = 18;
-	bStopped = false;
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libavutil/channel_layout.h>
+#include <libavutil/error.h>
+#include <libavutil/imgutils.h>
+#include <libswresample/swresample.h>
+#include <libswscale/swscale.h>
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <algorithm>
+#include <cerrno>
+#include <cmath>
+#include <cstring>
+
+namespace
+{
+	void TraceFFmpegError( const char *where, int error )
+	{
+		char message[AV_ERROR_MAX_STRING_SIZE] = {};
+		av_strerror( error, message, sizeof(message) );
+		NStr::DebugTrace( "FFmpeg: %s failed: %s\n", where, message );
+	}
+
+	unsigned short Pack565( unsigned char r, unsigned char g, unsigned char b )
+	{
+		return static_cast<unsigned short>( ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3) );
+	}
+
+	unsigned short Pack1555( unsigned char a, unsigned char r, unsigned char g, unsigned char b )
+	{
+		return static_cast<unsigned short>( ((a >= 128 ? 1 : 0) << 15) | ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3) );
+	}
+
+	unsigned short Pack4444( unsigned char a, unsigned char r, unsigned char g, unsigned char b )
+	{
+		return static_cast<unsigned short>( ((a >> 4) << 12) | ((r >> 4) << 8) | ((g >> 4) << 4) | (b >> 4) );
+	}
+}
+
+CBinkVideoPlayer::CBinkVideoPlayer()
+	: bMaintainAspect( true ), dwCopyFlags( 0 ), dwPlayFlags( 0 ), bLooped( false ),
+	  nLastPlayedFrame( -1 ), bStopped( false ), bPaused( false ),
+	  nShadingEffectStart( 17 ), nShadingEffectFinish( 18 ),
+	  pFormat( nullptr ), pVideoCodec( nullptr ), pAudioCodec( nullptr ),
+	  pVideoFrame( nullptr ), pAudioFrame( nullptr ), pPacket( nullptr ), pAVIO( nullptr ),
+	  pSws( nullptr ), pSwr( nullptr ), nVideoStream( -1 ), nAudioStream( -1 ), nAudioChannels( 0 ),
+	  nWidth( 0 ), nHeight( 0 ), nNumFrames( 0 ), nLengthMs( 0 ), nCurrentFrame( -1 ),
+	  fFrameRate( 0.0 ), fFrameAccumulatorMs( 0.0 ), timeLastUpdate( -1 ),
+	  nMemoryPos( 0 ), pAudioInterface( nullptr )
+{
+	rcDstRect.SetEmpty();
+}
+
 CBinkVideoPlayer::~CBinkVideoPlayer()
 {
-	if ( hBink ) 
-		BinkClose( hBink );
+	CloseMovie();
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void CBinkVideoPlayer::CloseMovie()
+{
+	if ( pAudioInterface )
+		pAudioInterface->EndMovieAudio();
+	pAudioInterface = nullptr;
+
+	if ( pSwr ) swr_free( &pSwr );
+	if ( pSws ) { sws_freeContext( pSws ); pSws = nullptr; }
+	if ( pPacket ) av_packet_free( &pPacket );
+	if ( pAudioFrame ) av_frame_free( &pAudioFrame );
+	if ( pVideoFrame ) av_frame_free( &pVideoFrame );
+	if ( pAudioCodec ) avcodec_free_context( &pAudioCodec );
+	if ( pVideoCodec ) avcodec_free_context( &pVideoCodec );
+
+	if ( pFormat )
+	{
+		// For custom AVIO, avformat_close_input does not own the AVIOContext.
+		avformat_close_input( &pFormat );
+	}
+	if ( pAVIO )
+	{
+		av_freep( &pAVIO->buffer );
+		avio_context_free( &pAVIO );
+	}
+
+	buffer.clear();
+	frameBGRA.clear();
+	nMemoryPos = 0;
+	nVideoStream = -1;
+	nAudioStream = -1;
+	nAudioChannels = 0;
+	nWidth = nHeight = nNumFrames = nLengthMs = 0;
+	nCurrentFrame = nLastPlayedFrame = -1;
+	fFrameRate = 0.0;
+	fFrameAccumulatorMs = 0.0;
+	timeLastUpdate = -1;
+	bPaused = false;
+	bStopped = true;
+}
+
+int CBinkVideoPlayer::ReadMemoryPacket( void *pOpaque, std::uint8_t *pOut, int nBufferSize )
+{
+	CBinkVideoPlayer *pThis = static_cast<CBinkVideoPlayer*>( pOpaque );
+	if ( !pThis || pThis->nMemoryPos >= pThis->buffer.size() )
+		return AVERROR_EOF;
+	const std::size_t remaining = pThis->buffer.size() - pThis->nMemoryPos;
+	const std::size_t count = std::min<std::size_t>( remaining, static_cast<std::size_t>(nBufferSize) );
+	std::memcpy( pOut, pThis->buffer.data() + pThis->nMemoryPos, count );
+	pThis->nMemoryPos += count;
+	return static_cast<int>( count );
+}
+
+std::int64_t CBinkVideoPlayer::SeekMemoryPacket( void *pOpaque, std::int64_t nOffset, int nWhence )
+{
+	CBinkVideoPlayer *pThis = static_cast<CBinkVideoPlayer*>( pOpaque );
+	if ( !pThis )
+		return AVERROR( EINVAL );
+	if ( nWhence == AVSEEK_SIZE )
+		return static_cast<std::int64_t>( pThis->buffer.size() );
+
+	const int baseWhence = nWhence & ~AVSEEK_FORCE;
+	std::int64_t base = 0;
+	if ( baseWhence == SEEK_CUR ) base = static_cast<std::int64_t>( pThis->nMemoryPos );
+	else if ( baseWhence == SEEK_END ) base = static_cast<std::int64_t>( pThis->buffer.size() );
+	else if ( baseWhence != SEEK_SET ) return AVERROR( EINVAL );
+
+	const std::int64_t next = base + nOffset;
+	if ( next < 0 || next > static_cast<std::int64_t>(pThis->buffer.size()) )
+		return AVERROR( EINVAL );
+	pThis->nMemoryPos = static_cast<std::size_t>( next );
+	return next;
+}
+
+bool CBinkVideoPlayer::OpenCodec( int nStreamIndex, AVCodecContext **ppCodec )
+{
+	if ( !pFormat || nStreamIndex < 0 || !ppCodec )
+		return false;
+	AVStream *pStream = pFormat->streams[nStreamIndex];
+	const AVCodec *pDecoder = avcodec_find_decoder( pStream->codecpar->codec_id );
+	if ( !pDecoder )
+		return false;
+
+	AVCodecContext *pCodec = avcodec_alloc_context3( pDecoder );
+	if ( !pCodec )
+		return false;
+	int result = avcodec_parameters_to_context( pCodec, pStream->codecpar );
+	if ( result >= 0 )
+		result = avcodec_open2( pCodec, pDecoder, nullptr );
+	if ( result < 0 )
+	{
+		TraceFFmpegError( "open decoder", result );
+		avcodec_free_context( &pCodec );
+		return false;
+	}
+	*ppCodec = pCodec;
+	return true;
+}
+
+bool CBinkVideoPlayer::ConfigureAudio()
+{
+	if ( !pAudioCodec || !pAudioInterface )
+		return false;
+
+	AVChannelLayout inputLayout = {};
+	AVChannelLayout outputLayout = {};
+	if ( pAudioCodec->ch_layout.nb_channels > 0 )
+		av_channel_layout_copy( &inputLayout, &pAudioCodec->ch_layout );
+	else
+		av_channel_layout_default( &inputLayout, 2 );
+	av_channel_layout_copy( &outputLayout, &inputLayout );
+
+	const int result = swr_alloc_set_opts2( &pSwr,
+		&outputLayout, AV_SAMPLE_FMT_FLT, pAudioCodec->sample_rate,
+		&inputLayout, pAudioCodec->sample_fmt, pAudioCodec->sample_rate,
+		0, nullptr );
+	nAudioChannels = outputLayout.nb_channels;
+	av_channel_layout_uninit( &outputLayout );
+	av_channel_layout_uninit( &inputLayout );
+	if ( result < 0 || !pSwr || swr_init( pSwr ) < 0 )
+	{
+		NStr::DebugTrace( "FFmpeg: failed to initialize movie audio resampler\n" );
+		return false;
+	}
+	return pAudioInterface->BeginMovieAudio( pAudioCodec->sample_rate, nAudioChannels );
+}
+
+bool CBinkVideoPlayer::OpenBink( const char *pszFileName, DWORD, DWORD dwFlags )
+{
+	CloseMovie();
+	dwPlayFlags = dwFlags;
+	bStopped = false;
+	bPaused = false;
+
+	int result = 0;
+	if ( dwFlags & IVideoPlayer::PLAY_FROM_MEMORY )
+	{
+		CPtr<IDataStream> pStream = GetSingleton<IDataStorage>()->OpenStream( pszFileName, STREAM_ACCESS_READ );
+		if ( pStream == 0 || pStream->GetSize() <= 0 )
+			return false;
+		buffer.resize( pStream->GetSize() );
+		if ( pStream->Read( buffer.data(), static_cast<int>(buffer.size()) ) != static_cast<int>(buffer.size()) )
+			return false;
+
+		pFormat = avformat_alloc_context();
+		unsigned char *pAVIOBuffer = static_cast<unsigned char*>( av_malloc( 32768 ) );
+		if ( !pFormat || !pAVIOBuffer )
+			return false;
+		pAVIO = avio_alloc_context( pAVIOBuffer, 32768, 0, this, &CBinkVideoPlayer::ReadMemoryPacket, nullptr, &CBinkVideoPlayer::SeekMemoryPacket );
+		if ( !pAVIO )
+			return false;
+		pFormat->pb = pAVIO;
+		pFormat->flags |= AVFMT_FLAG_CUSTOM_IO;
+		result = avformat_open_input( &pFormat, nullptr, nullptr, nullptr );
+	}
+	else
+	{
+		result = avformat_open_input( &pFormat, pszFileName, nullptr, nullptr );
+	}
+	if ( result < 0 )
+	{
+		TraceFFmpegError( "avformat_open_input", result );
+		CloseMovie();
+		return false;
+	}
+	result = avformat_find_stream_info( pFormat, nullptr );
+	if ( result < 0 )
+	{
+		TraceFFmpegError( "avformat_find_stream_info", result );
+		CloseMovie();
+		return false;
+	}
+
+	nVideoStream = av_find_best_stream( pFormat, AVMEDIA_TYPE_VIDEO, -1, -1, nullptr, 0 );
+	nAudioStream = av_find_best_stream( pFormat, AVMEDIA_TYPE_AUDIO, -1, -1, nullptr, 0 );
+	if ( nVideoStream < 0 || !OpenCodec( nVideoStream, &pVideoCodec ) )
+	{
+		NStr::DebugTrace( "FFmpeg: movie has no decodable video stream: %s\n", pszFileName );
+		CloseMovie();
+		return false;
+	}
+	if ( nAudioStream >= 0 && !OpenCodec( nAudioStream, &pAudioCodec ) )
+		nAudioStream = -1;
+
+	pVideoFrame = av_frame_alloc();
+	pAudioFrame = av_frame_alloc();
+	pPacket = av_packet_alloc();
+	if ( !pVideoFrame || !pAudioFrame || !pPacket )
+	{
+		CloseMovie();
+		return false;
+	}
+
+	nWidth = pVideoCodec->width;
+	nHeight = pVideoCodec->height;
+	frameBGRA.resize( static_cast<std::size_t>(nWidth) * static_cast<std::size_t>(nHeight) * 4u );
+	pSws = sws_getContext( nWidth, nHeight, pVideoCodec->pix_fmt,
+		nWidth, nHeight, AV_PIX_FMT_BGRA, SWS_BILINEAR, nullptr, nullptr, nullptr );
+	if ( !pSws )
+	{
+		CloseMovie();
+		return false;
+	}
+
+	const AVRational guessed = av_guess_frame_rate( pFormat, pFormat->streams[nVideoStream], nullptr );
+	fFrameRate = guessed.num > 0 && guessed.den > 0 ? av_q2d( guessed ) : 25.0;
+	if ( pFormat->duration > 0 )
+		nLengthMs = static_cast<int>( pFormat->duration * 1000 / AV_TIME_BASE );
+	else
+		nLengthMs = 0;
+
+	const int64_t streamFrames = pFormat->streams[nVideoStream]->nb_frames;
+	nNumFrames = streamFrames > 0 ? static_cast<int>( std::min<int64_t>(streamFrames, 0x7fffffff) ) :
+		(nLengthMs > 0 ? static_cast<int>( std::llround( nLengthMs * fFrameRate / 1000.0 ) ) : 0);
+
+	nCurrentFrame = -1;
+	nLastPlayedFrame = -1;
+	fFrameAccumulatorMs = 0.0;
+	timeLastUpdate = -1;
+	return true;
+}
+
+void CBinkVideoPlayer::DecodeAudioPacket( AVPacket *pAudioPacket )
+{
+	if ( !pAudioCodec || !pSwr || !pAudioInterface || !pAudioPacket )
+		return;
+	if ( avcodec_send_packet( pAudioCodec, pAudioPacket ) < 0 )
+		return;
+
+	while ( avcodec_receive_frame( pAudioCodec, pAudioFrame ) == 0 )
+	{
+		const int channels = std::max( nAudioChannels, 1 );
+		const int maxFrames = std::max( swr_get_out_samples( pSwr, pAudioFrame->nb_samples ), pAudioFrame->nb_samples );
+		std::vector<float> pcm( static_cast<std::size_t>(maxFrames) * static_cast<std::size_t>(channels) );
+		unsigned char *output[] = { reinterpret_cast<unsigned char*>( pcm.data() ) };
+		const int inputPlanes = av_sample_fmt_is_planar( static_cast<AVSampleFormat>(pAudioFrame->format) ) ?
+			std::max( pAudioFrame->ch_layout.nb_channels, 1 ) : 1;
+		std::vector<const unsigned char*> input( static_cast<std::size_t>(inputPlanes) );
+		for ( int i = 0; i < inputPlanes; ++i )
+			input[i] = pAudioFrame->extended_data[i];
+		const int frames = swr_convert( pSwr, output, maxFrames, input.data(), pAudioFrame->nb_samples );
+		if ( frames > 0 )
+			pAudioInterface->SubmitMovieAudio( pcm.data(), static_cast<unsigned int>(frames) );
+		av_frame_unref( pAudioFrame );
+	}
+}
+
+bool CBinkVideoPlayer::DecodeOneVideoFrame()
+{
+	if ( !pFormat || !pVideoCodec || !pPacket )
+		return false;
+
+	for (;;)
+	{
+		int receive = avcodec_receive_frame( pVideoCodec, pVideoFrame );
+		if ( receive == 0 )
+		{
+			unsigned char *dstData[4] = { frameBGRA.data(), nullptr, nullptr, nullptr };
+			int dstLinesize[4] = { nWidth * 4, 0, 0, 0 };
+			sws_scale( pSws, pVideoFrame->data, pVideoFrame->linesize, 0, nHeight, dstData, dstLinesize );
+			av_frame_unref( pVideoFrame );
+			++nCurrentFrame;
+			nLastPlayedFrame = nCurrentFrame;
+			return true;
+		}
+		if ( receive != AVERROR(EAGAIN) && receive != AVERROR_EOF )
+			return false;
+
+		const int read = av_read_frame( pFormat, pPacket );
+		if ( read < 0 )
+		{
+			avcodec_send_packet( pVideoCodec, nullptr );
+			if ( avcodec_receive_frame( pVideoCodec, pVideoFrame ) == 0 )
+				continue;
+			if ( bLooped || (dwPlayFlags & IVideoPlayer::PLAY_LOOPED) )
+				return RestartFromBeginning() && DecodeOneVideoFrame();
+			bStopped = true;
+			if ( pAudioInterface ) pAudioInterface->EndMovieAudio();
+			return false;
+		}
+
+		if ( pPacket->stream_index == nAudioStream )
+			DecodeAudioPacket( pPacket );
+		else if ( pPacket->stream_index == nVideoStream )
+			avcodec_send_packet( pVideoCodec, pPacket );
+		av_packet_unref( pPacket );
+	}
+}
+
+bool CBinkVideoPlayer::RestartFromBeginning()
+{
+	if ( !pFormat )
+		return false;
+	if ( av_seek_frame( pFormat, nVideoStream, 0, AVSEEK_FLAG_BACKWARD ) < 0 )
+		return false;
+	avcodec_flush_buffers( pVideoCodec );
+	if ( pAudioCodec ) avcodec_flush_buffers( pAudioCodec );
+	if ( pSwr ) swr_close( pSwr ), swr_init( pSwr );
+	nCurrentFrame = -1;
+	nLastPlayedFrame = -1;
+	bStopped = false;
+	if ( pAudioInterface && pAudioCodec )
+	{
+		pAudioInterface->EndMovieAudio();
+		pAudioInterface->BeginMovieAudio( pAudioCodec->sample_rate,
+			std::max( nAudioChannels, 1 ) );
+	}
+	return true;
+}
+
 void CBinkVideoPlayer::SetupRects()
 {
-	if ( rcDstRect.IsEmpty() || (hBink == 0) || images.empty() || images[0].rcSrcRect.IsEmpty() ) 
+	if ( rcDstRect.IsEmpty() || nWidth <= 0 || nHeight <= 0 || images.empty() || images[0].rcSrcRect.IsEmpty() )
 		return;
-	//
-	if ( bMaintainAspect ) 
+
+	CTRect<float> destination = rcDstRect;
+	if ( bMaintainAspect )
 	{
-		const float fCoeffX = rcDstRect.Width() / float( hBink->Width );
-		const float fCoeffY = rcDstRect.Height() / float( hBink->Height );
-		if ( (fCoeffX < fCoeffY) && (fabsf(fCoeffX - fCoeffY) > 0.001) ) 
+		const float fCoeffX = destination.Width() / static_cast<float>(nWidth);
+		const float fCoeffY = destination.Height() / static_cast<float>(nHeight);
+		if ( fCoeffX < fCoeffY && std::fabs(fCoeffX - fCoeffY) > 0.001f )
 		{
-			const float fNewSizeY = hBink->Height * fCoeffX;
-			rcDstRect.y1 = ( rcDstRect.Height() - fNewSizeY ) / 2.0f;
-			rcDstRect.y2 = rcDstRect.y1 + fNewSizeY;
+			const float newHeight = nHeight * fCoeffX;
+			const float top = destination.y1 + (destination.Height() - newHeight) * 0.5f;
+			destination.y1 = top;
+			destination.y2 = top + newHeight;
 		}
-		else if ( (fCoeffY < fCoeffX) && (fabsf(fCoeffY - fCoeffX) > 0.001) ) 
+		else if ( fCoeffY < fCoeffX && std::fabs(fCoeffY - fCoeffX) > 0.001f )
 		{
-			const float fNewSizeX = hBink->Height * fCoeffY;
-			rcDstRect.x1 = ( rcDstRect.Width() - fNewSizeX ) / 2.0f;
-			rcDstRect.x2 = rcDstRect.x1 + fNewSizeX;
+			const float newWidth = nWidth * fCoeffY;
+			const float left = destination.x1 + (destination.Width() - newWidth) * 0.5f;
+			destination.x1 = left;
+			destination.x2 = left + newWidth;
 		}
 	}
-	//
-	const float fCoeffX = rcDstRect.Width() / float( hBink->Width );
-	const float fCoeffY = rcDstRect.Height() / float( hBink->Height );
+
+	const float fCoeffX = destination.Width() / static_cast<float>(nWidth);
+	const float fCoeffY = destination.Height() / static_cast<float>(nHeight);
 	for ( CImagesList::iterator it = images.begin(); it != images.end(); ++it )
 	{
-		it->rcRect.x1 = int( rcDstRect.x1 + it->rcSrcRect.x1*fCoeffX ) - 0.5f;
-		it->rcRect.y1 = int( rcDstRect.y1 + it->rcSrcRect.y1*fCoeffY ) - 0.5f;
-		it->rcRect.x2 = int( rcDstRect.x1 + it->rcSrcRect.x2*fCoeffX ) - 0.5f;
-		it->rcRect.y2 = int( rcDstRect.y1 + it->rcSrcRect.y2*fCoeffY ) - 0.5f;
+		it->rcRect.x1 = static_cast<int>( destination.x1 + it->rcSrcRect.x1 * fCoeffX ) - 0.5f;
+		it->rcRect.y1 = static_cast<int>( destination.y1 + it->rcSrcRect.y1 * fCoeffY ) - 0.5f;
+		it->rcRect.x2 = static_cast<int>( destination.x1 + it->rcSrcRect.x2 * fCoeffX ) - 0.5f;
+		it->rcRect.y2 = static_cast<int>( destination.y1 + it->rcSrcRect.y2 * fCoeffY ) - 0.5f;
 	}
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CBinkVideoPlayer::SetTarget( IGFXTexture *pTexture, IGFX *pGFX )
+
+void CBinkVideoPlayer::SetTarget( IGFXTexture *pTexture, IGFX * )
 {
 	SImagePart image;
 	image.pTexture = pTexture;
 	images.clear();
 	images.push_back( image );
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void CBinkVideoPlayer::SetDstRect( const RECT &_rcDstRect, bool _bMaintainAspect )
 {
 	rcDstRect = _rcDstRect;
 	bMaintainAspect = _bMaintainAspect;
 	SetupRects();
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CBinkVideoPlayer::OpenBink( const char *pszFileName, DWORD dwOpenFlags, DWORD dwFlags )
-{
-	if ( dwFlags & IVideoPlayer::PLAY_FROM_MEMORY ) 
-	{
-		CPtr<IDataStream> pStream = GetSingleton<IDataStorage>()->OpenStream( pszFileName, STREAM_ACCESS_READ );
-		if ( (pStream == 0) || (pStream->GetSize() == 0) ) 
-			return false;
-		buffer.resize( pStream->GetSize() );
-		pStream->Read( &(buffer[0]), buffer.size() );
-		hBink = BinkOpen( &(buffer[0]), dwOpenFlags | BINKFROMMEMORY );
-	}
-	else
-		hBink = BinkOpen( pszFileName, dwOpenFlags );
-	//
-	dwPlayFlags = dwFlags;
-	//
-	if ( hBink != 0 )
-	{
-		// set sound volume
-		s32 nVolume = 32768 * GetSingleton<ISFX>()->GetSFXMasterVolume() / 255.0f;
-		BinkSetVolume( hBink, 0, nVolume );
-	}
-	return hBink != 0;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CBinkVideoPlayer::Play( const char *pszFileName, DWORD dwFlags, IGFX *pGFX, interface ISFX *pSFX )
+
+int CBinkVideoPlayer::Play( const char *pszFileName, DWORD dwFlags, IGFX *pGFX, ISFX *pSFX )
 {
 	Stop();
-	// initialize sound
-	if ( pSFX ) 
-	{
-		LPDIRECTSOUND pDS = reinterpret_cast<LPDIRECTSOUND>( pSFX->QI(0) );
-		if ( pDS != 0 ) 
-			BinkSoundUseDirectSound( pDS );
-	}
-	//
-	szFileName = pszFileName;
-	DWORD dwOpenFlags = 0;
-	if ( images.size() == 1 )							// if we have set 'external' render target
-	{
-		switch ( images[0].pTexture->GetFormat() ) 
-		{
-			case GFXPF_ARGB8888:
-				if ( dwFlags & IVideoPlayer::PLAY_WITH_ALPHA ) 
-					dwOpenFlags |= BINKALPHA;
-				dwCopyFlags |= BINKSURFACE32A;
-				break;
-			case GFXPF_ARGB4444:
-				if ( dwFlags & IVideoPlayer::PLAY_WITH_ALPHA ) 
-					dwOpenFlags |= BINKALPHA;
-				dwCopyFlags |= BINKSURFACE4444;
-				break;
-			case GFXPF_ARGB1555:
-				dwCopyFlags |= BINKSURFACE5551;
-				break;
-			case GFXPF_ARGB0565:
-				dwCopyFlags |= BINKSURFACE565;
-				break;
-			default:
-				NI_ASSERT_T( false, "Unsupported format in Bink video player" );
-		}
-		// open bink
-		if ( OpenBink(pszFileName, dwOpenFlags, dwFlags) == false ) 
-			return 0;
-		// setup rects
-		const int nSizeX = Min( images[0].pTexture->GetSizeX(0), int(hBink->Width) );
-		const int nSizeY = Min( images[0].pTexture->GetSizeY(0), int(hBink->Height) );
-		images[0].rcSrcRect.Set( 0, 0, nSizeX, nSizeY );
-		images[0].rcDstRect.Set( 0, 0, nSizeX, nSizeY );
-		images[0].rcMaps.Set( 0, 0, float(nSizeX) / float(images[0].pTexture->GetSizeX(0)), float(nSizeY) / float(images[0].pTexture->GetSizeY(0)) );
-	}
-	else																	// create 'internal' render target
-	{
-		dwCopyFlags |= BINKSURFACE32A;
-		if ( dwFlags & IVideoPlayer::PLAY_WITH_ALPHA ) 
-			dwOpenFlags |= BINKALPHA;
-		// open bink
-		if ( OpenBink(pszFileName, dwOpenFlags, dwFlags) == false ) 
-			return 0;
-		const bool bHasNonPow2Textures = (GetGlobalVar( "GFX.Caps.Texture.NonPow2Conditional", 0 ) != 0) || (GetGlobalVar( "GFX.Caps.Texture.NonPow2", 0 ) != 0);
-		if ( bHasNonPow2Textures )					// create one non-pow2 texture, if device supports it
-		{
-			images.clear();
+	szFileName = pszFileName ? pszFileName : "";
+	pAudioInterface = pSFX;
+	bLooped = bLooped || ((dwFlags & IVideoPlayer::PLAY_LOOPED) != 0);
 
+	if ( !OpenBink( pszFileName, 0, dwFlags ) )
+		return 0;
+	pAudioInterface = pSFX;
+	if ( pAudioCodec && pAudioInterface )
+		ConfigureAudio();
+
+	if ( images.size() == 1 && images[0].pTexture )
+	{
+		const int sizeX = Min( images[0].pTexture->GetSizeX(0), nWidth );
+		const int sizeY = Min( images[0].pTexture->GetSizeY(0), nHeight );
+		images[0].rcSrcRect.Set( 0, 0, sizeX, sizeY );
+		images[0].rcDstRect.Set( 0, 0, sizeX, sizeY );
+		images[0].rcMaps.Set( 0, 0, float(sizeX) / images[0].pTexture->GetSizeX(0), float(sizeY) / images[0].pTexture->GetSizeY(0) );
+	}
+	else
+	{
+		images.clear();
+		const bool nonPow2 = (GetGlobalVar( "GFX.Caps.Texture.NonPow2Conditional", 0 ) != 0) || (GetGlobalVar( "GFX.Caps.Texture.NonPow2", 0 ) != 0);
+		if ( nonPow2 )
+		{
 			SImagePart image;
-			image.pTexture = pGFX->CreateTexture( hBink->Width, hBink->Height, 1, GFXPF_ARGB8888, GFXD_STATIC );
-			image.rcSrcRect.Set( 0, 0, hBink->Width, hBink->Height );
-			image.rcDstRect.Set( 0, 0, hBink->Width, hBink->Height );
+			image.pTexture = pGFX->CreateTexture( nWidth, nHeight, 1, GFXPF_ARGB8888, GFXD_STATIC );
+			image.rcSrcRect.Set( 0, 0, nWidth, nHeight );
+			image.rcDstRect.Set( 0, 0, nWidth, nHeight );
 			image.rcMaps.Set( 0, 0, 1, 1 );
-			//
 			images.push_back( image );
 		}
-		else																// create serie of 256x256 textures to cover all render target
+		else
 		{
-			const int nNumTexturesX = fmod( hBink->Width, 256 ) == 0 ? hBink->Width / 256 : hBink->Width / 256 + 1;
-			const int nNumTexturesY = fmod( hBink->Height, 256 ) == 0 ? hBink->Height / 256 : hBink->Height / 256 + 1;
-			const bool bSquareOnly = GetGlobalVar( "GFX.Caps.Texture.SquareOnly", 0 ) != 0;
-			//
-			int nRestSizeY = hBink->Height;
-			int nPosY = 0;
-			for ( int i = 0; i < nNumTexturesY; ++i )
+			const bool squareOnly = GetGlobalVar( "GFX.Caps.Texture.SquareOnly", 0 ) != 0;
+			for ( int y = 0; y < nHeight; y += 256 )
 			{
-				const int nSrcSizeY = nRestSizeY >= 256 ? 256 : nRestSizeY;
-				int nRestSizeX = hBink->Width;
-				int nPosX = 0;
-				for ( int j = 0; j < nNumTexturesX; ++j )
+				for ( int x = 0; x < nWidth; x += 256 )
 				{
-					const int nSrcSizeX = nRestSizeX >= 256 ? 256 : nRestSizeX;
-					int nTextureSizeX = nRestSizeX < 256 ? GetNextPow2( nRestSizeX ) : 256;
-					int nTextureSizeY = nRestSizeY < 256 ? GetNextPow2( nRestSizeY ) : 256;
-					if ( bSquareOnly ) 
-						nTextureSizeX = nTextureSizeY = Max( nTextureSizeX, nTextureSizeY );
-					//
+					const int sourceWidth = Min( 256, nWidth - x );
+					const int sourceHeight = Min( 256, nHeight - y );
+					int textureWidth = sourceWidth < 256 ? GetNextPow2( sourceWidth ) : 256;
+					int textureHeight = sourceHeight < 256 ? GetNextPow2( sourceHeight ) : 256;
+					if ( squareOnly ) textureWidth = textureHeight = Max( textureWidth, textureHeight );
 					SImagePart image;
-					image.pTexture = pGFX->CreateTexture( nTextureSizeX, nTextureSizeY, 1, GFXPF_ARGB8888, GFXD_STATIC );
-					image.rcSrcRect.Set( nPosX, nPosY, nPosX + nSrcSizeX, nPosY + nSrcSizeY );
-					image.rcDstRect.Set( 0, 0, nSrcSizeX, nSrcSizeY );
-					image.rcMaps.Set( 0, 0, float(image.rcDstRect.Width()) / float(nTextureSizeX), float(image.rcDstRect.Height()) / float(nTextureSizeY) );
-					//
+					image.pTexture = pGFX->CreateTexture( textureWidth, textureHeight, 1, GFXPF_ARGB8888, GFXD_STATIC );
+					image.rcSrcRect.Set( x, y, x + sourceWidth, y + sourceHeight );
+					image.rcDstRect.Set( 0, 0, sourceWidth, sourceHeight );
+					image.rcMaps.Set( 0, 0, float(sourceWidth) / textureWidth, float(sourceHeight) / textureHeight );
 					images.push_back( image );
-					//
-					nRestSizeX -= 256;
-					nPosX += 256;
 				}
-				nRestSizeY -= 256;
-				nPosY += 256;
 			}
 		}
 	}
-	// for non-multiple to 16 movies do COPY ALL
-	if ( ((hBink->Width % 16) != 0) || ((hBink->Height % 16) != 0) )
-	{
-		NStr::DebugTrace( "****** WARNING: movie \"%s\" has non-multiple to 16 size (%d : %d)! Possible performance hit!\n", pszFileName, hBink->Width, hBink->Height );
-		dwCopyFlags |= BINKCOPYALL;
-	}
-	if ( dwFlags & IVideoPlayer::COPY_ALL ) 
-		dwCopyFlags |= BINKCOPYALL;
-	// clear system image
-	for ( CImagesList::const_iterator it = images.begin(); it != images.end(); ++it )
+
+	for ( const SImagePart &image : images )
 	{
 		SSurfaceLockInfo lock;
-		it->pTexture->Lock( 0, &lock );
-		//
-		for ( int i = 0; i < it->pTexture->GetSizeY(0); ++i )
-			memset( ((char*)lock.pData) + i*lock.nPitch, 0, it->pTexture->GetSizeX(0) );
-		//
-		it->pTexture->Unlock( 0 );
+		image.pTexture->Lock( 0, &lock );
+		for ( int y = 0; y < image.pTexture->GetSizeY(0); ++y )
+			std::memset( static_cast<char*>(lock.pData) + y * lock.nPitch, 0, lock.nPitch );
+		image.pTexture->Unlock( 0 );
 	}
-	// setup rects (geometry and txture mapping)
-	if ( rcDstRect.IsEmpty() ) 
-		rcDstRect.Set( 0, 0, hBink->Width, hBink->Height );
+
+	if ( rcDstRect.IsEmpty() )
+		rcDstRect.Set( 0, 0, nWidth, nHeight );
 	SetupRects();
-	// do first frame (w/o rendering)
-	DoOneFrame( false );
-	CopyRects();
-	//
-	return (hBink != 0) && (hBink->FrameRate > 0) ? 1000 * hBink->Frames / hBink->FrameRate : 0;
+	if ( DecodeOneVideoFrame() )
+		CopyRects();
+	return nLengthMs;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 bool CBinkVideoPlayer::Stop()
 {
-	CopyRects();
-	//
-	if ( hBink ) 
-	{
-		BinkClose( hBink );
-		hBink = 0;
-		buffer.clear();
-	}
+	CloseMovie();
 	return true;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 bool CBinkVideoPlayer::Pause( bool bPause )
 {
-	if ( hBink == 0 ) 
+	if ( !pFormat )
 		return false;
-	return BinkPause( hBink, bPause );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool CBinkVideoPlayer::DoOneFrame( bool bCheckForStop )
-{
-	if ( hBink == 0 ) 
-		return false;
-	if ( bCheckForStop && (hBink->FrameNum == hBink->Frames) && !bLooped ) 
-	{
-		bStopped = true;
-		BinkDoFrame( hBink );
-		BinkNextFrame( hBink );
-		return true;
-	}
-	//
-	BinkDoFrame( hBink );
-	BinkNextFrame( hBink );
-	//
-	if ( bCheckForStop && (nLastPlayedFrame > hBink->FrameNum) && !bLooped )
-	{
-		CopyRects();
-		return Stop();
-	}
-	//
-	nLastPlayedFrame = hBink->FrameNum;
-	//
+	bPaused = bPause;
+	if ( pAudioInterface ) pAudioInterface->PauseMovieAudio( bPause );
 	return true;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 bool CBinkVideoPlayer::Update( const NTimer::STime &time, bool bForcedUpdate )
 {
-	if ( hBink == 0 ) 
-		return ( dwPlayFlags & IVideoPlayer::PLAY_INFINITE ) != 0;
-	if ( bForcedUpdate ) 
+	if ( !pFormat )
+		return (dwPlayFlags & IVideoPlayer::PLAY_INFINITE) != 0;
+	if ( bStopped || bPaused )
+		return IsPlaying() || ((dwPlayFlags & IVideoPlayer::PLAY_INFINITE) != 0);
+
+	bool decoded = false;
+	if ( bForcedUpdate )
 	{
-		DoOneFrame();
-		CopyRects();
+		decoded = DecodeOneVideoFrame();
 	}
-	else if ( IsPlaying() )
+	else
 	{
-		bool bNeedCopyRects = false;
-		while ( BinkWait(hBink) == 0 ) 
+		if ( timeLastUpdate < 0 )
+			timeLastUpdate = time;
+		else
 		{
-			DoOneFrame();
-			bNeedCopyRects = true;
-			if ( !IsPlaying() ) 
-				break;
+			const double deltaMs = std::max<double>( 0.0, static_cast<double>(time - timeLastUpdate) );
+			timeLastUpdate = time;
+			fFrameAccumulatorMs += deltaMs;
 		}
-		if ( bNeedCopyRects ) 
-			CopyRects();
+
+		const double frameMs = fFrameRate > 0.0 ? 1000.0 / fFrameRate : 40.0;
+		int safety = 0;
+		while ( fFrameAccumulatorMs >= frameMs && IsPlaying() && safety++ < 8 )
+		{
+			fFrameAccumulatorMs -= frameMs;
+			decoded = DecodeOneVideoFrame() || decoded;
+		}
 	}
+	if ( decoded ) CopyRects();
 	return IsPlaying() || ((dwPlayFlags & IVideoPlayer::PLAY_INFINITE) != 0);
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static CTRect<long> rcDirtyRects[BINKMAXDIRTYRECTS];
-bool HasIntersection( const CTRect<long> &rcRect, const int nNumDirtyRects )
-{
-	for ( int i = 0; i < nNumDirtyRects; ++i )
-	{
-		if ( rcRect.IsIntersect(rcDirtyRects[i]) )
-			return true;
-	}
-	return nNumDirtyRects == 0;
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CopyRect( HBINK hBink, const SImagePart &image, const DWORD dwCopyFlags, const int nNumDirtyRects )
-{
-	if ( !HasIntersection(image.rcSrcRect, nNumDirtyRects) ) 
-		return;
-	//
-	SSurfaceLockInfo lock;
-	image.pTexture->Lock( 0, &lock );
-	//
-	BinkCopyToBufferRect( hBink, lock.pData, lock.nPitch, image.rcDstRect.Height(), image.rcDstRect.x1, image.rcDstRect.y1,
-												image.rcSrcRect.x1, image.rcSrcRect.y1, image.rcSrcRect.Width(), image.rcSrcRect.Height(), dwCopyFlags );
-	//
-	image.pTexture->Unlock( 0 );
-	image.pTexture->AddDirtyRect( 0 );
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void CBinkVideoPlayer::CopyRects()
 {
-	if ( hBink == 0 ) 
+	if ( frameBGRA.empty() )
 		return;
-	//
-	const int nNumDirtyRects = BinkGetRects( hBink, BINKSURFACEFAST );
-	for ( int i = 0; i < nNumDirtyRects; ++i )
+	for ( const SImagePart &image : images )
 	{
-		
-		rcDirtyRects[i].Set( hBink->FrameRects[i].Left,
-												 hBink->FrameRects[i].Top,
-												 hBink->FrameRects[i].Left + hBink->FrameRects[i].Width,
-												 hBink->FrameRects[i].Top + hBink->FrameRects[i].Height );
+		SSurfaceLockInfo lock;
+		image.pTexture->Lock( 0, &lock );
+		const int format = image.pTexture->GetFormat();
+		for ( int y = 0; y < image.rcSrcRect.Height(); ++y )
+		{
+			const unsigned char *src = frameBGRA.data() + ((image.rcSrcRect.y1 + y) * nWidth + image.rcSrcRect.x1) * 4;
+			unsigned char *dst = static_cast<unsigned char*>(lock.pData) + (image.rcDstRect.y1 + y) * lock.nPitch;
+			if ( format == GFXPF_ARGB8888 )
+			{
+				std::memcpy( dst + image.rcDstRect.x1 * 4, src, image.rcSrcRect.Width() * 4 );
+			}
+			else
+			{
+				unsigned short *dst16 = reinterpret_cast<unsigned short*>(dst) + image.rcDstRect.x1;
+				for ( int x = 0; x < image.rcSrcRect.Width(); ++x )
+				{
+					const unsigned char b = src[x*4+0], g = src[x*4+1], r = src[x*4+2], a = src[x*4+3];
+					if ( format == GFXPF_ARGB0565 ) dst16[x] = Pack565( r, g, b );
+					else if ( format == GFXPF_ARGB1555 ) dst16[x] = Pack1555( a, r, g, b );
+					else if ( format == GFXPF_ARGB4444 ) dst16[x] = Pack4444( a, r, g, b );
+				}
+			}
+		}
+		image.pTexture->Unlock( 0 );
+		image.pTexture->AddDirtyRect( 0 );
 	}
-	//
-	IGFX *pGFX = GetSingleton<IGFX>();
-	for ( CImagesList::const_iterator it = images.begin(); it != images.end(); ++it )
-		CopyRect( hBink, *it, dwCopyFlags, nNumDirtyRects );
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 bool CBinkVideoPlayer::Draw( IGFX *pGFX )
 {
 	pGFX->SetShadingEffect( nShadingEffectStart );
 	for ( CImagesList::const_iterator it = images.begin(); it != images.end(); ++it )
 	{
-		// draw
 		SGFXRect2 rect;
 		rect.rect = it->rcRect;
 		rect.maps = it->rcMaps;
 		rect.color = 0xffffffff;
 		rect.specular = 0xff000000;
 		rect.fZ = 0;
-		//
 		pGFX->SetTexture( 0, it->pTexture );
 		pGFX->DrawRects( &rect, 1 );
 	}
 	pGFX->SetShadingEffect( nShadingEffectFinish );
 	return true;
-
-/*	
-	// create and setup WORLD matrix for direct (texel-to-pixel) rendering.
-	// NOTE: projection matrix are assumed to be parallel
-	const SHMatrix &matProjection = pGFX->GetProjectionMatrix();
-	const CTRect<float> rcScreen = pGFX->GetScreenRect();
-	const float fWidth = Max( rcScreen.Width(), 1.0f );
-	const float fHeight = Max( rcScreen.Height(), 1.0f );
-	SHMatrix matrix;
-	Zero( matrix );
-	matrix._11 = 1;
-	matrix._14 = -fWidth / 2;
-	matrix._22 = -1;
-	matrix._24 = fHeight / 2;
-	matrix._33 = 1.0f / matProjection._33;//-( far_plane - near_plane );
-	matrix._34 = -matProjection._34 / matProjection._33;//-near_plane;
-	matrix._44 = 1;
-	//
-	SHMatrix matWorld;
-	Multiply( &matWorld, pGFX->GetInverseViewMatrix(), matrix );
-	pGFX->SetWorldTransforms( 0, &matWorld, 1 );
-	//
-	pGFX->SetShadingEffect( nShadingEffectStart );
-	for ( CImagesList::const_iterator it = images.begin(); it != images.end(); ++it )
-	{
-		const DWORD color = 0xffffffff;
-		const DWORD specular = 0xff000000;
-		const float fDepth = 0;
-		//
-		CTempBufferLock<SGFXLVertex> vertices = pGFX->GetTempVertices( 4, SGFXLVertex::format, GFXPT_TRIANGLELIST );
-		vertices[0].Setup( it->rcRect.minx, it->rcRect.maxy, fDepth, color, specular, it->rcMaps.minx, it->rcMaps.maxy );
-		vertices[1].Setup( it->rcRect.minx, it->rcRect.miny, fDepth, color, specular, it->rcMaps.minx, it->rcMaps.miny );
-		vertices[2].Setup( it->rcRect.maxx, it->rcRect.maxy, fDepth, color, specular, it->rcMaps.maxx, it->rcMaps.maxy );
-		vertices[3].Setup( it->rcRect.maxx, it->rcRect.miny, fDepth, color, specular, it->rcMaps.maxx, it->rcMaps.miny );
-		//
-		CTempBufferLock<WORD> indices = pGFX->GetTempIndices( 6, GFXIF_INDEX16, GFXPT_TRIANGLELIST );
-		indices[0] = 2;
-		indices[1] = 1;
-		indices[2] = 0;
-		indices[3] = 1;
-		indices[4] = 2;
-		indices[5] = 3;
-		//
-		pGFX->SetTexture( 0, it->pTexture );
-		pGFX->DrawTemp();
-	}
-	pGFX->SetShadingEffect( nShadingEffectFinish );
-	return true;
-*/
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CBinkVideoPlayer::Visit( ISceneVisitor *pVisitor, int nType )
+
+void CBinkVideoPlayer::Visit( ISceneVisitor *pVisitor, int )
 {
 	pVisitor->VisitSceneObject( this );
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 bool CBinkVideoPlayer::IsPlaying() const
 {
-	return (hBink != 0) && !bStopped;
+	return pFormat != nullptr && !bStopped;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 int CBinkVideoPlayer::GetCurrentFrame() const
 {
-	if ( !IsPlaying() ) 
-		return -1;
-	return hBink->FrameNum;
+	return IsPlaying() ? nCurrentFrame : -1;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 bool CBinkVideoPlayer::SetCurrentFrame( const int nFrame )
 {
-	if ( !IsPlaying() ) 
+	if ( !pFormat || nFrame < 0 || fFrameRate <= 0.0 )
 		return false;
-	BinkGoto( hBink, nFrame, 0 );
-	DoOneFrame();
-	CopyRects();
-	return true;
+	AVStream *pStream = pFormat->streams[nVideoStream];
+	const double seconds = nFrame / fFrameRate;
+	const int64_t timestamp = av_rescale_q( static_cast<int64_t>(seconds * AV_TIME_BASE), AVRational{1, AV_TIME_BASE}, pStream->time_base );
+	if ( av_seek_frame( pFormat, nVideoStream, timestamp, AVSEEK_FLAG_BACKWARD ) < 0 )
+		return false;
+	avcodec_flush_buffers( pVideoCodec );
+	if ( pAudioCodec ) avcodec_flush_buffers( pAudioCodec );
+	if ( pSwr )
+	{
+		swr_close( pSwr );
+		if ( swr_init( pSwr ) < 0 )
+			return false;
+	}
+	nCurrentFrame = nFrame - 1;
+	if ( pAudioInterface && pAudioCodec )
+	{
+		pAudioInterface->EndMovieAudio();
+		pAudioInterface->BeginMovieAudio( pAudioCodec->sample_rate,
+			std::max( nAudioChannels, 1 ) );
+	}
+	const bool ok = DecodeOneVideoFrame();
+	if ( ok ) CopyRects();
+	return ok;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 int CBinkVideoPlayer::GetLength() const
 {
-	return (hBink != 0) && (hBink->FrameRate > 0) ? 1000 * hBink->Frames / hBink->FrameRate : 0;
+	return nLengthMs;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 int CBinkVideoPlayer::GetNumFrames() const
 {
-	return hBink != 0? hBink->Frames : 0;
+	return nNumFrames;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 bool CBinkVideoPlayer::GetMovieSize( CVec2 *pSize ) const
 {
-	if ( (hBink == 0) || (pSize == 0) ) 
+	if ( !pFormat || !pSize )
 		return false;
-	//
-	pSize->x = hBink->Width;
-	pSize->y = hBink->Height;
+	pSize->x = nWidth;
+	pSize->y = nHeight;
 	return true;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 int CBinkVideoPlayer::operator&( IStructureSaver &ss )
 {
 	CSaverAccessor saver = &ss;
@@ -481,21 +677,18 @@ int CBinkVideoPlayer::operator&( IStructureSaver &ss )
 	saver.Add( 8, &nShadingEffectStart );
 	saver.Add( 9, &nShadingEffectFinish );
 	saver.Add( 10, &bStopped );
-	//
 	bool bPlaying = IsPlaying();
 	saver.Add( 20, &bPlaying );
-	
-	if ( saver.IsReading() ) 
+
+	if ( saver.IsReading() )
 	{
 		buffer.clear();
-		if ( bPlaying ) 
+		if ( bPlaying )
 		{
-			const int nStartFromFrame = nLastPlayedFrame;
+			const int startFrame = nLastPlayedFrame;
 			Play( szFileName.c_str(), dwPlayFlags, GetSingleton<IGFX>(), GetSingleton<ISFX>() );
-			if ( hBink ) 
-				BinkGoto( hBink, nStartFromFrame, 0 );
+			if ( startFrame > 0 ) SetCurrentFrame( startFrame );
 		}
 	}
 	return 0;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -123,7 +123,7 @@ BOOL STDCALL DiagAssert( DWORD dwOverrideOpts, LPCTSTR szMsg, LPCSTR szFile, DWO
   }
 
   // Make sure the message got translated into something.
-  LPTSTR szRealLastErr;
+  LPCTSTR szRealLastErr;
   if ( NULL != szFmtMsg )
     szRealLastErr = szFmtMsg;
   else
@@ -131,7 +131,7 @@ BOOL STDCALL DiagAssert( DWORD dwOverrideOpts, LPCTSTR szMsg, LPCSTR szFile, DWO
 
   // Get the module name.
   if ( 0 == GetModuleFileName(0, szModName, MAX_PATH) )
-    _tcscpy( szModName, _T("<unknown application>") );
+    _tcscpy_s( szModName, _countof(szModName), _T("<unknown application>") );
 
   // Build the message.
   pCurrPos += (wsprintf ( szBuff                                 ,
@@ -197,7 +197,7 @@ void STDCALL DiagOutput ( LPCTSTR szFmt , ... )
   va_list  args ;
 
   va_start( args , szFmt );
-  _vstprintf( szOutBuff , szFmt , args ) ;
+  _vstprintf_s( szOutBuff, _countof(szOutBuff), szFmt, args );
   OutputDebugString( szOutBuff );
   va_end( args );
 
@@ -399,7 +399,7 @@ static void DoStackTrace( LPTSTR szString, DWORD dwSize, DWORD dwNumSkip )
       dwSymSize = ConvertAddress( *loop , szSym );
       if ( dwSizeLeft < dwSymSize )
         break;
-      _tcscpy( szCurrPos , szSym );
+      _tcscpy_s( szCurrPos, dwSizeLeft, szSym );
       szCurrPos += dwSymSize;
       dwSizeLeft -= dwSymSize;
     }

@@ -26,8 +26,6 @@ struct KBDLLHOOKSTRUCT
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // keyboard low-level hook to disable fast task switching
 static HHOOK hHook = 0;
-// previous state of the SPI_SETSCREENSAVERRUNNING
-static UINT nPreviousState = 0;
 // current enable state
 static bool bCurrEnable = true;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,26 +55,21 @@ LRESULT CALLBACK LowLevelKeyboardProc( INT nCode, WPARAM wParam, LPARAM lParam )
   return CallNextHookEx( hHook, nCode, wParam, lParam );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-extern "C" WINBASEAPI BOOL WINAPI IsDebuggerPresent(void);
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void EnableSystemKeys( bool bEnable, HINSTANCE hInstance )
 {
-	if ( (bCurrEnable == bEnable) /*|| IsDebuggerPresent()*/ ) 
+	if ( bCurrEnable == bEnable )
 		return;
-	const DWORD dwOSVersion = GetVersion();
-	if ( dwOSVersion & 0x80000000 ) 
+	if ( bEnable )
 	{
-		if ( bEnable )
-			SystemParametersInfo( SPI_SETSCREENSAVERRUNNING, nPreviousState, &nPreviousState, 0 );
-		else
-			SystemParametersInfo( SPI_SETSCREENSAVERRUNNING, TRUE, &nPreviousState, 0 );
-	}
-	else if ( (dwOSVersion & 0xff) >= 5 ) 
-	{
-		if ( bEnable && (NSysKeys::hHook != 0) ) 
+		if ( NSysKeys::hHook != 0 )
+		{
 			UnhookWindowsHookEx( NSysKeys::hHook );
-		else
-			NSysKeys::hHook = SetWindowsHookEx( WH_KEYBOARD_LL, NSysKeys::LowLevelKeyboardProc, hInstance, 0 );
+			NSysKeys::hHook = 0;
+		}
+	}
+	else if ( NSysKeys::hHook == 0 )
+	{
+		NSysKeys::hHook = SetWindowsHookEx( WH_KEYBOARD_LL, NSysKeys::LowLevelKeyboardProc, hInstance, 0 );
 	}
 	bCurrEnable = bEnable;
 }

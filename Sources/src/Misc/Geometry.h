@@ -309,8 +309,8 @@ public:
   };
 public:
   SPlane() {  }
-	SPlane( float _a, float _b, float _c, float _d ) : a( _a ), b( _b ), c( _c ), d( _d ) {  }
-  SPlane( const CVec3 &vNormale, const float fDist ) : n( vNormale ), d( fDist ) {  }
+	SPlane( float _a, float _b, float _c, float _d ) { a = _a; b = _b; c = _c; d = _d; }
+  SPlane( const CVec3 &vNormale, const float fDist ) { n = vNormale; d = fDist; }
   SPlane( const CVec4 &v ) : vec4( v ) {  }
 	SPlane( const SPlane &plane ) : vec4( plane.vec4 ) {  }
   // setup functions
@@ -796,7 +796,7 @@ public:
 	int GetZ() const { return z1; }
 };
 template <class TFunctional>
-	void MakeLine3( int x1, int y1, int z1, int x2, int y2, int z3, TFunctional &func )
+	void MakeLine3( int x1, int y1, int z1, int x2, int y2, int z2, TFunctional &func )
 {
 	CBresenham3 line( x1, y1, z1, x2, y2, z2 );
 	// first point
@@ -809,7 +809,7 @@ template <class TFunctional>
 	}
 }
 template <class TFunctional>
-	void ScanLine3( int x1, int y1, int z1, int x2, int y2, int z3, TFunctional &func )
+	void ScanLine3( int x1, int y1, int z1, int x2, int y2, int z2, TFunctional &func )
 {
 	CBresenham3 line( x1, y1, z1, x2, y2, z2 );
 	// first point

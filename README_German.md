@@ -17,37 +17,29 @@ Bitte lesen Sie die Bedingungen des [Lizenzvertrags](LICENSE.md) sorgfältig dur
 
 # Vorbereitung
 
-Alle Bibliotheken aus dem SDK-Verzeichnis werden für die Kompilierung benötigt. Die Pfade zu diesen Bibliotheken müssen in **Tools => Options => Directories** in folgender Reihenfolge angegeben werden:
+Voraussetzungen:
 
-## Include
-```
-C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\STLPORT
-C:\SDK\BINK (nicht im Repository enthalten)
-C:\SDK\FMOD\API\INC (nicht im Repository enthalten)
-C:\SDK\S3TC
-C:\SDK\STINGRAY STUDIO 2002\INCLUDE\TOOLKIT (nicht im Repository enthalten)
-C:\SDK\STINGRAY STUDIO 2002\INCLUDE (nicht im Repository enthalten)
-C:\SDK\STINGRAY STUDIO 2002\REGEX\INCLUDE (nicht im Repository enthalten)
-C:\SDK\Maya4.0\include
-```
+- Windows 10 oder 11.
+- CMake 4.2 oder neuer.
+- Visual Studio 2026 mit der Workload **Desktopentwicklung mit C++** und einem Windows SDK.
+- Git und [vcpkg](https://github.com/microsoft/vcpkg). Setzen Sie `VCPKG_ROOT` auf das vcpkg-Verzeichnis.
+- FMOD Engine 2.01.x für Windows. FMOD wird separat lizenziert und ist nicht in diesem Repository enthalten.
 
-## Lib
-```
-C:\SDK\BINK (nicht im Repository enthalten)
-C:\SDK\FMOD\API\LIB (nicht im Repository enthalten)
-C:\SDK\S3TC
-C:\SDK\STINGRAY STUDIO 2002\LIB (nicht im Repository enthalten)
-C:\SDK\STINGRAY STUDIO 2002\REGEX\LIB (nicht im Repository enthalten)
-C:\SDK\Maya4.0\lib
+Die Direct3D-Kompatibilitätsquellen sind unter `Sources/sdk` enthalten. Legen Sie das FMOD SDK in dieser Verzeichnisstruktur ohne Leerzeichen ab:
+
+```text
+Sources/sdk/FMOD/Include/fmod.hpp
+Sources/sdk/FMOD/lib/x86/fmod_vc.lib
+Sources/sdk/FMOD/lib/x86/fmod.dll
 ```
 
-Zusätzlich wird **DirectX 8.1** oder höher benötigt (wird automatisch zu den Pfaden hinzugefügt).
+Führen Sie `build.bat` aus. Das vcpkg-Manifest installiert FFmpeg, libpng, libsquish, pugixml und zlib automatisch. Das mitgelieferte SDK unter `Sources/src/GameSpy` wird aus dem Quellcode gebaut; ein separater GameSpy-Download ist nicht erforderlich. Bink, STLPort, Stingray und das alte DirectX-8-SDK werden für das aktuelle Spielziel nicht benötigt.
 
-### Wichtige Hinweise
+Die Release-Datei wird nach `build/bin/Release` geschrieben. So verwenden Sie die Daten einer installierten Verkaufsversion:
 
-- Die Bibliotheken **Bink, FMOD, Stingray** sind nicht in diesem Repository enthalten, da sie eine separate Lizenzierung erfordern.
-- **stlport** *muss* sich im Visual C-Verzeichnis neben `include` befinden.
-- Der Pfad `C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO\VC98\STLPORT` muss **zuerst** stehen, sonst schlägt die Kompilierung fehl.
+```bat
+build\bin\Release\Game.exe -datadir "C:\path\to\Blitzkrieg"
+```
 
 ---
 

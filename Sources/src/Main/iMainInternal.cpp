@@ -627,7 +627,7 @@ void CMainLoop::Command( int nCommandID, const char *pszConfiguration )
 bool GetFileVersion( const std::string &szFileName, VS_FIXEDFILEINFO *pVersionInfo )
 {
 	char pszLocalFileName[2048];
-	strcpy( pszLocalFileName, szFileName.c_str() );
+	strcpy_s( pszLocalFileName, sizeof(pszLocalFileName), szFileName.c_str() );
 	DWORD dwLength = 0;
 	const int nVersionSize = GetFileVersionInfoSize( pszLocalFileName, &dwLength );
 	if ( nVersionSize == 0 ) 

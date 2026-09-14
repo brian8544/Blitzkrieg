@@ -48,7 +48,7 @@ class CZipFileSystem : public IDataStorage
 	};
 	//
 	CZipFilesList zipfiles;								// список открытых zip-файлов
-	typedef std::hash_map<std::string, SZipArchiveFileInfo> CFilesMap;
+	typedef std::unordered_map<std::string, SZipArchiveFileInfo> CFilesMap;
 	CFilesMap files;											// соответствие имени файла и информации, необходимой для его получени
 	//
 	std::string szBase;

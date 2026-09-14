@@ -59,9 +59,9 @@ class CStructureSaver : public IStructureSaver
 	IStructureSaver::EStoreMode eStoreMode;	// we can store data only and can store with objects re-creation...
 	// maps objects addresses during save(first) to addresses during load(second) - during loading
 	// or serves as a sign that some object has been already stored - during storing
-	typedef std::hash_map<void*, CPtr<IRefCount>, SDefaultPtrHash> CObjectsHash;
+	typedef std::unordered_map<void*, CPtr<IRefCount>, SDefaultPtrHash> CObjectsHash;
 	CObjectsHash objects;
-	typedef std::hash_map<void*,bool,SDefaultPtrHash> CPObjectsHash;
+	typedef std::unordered_map<void*,bool,SDefaultPtrHash> CPObjectsHash;
 	CPObjectsHash storedObjects;
 	std::list< CPtr<IRefCount> > toStore;
 

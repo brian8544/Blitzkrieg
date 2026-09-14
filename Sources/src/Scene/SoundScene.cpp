@@ -132,7 +132,7 @@ void CMapSounds::CMapSoundCell::Update( class CSoundScene * pScene, const CMapSo
 						!maxElement->second.instanceIDs.empty() &&
 						maxElement->second.nCount >= SSoundSceneConsts::MIN_SOUND_COUNT_TO_PLAY_LOOPED )
 			{
-				std::hash_map<WORD,CVec2>::iterator element = maxElement->second.instanceIDs.begin();
+				std::unordered_map<WORD,CVec2>::iterator element = maxElement->second.instanceIDs.begin();
 				playingLoopedSound.wInstanceID = element->first;
 				playingLoopedSound.wSoundTypeID = maxElement->first;
 				playingLoopedSound.wSceneID = pScene->AddSound( registeredSounds.ToT1(playingLoopedSound.wSoundTypeID).c_str(),
@@ -155,7 +155,7 @@ void CMapSounds::CMapSoundCell::Update( class CSoundScene * pScene, const CMapSo
 		
 		if ( maxElement != cellSounds.end() && !maxElement->second.instanceIDs.empty() )
 		{
-			std::hash_map<WORD,CVec2>::iterator element = maxElement->second.instanceIDs.begin();
+			std::unordered_map<WORD,CVec2>::iterator element = maxElement->second.instanceIDs.begin();
 			playingSound.wInstanceID = element->first;
 			playingSound.wSoundTypeID = maxElement->first;
 			playingSound.wSceneID = pScene->AddSound( registeredSounds.ToT1( playingSound.wSoundTypeID ).c_str(),
@@ -278,7 +278,7 @@ void CSoundScene::CPlayList::Clear()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSoundScene::CPlayList::Shuffle()
 { 
-	std::random_shuffle( melodies.begin(), melodies.end() ); 
+	NAlgorithms::LegacyRandomShuffle( melodies.begin(), melodies.end() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSoundScene::CPlayList::AddMelody( const std::string &pszFileName ) 
@@ -614,9 +614,9 @@ void CSoundScene::CStreamingSounds::CombatNotify()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSoundScene::CStreamingSounds::Update()
 {
-	const NTimer::STime curTime = pGameTimer->GetGameTime();
-	if ( pSFX == 0 )
+	if ( pSFX == 0 || pGameTimer == 0 )
 		return;
+	const NTimer::STime curTime = pGameTimer->GetGameTime();
 
 	if ( bCombatNotify )
 		timeLastCombatNotify = curTime;

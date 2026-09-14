@@ -427,7 +427,7 @@ void CClientAckManager::Update( interface IScene * pScene )
 
 	if ( !pTimer->IsPaused() )
 	{
-		for ( std::hash_map<int, CBoredUnitsContainer>::iterator it = boredUnits.begin(); it != boredUnits.end(); ++it )
+		for ( std::unordered_map<int, CBoredUnitsContainer>::iterator it = boredUnits.begin(); it != boredUnits.end(); ++it )
 		{
 			const EUnitAckType eType = static_cast<EUnitAckType>( (*it).first );
 			(*it).second.SendAck( curTime, eType, this, acksInfo[eType].nTimeAfterPrevious  );
@@ -536,9 +536,8 @@ void CClientAckManager::UnitDead( struct SMapObject *pUnit, interface IScene * p
 			UnregisterAck( &ack );
 			pScene->RemoveSound( ack.wSoundID );
 		}
+		unitAcks.erase( it );
 	}
-	
-	unitAcks.erase( it );
 
 	for ( BoredUnits::iterator it = boredUnits.begin(); it != boredUnits.end(); ++it )
 		it->second.DelUnit( pTipaUnit );

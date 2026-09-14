@@ -95,7 +95,7 @@ void CGamePlaying::RemoveClient( const int nClientID )
 			++i;
 
 		if ( i < players.size() )
-			std::construct( &(players[i]) );
+			std::construct_at( &(players[i]) );
 		
 		clientID2LogicID.erase( nClientID );
 	}

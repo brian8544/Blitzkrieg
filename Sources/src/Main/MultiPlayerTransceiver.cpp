@@ -125,7 +125,8 @@ void CMultiPlayerTransceiver::LoadGameSettings()
 	std::vector<int> busyNumbers( 16, 0 );
 	for ( int i = 0; i != nNumPlayers; ++i )
 	{
-		SPlayerInfo &player = *players.insert( players.end() );
+		players.emplace_back();
+		SPlayerInfo &player = players.back();
 
 		player.totalLagTime = 0;
 		player.lastLagUpdateTime = 0;
@@ -300,7 +301,7 @@ void CMultiPlayerTransceiver::SegmentFinished()
 		while ( const char *pszString = pBuffer->ReadASCII(CONSOLE_STREAM_MULTIPLAYER_CHECK) )
 		{
 			unsigned long checkSum = 0;
-			sscanf( pszString, "%ul", &checkSum );
+			sscanf_s( pszString, "%lu", &checkSum );
 			CControlSumCheckCommand *pCheckSumCommand = new CControlSumCheckCommand( nMyNumber, checkSum );
 
 			AddCommandToSend( pCheckSumCommand );

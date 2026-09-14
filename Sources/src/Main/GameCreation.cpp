@@ -17,8 +17,8 @@
 #include "..\Net\NetDriver.h"
 #include "..\StreamIO\OptionsConvert.h"
 
-#include "..\zlib\zlib.h"
-#include "..\zlib\zconf.h"
+#include <zlib.h>
+#include <zconf.h>
 
 // for debug
 #if !defined(_FINALRELEASE) || defined(_DEVVERSION)
@@ -50,7 +50,7 @@ void CCommonGameCreationInfo::Init()
 	lastPingMessageTime = 0;
 	startSendMessagesTime = 0;
 
-	std::hash_set<BYTE> channelMessages;
+	std::unordered_set<BYTE> channelMessages;
 
 	channelMessages.insert( BYTE( NGM_SEND_ME_MAP ) );
 	channelMessages.insert( BYTE( NGM_TOTAL_PACKED_SIZE ) );
@@ -289,7 +289,7 @@ void CCommonGameCreationInfo::DistributePlayersNumbers()
 		while ( allPlayers.size() < sides[i].nMaxPlayers )
 			allPlayers.push_back( -1 );
 
-		std::random_shuffle( allPlayers.begin(), allPlayers.end() );
+		NAlgorithms::LegacyRandomShuffle( allPlayers.begin(), allPlayers.end() );
 
 		std::vector<int>::const_iterator iter = allPlayers.begin();
 		for ( int nPlayer = mapInfo.playerParties.size() - 1; nPlayer >= 0; --nPlayer )
@@ -1168,7 +1168,7 @@ void CClientGameCreation::ProcessLogicIDSet( int nClientID, CStreamAccessor &pkt
 	NI_ASSERT_T( nOurLogicID == -1, NStr::Format( "Double logic id received ( %d, %d )", nOurLogicID, nLogicID ) );
 	players[nLogicID] = players[16];
 
-	std::construct( &(players[16]) );
+	std::construct_at( &(players[16]) );
 
 	nOurLogicID = nLogicID;
 	players[nLogicID].nLogicID = nLogicID;

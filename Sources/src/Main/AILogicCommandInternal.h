@@ -6,7 +6,7 @@
 #include "AILogicCommand.h"
 #include "NetMessages.h"
 #include "..\Common\Actions.h"
-#include "..\zlib\zconf.h"
+#include <zconf.h>
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class CRegisterGroupCommand : public IAILogicCommand
 {

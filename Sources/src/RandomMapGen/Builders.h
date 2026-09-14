@@ -70,6 +70,7 @@ struct STerrainTLVertex
 		};
 	};
 	//
+	STerrainTLVertex() { }
 	void Setup( float _sx, float _sy, float _sz, float _rhw, DWORD _color, float _tu, float _tv, float _tu1, float _tv1 )
 	{
 		x = _sx;
@@ -105,6 +106,7 @@ struct STerrainLVertex
 		};
 	};
 	//
+	STerrainLVertex() { }
 	// parameter 'rhw' are fake to achive compatibility with 'STerrainTLVertex'
 	void Setup( float _sx, float _sy, float _sz, float _rhw, DWORD _color, float _tu, float _tv, float _tu1, float _tv1 )
 	{
@@ -128,7 +130,7 @@ void CreateCrosses( const float fX, const float fY, const STerrainPatchInfo &pat
 										const STilesetDesc &tileset, const SCrossetDesc &crosset, 
 										const float fNoiseSizeX, const float fNoiseSizeY, struct STerrainPatch *pPatch );
 //
-void CreateWarFog( const float fX, const float fY, int nStartX, int nStartY, const std::hash_map<DWORD, DWORD> &visibilities, 
+void CreateWarFog( const float fX, const float fY, int nStartX, int nStartY, const std::unordered_map<DWORD, DWORD> &visibilities,
 									 const STerrainInfo &info, struct STerrainPatch *pPatch );
 void CreateMarker( const float fX, const float fY, const std::vector< CTPoint<int> > &marker, const STerrainInfo &info,
 									 IGFXVertices *pVertices, IGFXIndices *pIndices );

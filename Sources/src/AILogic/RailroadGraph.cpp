@@ -791,7 +791,7 @@ void CRailroadGraph::GetClosestPoints( const CVec2 &vPoint, std::list< CPtr<CEdg
 {
 	*pfMinDist = -1.0f;
 
-	for ( std::hash_map< DWORD, CObj<IEdge> >::iterator iter = edges.begin(); iter != edges.end(); ++iter )
+	for ( std::unordered_map< DWORD, CObj<IEdge> >::iterator iter = edges.begin(); iter != edges.end(); ++iter )
 	{
 		const DWORD dwNodesKey = iter->first;
 		const int nV1 = dwNodesKey >> 16;
@@ -873,7 +873,7 @@ IEdge* CRailroadGraph::GetEdge( const int v1, const int v2 )
 	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CRailroadGraph::LookForPoint( const int v, const CVec2 &vDir, std::hash_set<int> *pVisitedPoints, std::list<SPointInfo> *pPointsList )
+void CRailroadGraph::LookForPoint( const int v, const CVec2 &vDir, std::unordered_set<int> *pVisitedPoints, std::list<SPointInfo> *pPointsList )
 {
 	for ( std::list<int>::iterator iter = nodes[v].begin(); iter != nodes[v].end(); ++iter )
 	{
@@ -907,7 +907,7 @@ void CRailroadGraph::LookForPoint( const int v, const CVec2 &vDir, std::hash_set
 	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void CRailroadGraph::GetMovablePoint( const int v, const CVec2 &vDir, std::hash_set<int> *pVisitedPoints, std::list<SPointInfo> *pPointsList )
+void CRailroadGraph::GetMovablePoint( const int v, const CVec2 &vDir, std::unordered_set<int> *pVisitedPoints, std::list<SPointInfo> *pPointsList )
 {
 	NI_ASSERT_T( v < GetNNodes(), NStr::Format( "Wrong node passed (%d)", v ) );
 	LookForPoint( v, vDir, pVisitedPoints, pPointsList );
@@ -955,7 +955,7 @@ CEdgePoint* CRailroadGraph::MakeIndent( const CVec2 &vDir, CEdgePoint *pPoint, c
 		int v2 = 0;
 		bool bFinished = false;
 		
-		std::hash_set<int> visitedPoints;
+		std::unordered_set<int> visitedPoints;
 		std::list<SPointInfo> points;
 		points.push_back( SPointInfo( v1, vDir ) );
 		visitedPoints.insert( v1 );

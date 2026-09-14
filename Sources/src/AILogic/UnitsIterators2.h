@@ -166,6 +166,8 @@ public:
 template<>
 class CUnitsIter<1, 0>
 {
+	static constexpr BYTE cOnlyOneTypeVisibility = 1;
+	static constexpr int NSize = 0;
 	CVec2 vDownLeft;
 	CVec2 vUpRight;
 
@@ -314,6 +316,8 @@ public:
 template<>
 class CUnitsIter<0, 0>
 {
+	static constexpr BYTE cOnlyOneTypeVisibility = 0;
+	static constexpr int NSize = 0;
 	CVec2 vDownLeft;
 	CVec2 vUpRight;
 

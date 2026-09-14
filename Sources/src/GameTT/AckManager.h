@@ -47,7 +47,7 @@ private:
 	class CBoredUnitsContainer
 	{
 		DECLARE_SERIALIZE;
-		typedef std::hash_map<CPtr<IMOUnit>, bool, SPtrHash> CBoredUnits;
+		typedef std::unordered_map<CPtr<IMOUnit>, bool, SPtrHash> CBoredUnits;
 		CBoredUnits boredUnits;							
 		int nCounter;												// дл€ оптимизации - размер boredUnits
 		NTimer::STime timeLastBored;				// time for last bored sound
@@ -164,9 +164,9 @@ private:
 			: vPos( _vPos ), szSoundName( _szSoundName ), timeSinceStart( nTimeSinceStart ) {  }
 	};
 	//
-	typedef std::hash_map< int, SUnitAckInfo > CUnitAcksInfo;
-	typedef std::hash_map< int, NTimer::STime > CUnitAcksPresence;
-	typedef std::hash_map< CPtr<IMOUnit>, SUnitAck, SDefaultPtrHash > CUnitsAcks;
+	typedef std::unordered_map< int, SUnitAckInfo > CUnitAcksInfo;
+	typedef std::unordered_map< int, NTimer::STime > CUnitAcksPresence;
+	typedef std::unordered_map< CPtr<IMOUnit>, SUnitAck, SDefaultPtrHash > CUnitsAcks;
 	typedef std::list< SDeathAck > CDeathAcks;
 
 	//дл€ выбора заданного типа асков
@@ -190,7 +190,7 @@ private:
 	int nSelectionCounter;
 	
 	// тут инфо о юнитах, зарегистрированных в bored состо€ни€х
-	typedef std::hash_map<int, CBoredUnitsContainer> BoredUnits;
+	typedef std::unordered_map<int, CBoredUnitsContainer> BoredUnits;
 	BoredUnits boredUnits;	
 
 	CUnitAcksPresence acksPresence;				// наличие в даный момент в звучании данного Ack'а 
@@ -200,7 +200,7 @@ private:
 	
 	// не сериалайзитс€.
 	CUnitAcksInfo			acksInfo;						// данные об Ack'ах
-	std::hash_map<std::string,int> loadHelper;
+	std::unordered_map<std::string,int> loadHelper;
 	// константы
 	int MIN_ACK_RADIUS;
 	int MAX_ACK_RADIUS;

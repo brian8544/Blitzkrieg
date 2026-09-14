@@ -109,13 +109,13 @@ struct STerrainCurrMeshData
 	bool Draw( IGFX *pGFX, IGFXTexture *pTileset, IGFXTexture *pCrosset, IGFXTexture *pNoise, bool bEnableNoise );
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-__forceinline DWORD GetVisibilityColor( const DWORD dwKey, const std::hash_map<DWORD, DWORD> &visibilities )
+__forceinline DWORD GetVisibilityColor( const DWORD dwKey, const std::unordered_map<DWORD, DWORD> &visibilities )
 {
-	std::hash_map<DWORD, DWORD>::const_iterator pos = visibilities.find( dwKey );
+	std::unordered_map<DWORD, DWORD>::const_iterator pos = visibilities.find( dwKey );
 	return pos != visibilities.end() ? DWORD( ( 112UL - (DWORD(pos->second) << 4) ) << 24 ) : 112UL << 24;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-__forceinline DWORD GetVisibilityColor( const int nX, const int nY, const std::hash_map<DWORD, DWORD> &visibilities )
+__forceinline DWORD GetVisibilityColor( const int nX, const int nY, const std::unordered_map<DWORD, DWORD> &visibilities )
 {
 	return GetVisibilityColor( ( DWORD( nY ) << 16 ) | DWORD( nX ), visibilities );
 }
@@ -162,7 +162,7 @@ class CTerrain : public ITerrain, public ITerrainEditor
 	//
 	STerrainCurrMeshData mshCurrent;			// current mesh data
 	// visibilities
-	std::hash_map<DWORD, DWORD> visibilities;
+	std::unordered_map<DWORD, DWORD> visibilities;
 	// terrain editor fields
 	CTerrainBuilder terrabuild;
 	// for terrain sound info

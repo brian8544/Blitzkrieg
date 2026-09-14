@@ -180,7 +180,7 @@ void STDCALL DiagOutput( LPCTSTR szFmt, ... );
 
 #ifdef __cplusplus
 //inline void TraceOutput(LPCTSTR, ...) { }
-#define TRACE   (void)0
+#define TRACE   __noop
 #endif
 
 #define TRACE0(fmt)

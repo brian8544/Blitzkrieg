@@ -5,7 +5,7 @@
 void CPlayList::CreateRandomList()
 {
 	szRandomized = szMelodies;
-	std::random_shuffle( szRandomized.begin(), szRandomized.end() );
+	NAlgorithms::LegacyRandomShuffle( szRandomized.begin(), szRandomized.end() );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const char* CPlayList::GetNextMelody()
