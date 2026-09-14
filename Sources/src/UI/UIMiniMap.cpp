@@ -1240,7 +1240,8 @@ bool CUIMiniMap::OnLButtonDown( const CVec2 &vPos, EMouseState mouseState )
 		nSize = wndRect.right - wndRect.left;
 		
 		ICursor *_pCursor = GetSingleton<ICursor>();
-		_pCursor->SetBounds( wndRect.left, wndRect.top, wndRect.right, wndRect.bottom );
+		const float fUIScale = Max( 1.0f, float(GetGlobalVar("Options.GFX.InterfaceScale", 100)) / 100.0f );
+		_pCursor->SetBounds( wndRect.left * fUIScale, wndRect.top * fUIScale, wndRect.right * fUIScale, wndRect.bottom * fUIScale );
 
 		//получаем экранные координаты мыши
 		CTPoint<float> miniMapMousePos;

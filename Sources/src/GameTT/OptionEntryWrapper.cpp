@@ -37,12 +37,17 @@ CUIOption::CUIOption( IUIStatic *_pOptionName, IUIDialog *_pDialog, IOption *_pO
 	const std::string szKeyName = szKeyOption + ".name";
 	const std::string szKeyTooltip = szKeyOption + ".tooltip";
 	IText * pText = pTM->GetString( szKeyName.c_str() );
-	NI_ASSERT_T( pText != 0, NStr::Format("cannot find local name %s for options", szKeyName.c_str() ) );
+	const bool bInterfaceScale = strcmp( pOption->GetName(), "GFX.InterfaceScale" ) == 0;
+	NI_ASSERT_T( pText != 0 || bInterfaceScale, NStr::Format("cannot find local name %s for options", szKeyName.c_str() ) );
 	if ( pText )
 		pOptionName->SetWindowText( 0, pText->GetString() );
+	else if ( bInterfaceScale )
+		pOptionName->SetWindowText( 0, L"Interface scale" );
 	pText = pTM->GetString( szKeyTooltip.c_str() );
 	if ( pText )
 		pOptionName->SetHelpContext( 0, pText->GetString() );
+	else if ( bInterfaceScale )
+		pOptionName->SetHelpContext( 0, L"Scales interface elements and text: 100%, 125%, 150% or 200%." );
 
 	pOption->Set( this );
 }
@@ -100,6 +105,15 @@ void CUIOption::ChangeSelection( const int nCurSelection )
 
 	ITextManager * pTM = GetSingleton<ITextManager>();
 	IUIStatic * pStatic = checked_cast<IUIStatic*>( pSubDialog->GetChildByID( E_SELECTIONS_ENTRY ) );
+
+	if ( strcmp(pOption->GetName(), "GFX.InterfaceScale") == 0 )
+	{
+		pStatic->SetWindowText( 0, NStr::ToUnicode(szSelections[nCurSelection].szProgName).c_str() );
+		IText * pHelpContext = pOptionName->GetHelpContext( VNULL2, 0 );
+		if ( pHelpContext )
+			pStatic->SetHelpContext( 0, pHelpContext->GetString() );
+		return;
+	}
 
 	IText * pText = pTM->GetString( szKeyName.c_str() );
 	if ( pText )

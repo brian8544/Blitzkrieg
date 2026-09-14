@@ -224,8 +224,8 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		SetGlobalVar( "GFX.Mode.Mission.FullScreen", int(cmdp.eFullscreenMode) );
 		SetGlobalVar( "GFX.Mode.Mission.Frequency", cmdp.nFreq );
 		// in-interface
-		SetGlobalVar( "GFX.Mode.InterMission.SizeX", 1024 );
-		SetGlobalVar( "GFX.Mode.InterMission.SizeY", 768 );
+		SetGlobalVar( "GFX.Mode.InterMission.SizeX", cmdp.nScreenSizeX );
+		SetGlobalVar( "GFX.Mode.InterMission.SizeY", cmdp.nScreenSizeY );
 		SetGlobalVar( "GFX.Mode.InterMission.BPP", cmdp.nScreenBPP );
 		SetGlobalVar( "GFX.Mode.InterMission.Stencil", -1 );
 		SetGlobalVar( "GFX.Mode.InterMission.FullScreen", int(cmdp.eFullscreenMode) );

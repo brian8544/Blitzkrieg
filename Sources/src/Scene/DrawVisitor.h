@@ -72,11 +72,13 @@ struct SUIObject
 		// custom
 		IUIElement *pElement;
 	};
+	float fUIScale;
+	CVec2 vUIOffset;
 	// non-simple types
 	// rects specific
 	std::vector<SGFXRect2> rects;
 	//
-	SUIObject( const EType _eType ) : eType( _eType ) {  }
+	SUIObject( const EType _eType ) : eType( _eType ), fUIScale( 1.0f ), vUIOffset( 0, 0 ) {  }
 	//
 	bool IsRects() const { return eType == TYPE_RECTS; }
 	bool IsText() const { return eType == TYPE_TEXT; }
@@ -101,6 +103,8 @@ class CDrawVisitor : public ISceneVisitor
 	CTRect<float> rcScreen;
 	SPlane vViewVolumePlanes[6];
 	CDepthOptimizer depthoptimizer;
+	float fCurrentUIScale;
+	CVec2 vCurrentUIOffset;
 	//
 	void AddSingleSprite( const SBasicSpriteInfo *pObj, CSpriteVisList *pSprites, WORD wPriority );
 	void AddSingleParticleEffect( IParticleSource *pPS, CParticlesVisMap *pParticles );
@@ -130,7 +134,7 @@ public:
 	CUIObjectsList uiObjects;							// ui objects, divided by levels
 public:
 	CDrawVisitor( const float fAllowedDepth ) 
-		: pCamera( 0 ), depthoptimizer( 100, 75, fAllowedDepth ) {  }
+		: pCamera( 0 ), depthoptimizer( 100, 75, fAllowedDepth ), fCurrentUIScale( 1.0f ), vCurrentUIOffset( 0, 0 ) {  }
 	//
 	void Init( ICamera *_pCamera, const SHMatrix &_matrix, const CTRect<short> &_rcScreen, const SPlane *pViewVolumePlanes );
 	void Clear();
@@ -155,6 +159,7 @@ public:
 	void STDCALL VisitUIRects( IGFXTexture *pTexture, const int nShadingEffect, SGFXRect2 *rects, const int nNumRects );
 	void STDCALL VisitUIText( IGFXText *pText, const CTRect<float> &rcRect, const int nY, const DWORD dwColor, const DWORD dwFlags );
 	void STDCALL VisitUICustom( interface IUIElement *pElement );
+	void STDCALL SetUITransform( const float fScale, const CVec2 &vOffset ) { fCurrentUIScale = fScale; vCurrentUIOffset = vOffset; }
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif // __DRAWVISITOR_H__

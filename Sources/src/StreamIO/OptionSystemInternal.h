@@ -57,8 +57,10 @@ class COptionSystem : public CTVarSystem< SOption, CTRefCount<IOptionSystem> >
 	//
 	mutable SOptionDesc descriptor;				// temporal descriptor to store options in
 	mutable std::vector<SOptionDropListValue> droplist;	// temporal list for 'droplist' control (localized)
+	bool bInitialized;
 
 	void InnerSet( const std::string &szVarName, const variant_t &var );
+	void EnsureInterfaceScaleOption();
 public:
 	COptionSystem();
 	virtual ~COptionSystem() 

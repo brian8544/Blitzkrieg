@@ -9,14 +9,14 @@
 
 static const int GLOBAL_CONSOLE_ID = 0xAC07A918;
 
-static const int ACKS_VERTICAL_POSITION = 30;				// Позиция появления сообщений, считая сверху экрана
-static const int TEXT_VERTICAL_SIZE = 20;						// Размер шрифта по вертикали
-static const int TEXT_TWO = 20;											// Размер >> по горизонтали
-static const int TEXT_LEFT_SPACE = 0;								// Отступ от левого края экрана до текста в acknowledgement
-static const int CHAT_MESSAGE_LEFT = 0;							// Отступ от левого края экрана до текста в chat message
-static const int CHAT_MESSAGE_TOP = 0;							// Отступ от верхнего края экрана до текста в chat message
-// константы, прогружаемые из файла
-static int TEXT_ANIMATION_TIME = 5000;							// Время для отображения текстового сообщения, потом оно пропадает
+static const int ACKS_VERTICAL_POSITION = 30;				// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+static const int TEXT_VERTICAL_SIZE = 20;						// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+static const int TEXT_TWO = 20;											// пїЅпїЅпїЅпїЅпїЅпїЅ >> пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+static const int TEXT_LEFT_SPACE = 0;								// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ acknowledgement
+static const int CHAT_MESSAGE_LEFT = 0;							// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ chat message
+static const int CHAT_MESSAGE_TOP = 0;							// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ chat message
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+static int TEXT_ANIMATION_TIME = 5000;							// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CUIScreen::operator&( interface IStructureSaver &ss )
 {
@@ -65,7 +65,7 @@ int CUIScreen::SAcknowledgment::operator&( interface IStructureSaver &ss )
 	return 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CUIScreen::CUIScreen() : m_mouseState( E_MOUSE_FREE ), m_keyboardState( E_KEYBOARD_FREE ), bChatMode( false ), nCursorPos( 0 )
+CUIScreen::CUIScreen() : m_mouseState( E_MOUSE_FREE ), m_keyboardState( E_KEYBOARD_FREE ), bChatMode( false ), nCursorPos( 0 ), fRenderScale( 1.0f ), vRenderOffset( 0, 0 )
 {
 	SetShowBackgroundFlag( false );
 	szLastChatMessage = L"";
@@ -104,57 +104,120 @@ int CUIScreen::Load( const char *pszResourceName, bool bRelative )
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool CUIScreen::IsMissionHUD() const
+{
+	return _stricmp( szResourceName.c_str(), "ui\\mission" ) == 0;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CVec2 CUIScreen::PhysicalToLogical( const CVec2 &vPos ) const
+{
+	const float fScale = Max( fRenderScale, 0.01f );
+	return CVec2( (vPos.x - vRenderOffset.x) / fScale, (vPos.y - vRenderOffset.y) / fScale );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void CUIScreen::LogicalToPhysical( CTRect<float> *pRect ) const
+{
+	if ( !pRect )
+		return;
+	pRect->x1 = pRect->x1 * fRenderScale + vRenderOffset.x;
+	pRect->y1 = pRect->y1 * fRenderScale + vRenderOffset.y;
+	pRect->x2 = pRect->x2 * fRenderScale + vRenderOffset.x;
+	pRect->y2 = pRect->y2 * fRenderScale + vRenderOffset.y;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CUIScreen::Reposition( const CTRect<float> &rcParent )
 {
-	SetScreenRect( rcParent );
+	const int nScalePercent = GetGlobalVar( "Options.GFX.InterfaceScale", 100 );
+	const float fRequestedScale = Max( 1.0f, float(nScalePercent) / 100.0f );
+	CTRect<float> rcLogical;
+
+	if ( IsMissionHUD() )
+	{
+		fRenderScale = fRequestedScale;
+		vRenderOffset.Set( rcParent.x1, rcParent.y1 );
+		rcLogical.Set( 0, 0, rcParent.Width() / fRenderScale, rcParent.Height() / fRenderScale );
+	}
+	else
+	{
+		const float fLegacyWidth = 1024.0f;
+		const float fLegacyHeight = 768.0f;
+		const float fFitScale = Min( rcParent.Width() / fLegacyWidth, rcParent.Height() / fLegacyHeight );
+		fRenderScale = fRequestedScale;
+		if ( fFitScale < 1.0f )
+			fRenderScale = fFitScale;
+		fRenderScale = Max( fRenderScale, 0.25f );
+		vRenderOffset.x = rcParent.x1 + (rcParent.Width() - fLegacyWidth * fRenderScale) * 0.5f;
+		vRenderOffset.y = rcParent.y1 + (rcParent.Height() - fLegacyHeight * fRenderScale) * 0.5f;
+		rcLogical.Set( 0, 0, fLegacyWidth, fLegacyHeight );
+	}
+
+	SetScreenRect( rcLogical );
 	SetPos( CVec2(0, 0) );
-	SetSize( CVec2(rcParent.Width(), rcParent.Height()) );
-	CMultipleWindow::Reposition( rcParent );
-//	UpdateSubRects();
+	SetSize( CVec2(rcLogical.Width(), rcLogical.Height()) );
+	CMultipleWindow::Reposition( rcLogical );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+IUIElement* CUIScreen::PickElement( const CVec2 &vPos, int nRecursion )
+{
+	return CMultipleWindow::PickElement( PhysicalToLogical(vPos), nRecursion );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+IText* CUIScreen::GetHelpContext( const CVec2 &vPos, CTRect<float> *pRect )
+{
+	IText *pText = CMultipleWindow::GetHelpContext( PhysicalToLogical(vPos), pRect );
+	if ( pText && pRect )
+		LogicalToPhysical( pRect );
+	return pText;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CUIScreen::OnLButtonDblClk( const CVec2 &vPos )
 {
-	//Юрик перенес проверку в Input
-	return CMultipleWindow::OnLButtonDblClk( vPos );
+	//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ Input
+	return CMultipleWindow::OnLButtonDblClk( PhysicalToLogical(vPos) );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CUIScreen::OnMouseMove( const CVec2 &vPos, EMouseState mouseState )
 {
-	return CMultipleWindow::OnMouseMove( vPos, (EMouseState) m_mouseState );
+	return CMultipleWindow::OnMouseMove( PhysicalToLogical(vPos), (EMouseState) m_mouseState );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CUIScreen::OnLButtonDown( const CVec2 &vPos, EMouseState mouseState )
 {
+	const CVec2 vLogicalPos = PhysicalToLogical( vPos );
 	m_prevPrevLButtonPos.x = m_prevLButtonPos.x;
 	m_prevPrevLButtonPos.y = m_prevLButtonPos.y;
-	m_prevLButtonPos.x = vPos.x;
-	m_prevLButtonPos.y = vPos.y;
+	m_prevLButtonPos.x = vLogicalPos.x;
+	m_prevLButtonPos.y = vLogicalPos.y;
 
-	//тут надо сохранить state
+	//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ state
 	m_mouseState |= E_LBUTTONDOWN;
-	return CMultipleWindow::OnLButtonDown( vPos, (EMouseState) m_mouseState );
+	return CMultipleWindow::OnLButtonDown( vLogicalPos, (EMouseState) m_mouseState );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CUIScreen::OnLButtonUp( const CVec2 &vPos, EMouseState mouseState )
 {
-	//тут надо сохранить state
+	//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ state
 	m_mouseState &= ~E_LBUTTONDOWN;
-	return CMultipleWindow::OnLButtonUp( vPos, (EMouseState) m_mouseState );
+	return CMultipleWindow::OnLButtonUp( PhysicalToLogical(vPos), (EMouseState) m_mouseState );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CUIScreen::OnRButtonDown( const CVec2 &vPos, EMouseState mouseState )
 {
-	//тут надо сохранить state
+	//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ state
 	m_mouseState |= E_RBUTTONDOWN;
-	return CMultipleWindow::OnRButtonDown( vPos, (EMouseState) m_mouseState );
+	return CMultipleWindow::OnRButtonDown( PhysicalToLogical(vPos), (EMouseState) m_mouseState );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CUIScreen::OnRButtonUp( const CVec2 &vPos, EMouseState mouseState )
 {
-	//тут надо сохранить state
+	//пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ state
 	m_mouseState &= ~E_RBUTTONDOWN;
-	return CMultipleWindow::OnRButtonUp( vPos, (EMouseState) m_mouseState );
+	return CMultipleWindow::OnRButtonUp( PhysicalToLogical(vPos), (EMouseState) m_mouseState );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool CUIScreen::OnMouseWheel( const CVec2 &vPos, EMouseState mouseState, float fDelta )
+{
+	return CMultipleWindow::OnMouseWheel( PhysicalToLogical(vPos), (EMouseState) m_mouseState, fDelta );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CUIScreen::OnChar( int nAsciiCode, int nVirtualKey, bool bPressed, DWORD keyState )
@@ -183,8 +246,8 @@ bool CUIScreen::OnChar( int nAsciiCode, int nVirtualKey, bool bPressed, DWORD ke
 
 
 
-	//если нажата ~ без флагов то скрываю консольку
-	//192 это виртуальный код ~
+	//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ ~ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+	//192 пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ ~
 	if ( /* !GetModalFlag() && */ nVirtualKey == 192 && bChatMode == false && bPressed == true && m_keyboardState == E_KEYBOARD_FREE )
 	{
 		/*
@@ -238,7 +301,7 @@ bool CUIScreen::ProcessMessage( const SUIMessage &msg )
 		if ( CMultipleWindow::ProcessMessage( msg ) )
 			return true;
 
-		//входим в режим набора текста
+		//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		bChatMode = true;
 		SUIMessage msg;
 		msg.nMessageCode = MC_SET_TEXT_MODE;
@@ -260,7 +323,7 @@ bool CUIScreen::ProcessMessage( const SUIMessage &msg )
 	{
 		if ( msg.nMessageCode == (MC_ENTER_CHAT_MODE | PROCESSED_FLAG) )
 		{
-			//входим в режим набора текста
+			//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			bChatMode = true;
 			bMessagesToEveryone = true;
 			SetGlobalVar( "bMessagesToEveryone", 1 );
@@ -273,7 +336,7 @@ bool CUIScreen::ProcessMessage( const SUIMessage &msg )
 		}
 		if ( msg.nMessageCode == (MC_ENTER_CHAT_MODE_FRIENDS | PROCESSED_FLAG) )
 		{
-			//входим в режим набора текста
+			//пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			bChatMode = true;
 			bMessagesToEveryone = false;
 			SetGlobalVar( "bMessagesToEveryone", 0 );
@@ -335,11 +398,13 @@ bool CUIScreen::GetMessage( SGameMessage *pMsg )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CUIScreen::Visit( interface ISceneVisitor *pVisitor )
 {
+	pVisitor->SetUITransform( fRenderScale, vRenderOffset );
 	CMultipleWindow::Visit( pVisitor );
 	// 
 	IUIConsole *pConsole = checked_cast<IUIConsole*>( GetChildByID(GLOBAL_CONSOLE_ID) );
 	if ( !pConsole || ( !pConsole->IsVisible() && !pConsole->IsAnimationStage() ) )
 		pVisitor->VisitUICustom( dynamic_cast<IUIElement*>(this) );
+	pVisitor->SetUITransform( 1.0f, VNULL2 );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CUIScreen::Draw( interface IGFX *pGFX )
@@ -348,7 +413,7 @@ void CUIScreen::Draw( interface IGFX *pGFX )
 	if ( !pConsole || ( !pConsole->IsVisible() && !pConsole->IsAnimationStage() ) )
 	{
 		pGFX->SetShadingEffect( 3 );	
-		//если нету консольки, или есть консоль, но она невидимая
+		//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		const CTRect<float> &rc = GetScreenRect();
 		int nCurrentY = rc.y1 + ACKS_VERTICAL_POSITION;
 		for ( CListOfAcks::iterator it = listOfAcks.begin(); it != listOfAcks.end(); ++it )
@@ -403,7 +468,7 @@ bool CUIScreen::Update( const NTimer::STime &currTime )
 		const float fVal = pMouseWheelSlider->GetDelta();
 		if ( fVal )
 		{
-			CMultipleWindow::OnMouseWheel( GetSingleton<ICursor>()->GetPos(), (EMouseState) m_mouseState, fVal );
+			OnMouseWheel( GetSingleton<ICursor>()->GetPos(), (EMouseState) m_mouseState, fVal );
 		}
 	}
 
@@ -412,7 +477,7 @@ bool CUIScreen::Update( const NTimer::STime &currTime )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CUIScreen::UpdateChatString( int nAsciiCode, int nVirtualKey, bool bPressed )
 {
-	//Если печатный символ, то просто выводим его
+	//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 //	if ( isprint( nAsciiCode ) )
 	if ( nAsciiCode >= 32 )
 	{
@@ -430,7 +495,7 @@ void CUIScreen::UpdateChatString( int nAsciiCode, int nVirtualKey, bool bPressed
 	}
 	
 
-	//Если не печатный символ, то обрабатываем дополнительное управление
+	//пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	switch( nVirtualKey )
 	{
 	case VK_RETURN:
@@ -472,7 +537,7 @@ void CUIScreen::UpdateChatString( int nAsciiCode, int nVirtualKey, bool bPressed
 			bChatMode = false;
 			bMessagesToEveryone = true;
 
-			//сбросим text enter mode
+			//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ text enter mode
 			SUIMessage msg;
 			msg.nMessageCode = MC_CANCEL_TEXT_MODE;
 			msg.nFirst = GetWindowID();
@@ -498,12 +563,12 @@ void CUIScreen::UpdateChatString( int nAsciiCode, int nVirtualKey, bool bPressed
 			break;
 		if ( m_keyboardState == E_KEYBOARD_FREE )
 		{
-			//на одну позицию влево
+			//пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 			nCursorPos--;
 		}
 		if ( m_keyboardState & E_CTRL_KEY_DOWN )
 		{
-			//Если нажата crtl и стрелка влево, то сдвигаемся влево на одно слово
+			//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ crtl пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 			while( nCursorPos > 0 && isspace(szChatMessage[nCursorPos-1]) )
 				nCursorPos--;
 			if ( nCursorPos > 0 )
@@ -523,12 +588,12 @@ void CUIScreen::UpdateChatString( int nAsciiCode, int nVirtualKey, bool bPressed
 			break;
 		if ( m_keyboardState == E_KEYBOARD_FREE )
 		{
-			//на одну позицию вправо
+			//пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			nCursorPos++;
 		}
 		else if ( m_keyboardState & E_CTRL_KEY_DOWN )
 		{
-			//Если нажата crtl и стрелка вправо, то сдвигаемся вправо на одно слово
+			//пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ crtl пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 			if ( nCursorPos < szChatMessage.size() )
 			{
 				if ( isalpha(szChatMessage[nCursorPos]) )
@@ -547,7 +612,7 @@ void CUIScreen::UpdateChatString( int nAsciiCode, int nVirtualKey, bool bPressed
 	case VK_HOME:
 		if ( m_keyboardState == E_KEYBOARD_FREE )
 		{
-			//на начало строки
+			//пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			nCursorPos = 0;
 		}
 		break;
@@ -555,7 +620,7 @@ void CUIScreen::UpdateChatString( int nAsciiCode, int nVirtualKey, bool bPressed
 	case VK_END:
 		if ( m_keyboardState == E_KEYBOARD_FREE )
 		{
-			//на конец строки
+			//пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			nCursorPos = szChatMessage.size();
 		}
 		break;
@@ -565,7 +630,7 @@ void CUIScreen::UpdateChatString( int nAsciiCode, int nVirtualKey, bool bPressed
 		nCursorPos = 0;
 		bChatMode = false;
 		
-		//сбросим text enter mode
+		//пїЅпїЅпїЅпїЅпїЅпїЅпїЅ text enter mode
 		SUIMessage msg;
 		msg.nMessageCode = MC_CANCEL_TEXT_MODE;
 		msg.nFirst = GetWindowID();

@@ -232,6 +232,7 @@ interface IGFX : public IRefCount
 
 	// font setup
 	virtual bool STDCALL SetFont( IGFXFont *pFont ) = 0;
+	virtual void STDCALL SetUIFontScale( float fScale ) = 0;
 
 	// screen management
 	virtual bool STDCALL IsActive() = 0;

@@ -181,6 +181,7 @@ interface ISceneVisitor : public IRefCount
 	virtual void STDCALL VisitUIRects( interface IGFXTexture *pTexture, const int nShadingEffect, struct SGFXRect2 *rects, const int nNumRects ) = 0;
 	virtual void STDCALL VisitUIText( interface IGFXText *pText, const CTRect<float> &rcRect, const int nY, const DWORD dwColor, const DWORD dwFlags ) = 0;
 	virtual void STDCALL VisitUICustom( interface IUIElement *pElement ) = 0;
+	virtual void STDCALL SetUITransform( const float fScale, const CVec2 &vOffset ) {  }
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ************************************************************************************************************************ //

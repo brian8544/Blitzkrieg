@@ -124,6 +124,7 @@ class CGraphicsEngine : public IGFX
 	// CRAP}
 	// fonts
 	CPtr<CFont> pCurrentFont;
+	float fUIFontScale;
 	// frame number
 	int nCurrFrameNumber;
 	// statistics
@@ -240,9 +241,9 @@ class CGraphicsEngine : public IGFX
 	}
 public:
 	CGraphicsEngine() 
-		: fBrightness( 0 ), fContrast( 0 ), fGamma( 0 ), bUseOptimizedBuffers( false ), dwLastTempBufferFormat( 0 ), dwLastVertexShader( 0 ), bDirectTransform( false ) {  }
+		: fBrightness( 0 ), fContrast( 0 ), fGamma( 0 ), bUseOptimizedBuffers( false ), dwLastTempBufferFormat( 0 ), dwLastVertexShader( 0 ), bDirectTransform( false ), fUIFontScale( 1.0f ) {  }
 	CGraphicsEngine( const SAdapterDesc *pAdapter ) 
-		: adapter( *pAdapter ), fBrightness( 0 ), fContrast( 0 ), fGamma( 0 ), bUseOptimizedBuffers( false ), dwLastTempBufferFormat( 0 ), dwLastVertexShader( 0 ), bDirectTransform( false ) {  }
+		: adapter( *pAdapter ), fBrightness( 0 ), fContrast( 0 ), fGamma( 0 ), bUseOptimizedBuffers( false ), dwLastTempBufferFormat( 0 ), dwLastVertexShader( 0 ), bDirectTransform( false ), fUIFontScale( 1.0f ) {  }
 	virtual ~CGraphicsEngine() { CGraphicsEngine::Done(); }
 
 	// initialization and setup
@@ -301,6 +302,7 @@ public:
 
 	// font setup
 	bool STDCALL SetFont( IGFXFont *pFont );
+	void STDCALL SetUIFontScale( float fScale ) { fUIFontScale = Max(0.01f, fScale); }
 
 	// screen management
 	bool STDCALL IsActive();

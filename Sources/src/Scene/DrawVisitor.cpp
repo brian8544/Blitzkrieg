@@ -34,6 +34,8 @@ void CDrawVisitor::Clear()
 	gunTraces.clear();
 	depthoptimizer.Clear();
 	uiObjects.clear();
+	fCurrentUIScale = 1.0f;
+	vCurrentUIOffset.Set( 0, 0 );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // billboard sprite object
@@ -213,15 +215,20 @@ void CDrawVisitor::VisitUIRects( IGFXTexture *pTexture, const int nShadingEffect
 {
 	if ( uiObjects.empty() || !uiObjects.back().IsRects() || 
 		   (uiObjects.back().pTexture != pTexture) || 
-			 (uiObjects.back().nShadingEffect != nShadingEffect) )
+			 (uiObjects.back().nShadingEffect != nShadingEffect) ||
+			 (uiObjects.back().fUIScale != fCurrentUIScale) ||
+			 (uiObjects.back().vUIOffset.x != vCurrentUIOffset.x) ||
+			 (uiObjects.back().vUIOffset.y != vCurrentUIOffset.y) )
 	{
 		uiObjects.push_back( SUIObject(SUIObject::TYPE_RECTS) );
 		uiObjects.back().pTexture = pTexture;
 		uiObjects.back().nShadingEffect = nShadingEffect;
+		uiObjects.back().fUIScale = fCurrentUIScale;
+		uiObjects.back().vUIOffset = vCurrentUIOffset;
 	}
 	//
 	{
-		float fTexDiffX = 0, fTexDiffY = 0, fScrDiff = -0.5f;
+		float fTexDiffX = 0, fTexDiffY = 0, fScrDiff = -0.5f / Max(fCurrentUIScale, 0.01f);
 		if ( pTexture ) 
 		{
 			fTexDiffX = -0.5f / float ( pTexture->GetSizeX(0) );
@@ -231,7 +238,12 @@ void CDrawVisitor::VisitUIRects( IGFXTexture *pTexture, const int nShadingEffect
 		obj.rects.reserve( obj.rects.size() + nNumRects );
 		for ( int i = 0; i < nNumRects; ++i )
 		{
-			if ( rcScreen.IsIntersect(pRects[i].rect) && !pRects[i].rect.IsEmpty() )
+			CTRect<float> rcPhysical = pRects[i].rect;
+			rcPhysical.x1 = rcPhysical.x1 * fCurrentUIScale + vCurrentUIOffset.x;
+			rcPhysical.y1 = rcPhysical.y1 * fCurrentUIScale + vCurrentUIOffset.y;
+			rcPhysical.x2 = rcPhysical.x2 * fCurrentUIScale + vCurrentUIOffset.x;
+			rcPhysical.y2 = rcPhysical.y2 * fCurrentUIScale + vCurrentUIOffset.y;
+			if ( rcScreen.IsIntersect(rcPhysical) && !pRects[i].rect.IsEmpty() )
 			{
 				obj.rects.push_back( pRects[i] );
 				obj.rects.back().rect.Move( fScrDiff, fScrDiff );
@@ -246,10 +258,17 @@ void CDrawVisitor::VisitUIRects( IGFXTexture *pTexture, const int nShadingEffect
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDrawVisitor::VisitUIText( IGFXText *pText, const CTRect<float> &rcRect, const int nY, const DWORD dwColor, const DWORD dwFlags )
 {
-	if ( (pText == 0) || (pText->GetText()->GetLength() == 0) || !rcScreen.IsIntersect(rcRect) ) 
+	CTRect<float> rcPhysical = rcRect;
+	rcPhysical.x1 = rcPhysical.x1 * fCurrentUIScale + vCurrentUIOffset.x;
+	rcPhysical.y1 = rcPhysical.y1 * fCurrentUIScale + vCurrentUIOffset.y;
+	rcPhysical.x2 = rcPhysical.x2 * fCurrentUIScale + vCurrentUIOffset.x;
+	rcPhysical.y2 = rcPhysical.y2 * fCurrentUIScale + vCurrentUIOffset.y;
+	if ( (pText == 0) || (pText->GetText()->GetLength() == 0) || !rcScreen.IsIntersect(rcPhysical) ) 
 		return;
 	uiObjects.push_back( SUIObject(SUIObject::TYPE_TEXT) );
 	SUIObject &obj = uiObjects.back();
+	obj.fUIScale = fCurrentUIScale;
+	obj.vUIOffset = vCurrentUIOffset;
 	obj.pText = pText;
 	obj.rcRect = rcRect;
 	obj.nY = nY;
@@ -262,6 +281,8 @@ void CDrawVisitor::VisitUICustom( interface IUIElement *pElement )
 	if ( pElement == 0 ) 
 		return;
 	uiObjects.push_back( SUIObject(SUIObject::TYPE_CUSTOM) );
+	uiObjects.back().fUIScale = fCurrentUIScale;
+	uiObjects.back().vUIOffset = vCurrentUIOffset;
 	uiObjects.back().pElement = pElement;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

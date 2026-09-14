@@ -13,8 +13,20 @@ class CFont : public IGFXFont
 	DECLARE_SERIALIZE;
 	SHARED_RESOURCE_METHODS( nRefData.a, "Font.Metrics" );
 	//
-	SFontFormat format;										// all the font format data
-  CPtr<IGFXBaseTexture> pTexture;				// font texture
+	SFontFormat format;										// current font format (logical metrics + texture UVs)
+	SFontFormat baseFormat;								// original logical metrics/UVs loaded from disk
+  CPtr<IGFXBaseTexture> pTexture;				// current font texture
+	CPtr<IGFXTexture> pBaseTexture;					// original font texture
+	struct SScaledFontData
+	{
+		int nScalePercent;
+		SFontFormat format;
+		CPtr<IGFXTexture> pTexture;
+		SScaledFontData() : nScalePercent( 0 ) {  }
+	};
+	std::vector<SScaledFontData> scaledFonts;
+	int nPreparedScalePercent;
+	bool BuildScaledFont( const int nScalePercent, SScaledFontData *pData );
 	// visit text
 	template <class TChar, class TVisitor>
 		const float VisitText( const TChar *pszStringBegin, const TChar *pszStringEnd, float sx, const float sy, TVisitor &visitor ) const
@@ -45,12 +57,16 @@ class CFont : public IGFXFont
 			return VisitText( pszString, pszString + nCounter, 0, 0, CTextWidthVisitor() );
 		}
 public:
-	CFont() {  }
+	CFont() : nPreparedScalePercent( 100 ) {  }
 	//
 	bool Init( const SFontFormat &_format, IGFXTexture *_pTexture )
 	{
 		format = _format;
+		baseFormat = _format;
 		pTexture = _pTexture;
+		pBaseTexture = _pTexture;
+		scaledFonts.clear();
+		nPreparedScalePercent = 100;
 		return true;
 	}
   //
@@ -74,6 +90,7 @@ public:
                          std::vector<SGFXLVertex> &vertices, std::vector<WORD> &indices ) const;
   //
 	IGFXBaseTexture* GetTexture() { return pTexture; }
+	void PrepareForScale( const float fScale );
 	// internal container clearing
 	virtual void STDCALL ClearInternalContainer() {  }
 	virtual bool STDCALL Load( const bool bPreLoad = false );

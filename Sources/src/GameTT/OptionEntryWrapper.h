@@ -31,6 +31,7 @@ class CUIOption : public IUISetOptionsToUI, public IUIGetOptionsFromUI, public I
 		// store current value to option.
 	void SaveOption();
 	void ChangeSelection( const int nCurSelection );
+	void UpdateInterfaceScaleCaption();
 public:
 	CUIOption() {  }
 	// init textes and dialog according to current option value and type

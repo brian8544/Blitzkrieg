@@ -47,6 +47,12 @@ private:
 	//Message Box
 	CPtr<CUIMessageBoxBridge> pMessageBox;
 
+	float fRenderScale;
+	CVec2 vRenderOffset;
+	CVec2 PhysicalToLogical( const CVec2 &vPos ) const;
+	void LogicalToPhysical( CTRect<float> *pRect ) const;
+	bool IsMissionHUD() const;
+
 public:
 	CUIScreen();
 
@@ -60,6 +66,8 @@ public:
 	virtual void STDCALL Visit( interface ISceneVisitor *pVisitor );
 	
 	virtual bool STDCALL IsInside( const CVec2 &_vPos ) { return IsInsideChild( _vPos ); }
+	virtual IUIElement* STDCALL PickElement( const CVec2 &vPos, int nRecursion );
+	virtual IText* STDCALL GetHelpContext( const CVec2 &vPos, CTRect<float> *pRect );
 	virtual bool STDCALL IsEmpty() { return CMultipleWindow::IsEmpty(); }
 	virtual void STDCALL Reposition( const CTRect<float> &rcParent );
 	
@@ -70,6 +78,7 @@ public:
 	virtual bool STDCALL OnLButtonUp( const CVec2 &vPos, EMouseState mouseState );
 	virtual bool STDCALL OnRButtonDown( const CVec2 &vPos, EMouseState mouseState );
 	virtual bool STDCALL OnRButtonUp( const CVec2 &vPos, EMouseState mouseState );
+	virtual bool STDCALL OnMouseWheel( const CVec2 &vPos, EMouseState mouseState, float fDelta );
 	virtual bool STDCALL ProcessMessage( const SUIMessage &msg );
 	virtual void STDCALL ProcessGameMessage( const SGameMessage &msg );
 	virtual bool STDCALL GetMessage( SGameMessage *pMsg );

@@ -637,6 +637,13 @@ void CScene::Draw( ICamera *pCamera )
 		pGFX->SetShadingEffect( 3 );
 		for ( CDrawVisitor::CUIObjectsList::const_iterator it = pDrawVisitor->uiObjects.begin(); it != pDrawVisitor->uiObjects.end(); ++it )
 		{
+			pGFX->SetUIFontScale( it->fUIScale );
+			SHMatrix matUI = MONE;
+			matUI._11 = it->fUIScale;
+			matUI._22 = it->fUIScale;
+			matUI._14 = it->vUIOffset.x;
+			matUI._24 = it->vUIOffset.y;
+			pGFX->SetWorldTransforms( 0, &matUI, 1 );
 			switch ( it->eType ) 
 			{
 				case SUIObject::TYPE_RECTS:
@@ -656,6 +663,8 @@ void CScene::Draw( ICamera *pCamera )
 					break;
 			}
 		}
+		pGFX->SetWorldTransforms( 0, &MONE, 1 );
+		pGFX->SetUIFontScale( 1.0f );
 	}
 	/*
 	if ( !uiScreens.empty() && bShowUI )

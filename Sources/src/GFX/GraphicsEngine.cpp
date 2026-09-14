@@ -1804,6 +1804,7 @@ bool CGraphicsEngine::DrawStringA( const char *pszString, int nX, int nY, DWORD 
   if ( pCurrentFont == 0 )
     return false;
 	//
+	pCurrentFont->PrepareForScale( fUIFontScale );
 	pCurrentFont->FillGeometryData( pszString, nX, nY, dwColor, 0xff000000, tempvertices, tempindices );
 	if ( tempvertices.empty() || tempindices.empty() )
 		return true;
@@ -1817,6 +1818,7 @@ bool CGraphicsEngine::DrawString( const wchar_t *pszString, int nX, int nY, DWOR
   if ( pCurrentFont == 0 )
     return false;
 	//
+	pCurrentFont->PrepareForScale( fUIFontScale );
 	pCurrentFont->FillGeometryData( pszString, nX, nY, dwColor, 0xff000000, tempvertices, tempindices );
 	if ( tempvertices.empty() || tempindices.empty() )
 		return true;
@@ -1830,6 +1832,9 @@ bool CGraphicsEngine::DrawText( IGFXText *pTxt, const RECT &rect, int nY, DWORD 
 	SetShadingEffect( 3 );
 	pTxt->SetWidth( rect.right - rect.left );
 	CGFXText *pText = static_cast<CGFXText*>( pTxt );
+	CFont *pFont = static_cast<CFont*>( pText->GetFont() );
+	if ( pFont != 0 )
+		pFont->PrepareForScale( fUIFontScale );
 	tempvertices.clear();
 	tempindices.clear();
 	pText->FillGeometryData( dwFlags, rect, rect.top + nY, 0, 0xff000000, tempvertices, tempindices );

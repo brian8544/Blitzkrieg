@@ -25,9 +25,63 @@
 // **
 // ************************************************************************************************************************ //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-COptionSystem::COptionSystem()
+COptionSystem::COptionSystem() : bInitialized( false )
 {
 	ChangeSerialize( "*", true );
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static int GetInterfaceScalePercent( const variant_t &var )
+{
+	if ( var.vt == VT_BSTR )
+	{
+		const std::string szScale = (const char*)bstr_t(var);
+		if ( szScale == "125%" || szScale == "125" )
+			return 125;
+		if ( szScale == "150%" || szScale == "150" )
+			return 150;
+		if ( szScale == "200%" || szScale == "200" )
+			return 200;
+		return 100;
+	}
+
+	const int nValue = int(long(var));
+	if ( nValue >= 0 && nValue <= 3 )
+	{
+		const int scales[4] = { 100, 125, 150, 200 };
+		return scales[nValue];
+	}
+	if ( nValue == 125 || nValue == 150 || nValue == 200 )
+		return nValue;
+	return 100;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static const wchar_t *GetInterfaceScaleName( const int nPercent )
+{
+	switch ( nPercent )
+	{
+	case 125: return L"125%";
+	case 150: return L"150%";
+	case 200: return L"200%";
+	default:  return L"100%";
+	}
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void COptionSystem::EnsureInterfaceScaleOption()
+{
+	int nCurrentScale = 100;
+	if ( const SOption *pOldOption = GetVar("GFX.InterfaceScale") )
+		nCurrentScale = GetInterfaceScalePercent( pOldOption->Get() );
+
+	SOption opt;
+	opt.Set( variant_t(GetInterfaceScaleName(nCurrentScale)) );
+	opt.nEditorType = EOET_CLICK_SWITCHES;
+	opt.szAction = "SetInterfaceScale";
+	opt.szActionFill = "GetInterfaceScale";
+	opt.dwFlags = OPTION_FLAG_MAIN_OPTIONS;
+	opt.nOrder = 100000;
+	opt.defaultValue.Set( variant_t(L"100%") );
+	opt.bInstantApply = true;
+	SetVar( "GFX.InterfaceScale", &opt );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void FillOnOff( std::vector<SOptionDropListValue> *pDroplist )
@@ -256,6 +310,12 @@ void COptionSystem::InnerSet( const std::string &szVarName, const variant_t &var
 				SetGlobalVar( ("Options." + szVarName).c_str(), 1 );
 			}
 		}
+		else if ( pOpt->szAction == "SetInterfaceScale" )
+		{
+			SetGlobalVar( "Options.GFX.InterfaceScale", GetInterfaceScalePercent(var) );
+			if ( bInitialized )
+				GetSingleton<IScene>()->Reposition();
+		}
 		else if ( pOpt->szAction == "SetVideoMode" )
 		{
 			std::vector<std::string> strings;
@@ -263,9 +323,15 @@ void COptionSystem::InnerSet( const std::string &szVarName, const variant_t &var
 			NI_ASSERT_T( strings.size() == 3, NStr::Format("Wrong video mode set (%s)", (const char*)bstr_t(var)) );
 			if ( strings.size() == 3 ) 
 			{
-				SetGlobalVar( "GFX.Mode.Mission.SizeX", NStr::ToInt(strings[0]) );
-				SetGlobalVar( "GFX.Mode.Mission.SizeY", NStr::ToInt(strings[1]) );
-				SetGlobalVar( "GFX.Mode.Mission.BPP", NStr::ToInt(strings[2]) );
+				const int nSizeX = NStr::ToInt(strings[0]);
+				const int nSizeY = NStr::ToInt(strings[1]);
+				const int nBPP = NStr::ToInt(strings[2]);
+				SetGlobalVar( "GFX.Mode.Mission.SizeX", nSizeX );
+				SetGlobalVar( "GFX.Mode.Mission.SizeY", nSizeY );
+				SetGlobalVar( "GFX.Mode.Mission.BPP", nBPP );
+				SetGlobalVar( "GFX.Mode.InterMission.SizeX", nSizeX );
+				SetGlobalVar( "GFX.Mode.InterMission.SizeY", nSizeY );
+				SetGlobalVar( "GFX.Mode.InterMission.BPP", nBPP );
 			}
 		}
 		else if ( pOpt->szAction == "SetGammaCorrection" )
@@ -335,6 +401,16 @@ const std::vector<SOptionDropListValue>& COptionSystem::GetDropValues( const std
 				{
 					FillOnOff( &droplist );
 				}
+				else if ( pOpt->szActionFill == "GetInterfaceScale" )
+				{
+					const char *scales[4] = { "100%", "125%", "150%", "200%" };
+					for ( int i = 0; i < 4; ++i )
+					{
+						SOptionDropListValue val;
+						val.szProgName = scales[i];
+						droplist.push_back( val );
+					}
+				}
 				else if ( pOpt->szActionFill == "GetVideoModes" ) 
 				{
 					const SGFXDisplayMode *pMode = GetSingleton<IGFX>()->GetDisplayModes();
@@ -385,6 +461,7 @@ const std::vector<SOptionDropListValue>& COptionSystem::GetDropValues( const std
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void COptionSystem::Init()
 {
+	EnsureInterfaceScaleOption();
 	for ( CPtr<IOptionSystemIterator> pIter = CreateIterator(); !pIter->IsEnd(); pIter->Next() )
 	{
 		const SOptionDesc * pDesc = pIter->GetDesc();
@@ -394,6 +471,7 @@ void COptionSystem::Init()
 		else
 			InnerSet( pDesc->szName, pDesc->defaultValue ); // or set default
 	}
+	bInitialized = true;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // serialize to configuration file
