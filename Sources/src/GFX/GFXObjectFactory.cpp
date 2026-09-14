@@ -64,30 +64,9 @@ void STDCALL CGFXModuleChecker::SetModuleFunctionalityLimits() const
 	NVideoCheck::GetVideoMemory( &memory );
 	const int MB = 1024*1024;
 	// video resolution
-	if ( memory.local.dwTotal > 32*MB ) 
-	{
-		SetGlobalVar( "GFX.Limit.Mode.SizeX", 1000000 );
-		SetGlobalVar( "GFX.Limit.Mode.SizeY", 1000000 );
-		SetGlobalVar( "GFX.Limit.Mode.BPP", 32 );
-	}
-	if ( memory.local.dwTotal > 24*MB ) 
-	{
-		SetGlobalVar( "GFX.Limit.Mode.SizeX", 1600 );
-		SetGlobalVar( "GFX.Limit.Mode.SizeY", 1200 );
-		SetGlobalVar( "GFX.Limit.Mode.BPP", 32 );
-	}
-	else if ( memory.local.dwTotal > 12*MB ) 
-	{
-		SetGlobalVar( "GFX.Limit.Mode.SizeX", 1024 );
-		SetGlobalVar( "GFX.Limit.Mode.SizeY", 768 );
-		SetGlobalVar( "GFX.Limit.Mode.BPP", 32 );
-	}
-	else if ( memory.local.dwTotal > 4*MB ) 
-	{
-		SetGlobalVar( "GFX.Limit.Mode.SizeX", 800 );
-		SetGlobalVar( "GFX.Limit.Mode.SizeY", 600 );
-		SetGlobalVar( "GFX.Limit.Mode.BPP", 16 );
-	}
+	SetGlobalVar( "GFX.Limit.Mode.SizeX", 1000000 );
+	SetGlobalVar( "GFX.Limit.Mode.SizeY", 1000000 );
+	SetGlobalVar( "GFX.Limit.Mode.BPP", 32 );
 	// texture quality
 	if ( memory.texture.dwTotal > 32*MB ) 
 		SetGlobalVar( "GFX.Limit.TextureQuality", 2 );
