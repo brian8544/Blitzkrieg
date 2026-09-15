@@ -15,9 +15,9 @@ struct SDefaultPtrHash
 struct SPtrHash
 {
 	template <class T>
-		int operator()( const CPtr<T> &a ) const { return int( a.GetPtr() ); }
+		std::size_t operator()( const CPtr<T> &a ) const noexcept { return std::hash<std::uintptr_t>{}( reinterpret_cast<std::uintptr_t>( a.GetPtr() ) ); }
 	template <class T>
-		int operator()( const CObj<T> &a ) const { return int( a.GetPtr() ); }
+		std::size_t operator()( const CObj<T> &a ) const noexcept { return std::hash<std::uintptr_t>{}( reinterpret_cast<std::uintptr_t>( a.GetPtr() ) ); }
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif // __HASHFUNCS_H__

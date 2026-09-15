@@ -655,7 +655,7 @@ bool CWorldClient::ActionLeave( const CVec2 &vPos2, bool bAddAction )
 		if ( passangers.empty() )
 			return false;
 		//
-		const int nNumObjects = passangers.size();
+		const int nNumObjects = static_cast<int>( passangers.size() );
 		IRefCount **ppAIObjects = GetTempBuffer<IRefCount*>( nNumObjects );
 		IRefCount **ppTempObjects = ppAIObjects;
 		for ( std::vector<IMOUnit*>::iterator it = passangers.begin(); it != passangers.end(); ++it )

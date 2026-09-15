@@ -29,7 +29,7 @@ bool ExtractKeyAndValue( const std::wstring &szInput, std::string *pKey, std::ws
 	if ( szString.size() < 3 ) 
 		return false;												// eject too short (read wrong) strings
 	//
-	const int nPos = szString.find( L'#' );
+	const int nPos = static_cast<int>( szString.find( L'#' ) );
 	if ( nPos == std::wstring::npos ) 
 		return false;												// string w/o separator (#) we'll treat as wrong... ejecting
 	// key
@@ -42,7 +42,7 @@ bool ExtractKeyAndValue( const std::wstring &szInput, std::string *pKey, std::ws
 	pValue->erase( 0, pValue->find_first_not_of(L' ') );
 	// trim value right
 	{
-		const int nPos = pValue->find_last_not_of( L' ' );
+		const int nPos = static_cast<int>( pValue->find_last_not_of( L' ' ) );
 		if ( nPos == std::wstring::npos )
 		{
 			if ( pValue->find_first_of( L' ' ) == 0 )
@@ -79,7 +79,7 @@ bool CTextManager::AddTextFile( const char *pszFileName )
 	//
 	do
 	{
-		nPos = szString.find( wSeparator, nLastPos );
+		nPos = static_cast<int>( szString.find( wSeparator, nLastPos ) );
 		//
 		std::string szKey;
 		std::wstring wszValue;

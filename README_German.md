@@ -29,8 +29,8 @@ Die Direct3D-Kompatibilitätsquellen sind unter `Sources/sdk` enthalten. Legen S
 
 ```text
 Sources/sdk/FMOD/Include/fmod.hpp
-Sources/sdk/FMOD/lib/x86/fmod_vc.lib
-Sources/sdk/FMOD/lib/x86/fmod.dll
+Sources/sdk/FMOD/lib/x64/fmod_vc.lib
+Sources/sdk/FMOD/lib/x64/fmod.dll
 ```
 
 Führen Sie `build.bat` aus. Das vcpkg-Manifest installiert FFmpeg, libpng, libsquish, pugixml und zlib automatisch. Das mitgelieferte SDK unter `Sources/src/GameSpy` wird aus dem Quellcode gebaut; ein separater GameSpy-Download ist nicht erforderlich. Bink, STLPort, Stingray und das alte DirectX-8-SDK werden für das aktuelle Spielziel nicht benötigt.

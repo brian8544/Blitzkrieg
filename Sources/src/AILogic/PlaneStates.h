@@ -94,7 +94,7 @@ protected:
 public:
 	CPlanePatrolState() : nCurPointIndex( 0 ), pPlane( 0 ) {  }
 	CPlanePatrolState( CAviation *pPlane, const CVec2 &point );
-	int GetNPoints() const { return vPatrolPoints.size(); }
+	int GetNPoints() const { return static_cast<int>( vPatrolPoints.size() ); }
 	// для добавления точек патрулирования
 	void AddPoint( const CVec2 &vAddPoint );
 	void TakeOff() { ToTakeOffState(); } 

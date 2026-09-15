@@ -75,7 +75,7 @@ public:
 		return GetIndex( GetDesc( pszName ) );
 	}
 
-	virtual int STDCALL GetNumDescs() const { return objects.size(); }
+	virtual int STDCALL GetNumDescs() const { return static_cast<int>( objects.size() ); }
 	virtual const SGDBObjectDesc* STDCALL GetAllDescs() const { return &( objects[0] ); }
 	// additional object info retrieving
 	virtual const IGDBObject* STDCALL GetRPGStats( const IGDBObject *pObject );

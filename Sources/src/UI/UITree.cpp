@@ -233,7 +233,7 @@ void CUIList::AddItem()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CUIList::RemoveItem( int nIndex )
 {
-	NI_ASSERT_T( nIndex < listItems.size() && nIndex >= 0, NStr::Format("Wrong item (%d) to remove (max %d)", nIndex, listItems.size()) );
+	NI_ASSERT_T( nIndex < static_cast<int>(listItems.size()) && nIndex >= 0, NStr::Format("Wrong item (%d) to remove (max %d)", nIndex, static_cast<int>(listItems.size())) );
 	CUIListItems::iterator it = listItems.begin() + nIndex;
 	listItems.erase( it );
 }
@@ -245,7 +245,7 @@ IUIListRaw* CUIList::GetItem( int nIndex )
 		return &headers;
 	}
 
-	NI_ASSERT_T( nIndex < listItems.size() && nIndex >= 0, NStr::Format("Wrong item (%d) to get (max %d)", nIndex, listItems.size()) );
+	NI_ASSERT_T( nIndex < static_cast<int>(listItems.size()) && nIndex >= 0, NStr::Format("Wrong item (%d) to get (max %d)", nIndex, static_cast<int>(listItems.size())) );
 	CUIListItems::iterator it = listItems.begin() + nIndex;
 	return &(*it);
 }

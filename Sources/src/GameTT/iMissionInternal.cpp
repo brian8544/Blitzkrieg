@@ -1329,7 +1329,7 @@ bool CInterfaceMission::NewMission( const std::string &_szMapName, bool _bCycled
 					szPartyName = mapinfo.unitCreation.units[nPlayerID].szPartyName;
 				else
 				{
-					const std::string szError = NStr::Format( "Player party for player %d (total = %d players in UnitCreation) was not set for map \"%s\"", nPlayerID, mapinfo.unitCreation.units.size(), _szMapName.c_str() );
+					const std::string szError = NStr::Format( "Player party for player %d (total = %d players in UnitCreation) was not set for map \"%s\"", nPlayerID, static_cast<int>(mapinfo.unitCreation.units.size()), _szMapName.c_str() );
 					GetSingleton<IConsoleBuffer>()->WriteASCII( CONSOLE_STREAM_CHAT, szError.c_str(), 0xffff0000, true );
 				}
 			}
@@ -1349,10 +1349,10 @@ bool CInterfaceMission::NewMission( const std::string &_szMapName, bool _bCycled
 	// compose full script name from map and script names
 	{
 		std::string szScriptName;
-		const int nMapNamePos = szTerrainName.rfind( '\\' );
+		const int nMapNamePos = static_cast<int>( szTerrainName.rfind( '\\' ) );
 		if ( nMapNamePos != std::string::npos ) 
 			szScriptName = szTerrainName.substr( 0, nMapNamePos + 1 );
-		const int nScriptNamePos = mapinfo.szScriptFile.rfind( '\\' );
+		const int nScriptNamePos = static_cast<int>( mapinfo.szScriptFile.rfind( '\\' ) );
 		if ( nScriptNamePos != std::string::npos ) 
 			szScriptName += mapinfo.szScriptFile.substr( nScriptNamePos + 1 );
 		else
@@ -1429,7 +1429,7 @@ bool CInterfaceMission::NewMission( const std::string &_szMapName, bool _bCycled
 	{
     if ( IUIMiniMap *pUIMiniMap = checked_cast<IUIMiniMap*>( pUIScreen->GetChildByID( 20000 ) ) )
     {
-			pUIMiniMap->SetTerrainSize( pTerrain->GetSizeX(), pTerrain->GetSizeY(), mapinfo.diplomacies.size() ); 
+			pUIMiniMap->SetTerrainSize( pTerrain->GetSizeX(), pTerrain->GetSizeY(), static_cast<int>( mapinfo.diplomacies.size() ) );
 			const std::string szTextureName = "maps\\" + szMapName;
 			{
 				SStorageElementStats mapStats, miniMapStats;
@@ -1472,7 +1472,7 @@ bool CInterfaceMission::NewMission( const std::string &_szMapName, bool _bCycled
 	//
 	// иницализация звуков от карты
 	if ( mapinfo.soundsList.size() )
-		pScene->InitMapSounds( &mapinfo.soundsList.front(), mapinfo.soundsList.size() );
+		pScene->InitMapSounds( &mapinfo.soundsList.front(), static_cast<int>( mapinfo.soundsList.size() ) );
 
 	// Инициализация музыки внутри игры
 	pScene->InitMusic( GetSingleton<IScenarioTracker>()->GetUserPlayer()->GetGeneralSide() );
@@ -2454,14 +2454,14 @@ void CInterfaceMission::PreSelectObjects( const CPickVisObjList &picked )
 	int i = 0;
 	for ( CPickVisObjList::const_iterator it = picked.begin(); it != picked.end(); ++it, ++i )
 		preselectedObjects[i] = it->first;
-	pWorld->PreSelect( &(preselectedObjects[0]), preselectedObjects.size() );
+	pWorld->PreSelect( &(preselectedObjects[0]), static_cast<int>( preselectedObjects.size() ) );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CInterfaceMission::AddPreSelectedObjects()
 {
 	if ( !preselectedObjects.empty() )
 	{
-		pWorld->Select( &(preselectedObjects[0]), preselectedObjects.size() );
+		pWorld->Select( &(preselectedObjects[0]), static_cast<int>( preselectedObjects.size() ) );
 		preselectedObjects.clear();
 	}
 }

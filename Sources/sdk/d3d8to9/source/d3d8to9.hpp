@@ -6,9 +6,11 @@
 #pragma once
 
 #include <vector>
-#include <unordered_set>
+#include <unordered_map>
 #include "d3d8.hpp"
 #include "interface_query.hpp"
+
+struct VertexShaderInfo;
 
 class Direct3D8 : public IDirect3D8
 {
@@ -163,6 +165,9 @@ public:
 private:
 	void ApplyClipPlanes();
 	void ReleaseShadersAndStateBlocks();
+	DWORD AllocateVertexShaderHandle();
+	DWORD AllocatePixelShaderHandle();
+	DWORD AllocateStateBlockToken();
 
 	Direct3D8 *const D3D;
 	IDirect3DDevice9 *const ProxyInterface;
@@ -181,8 +186,13 @@ private:
 	float StoredClipPlanes[MAX_CLIP_PLANES][4] = {};
 	DWORD ClipPlaneRenderState = 0;
 
-	// Store shader handles and state block tokens so they can be destroyed later to mirror D3D8 behavior
-	std::unordered_set<DWORD> PixelShaderHandles, VertexShaderHandles, StateBlockTokens;
+	// D3D8 exposes 32-bit opaque handles. Never encode native pointers in them on x64.
+	std::unordered_map<DWORD, IDirect3DPixelShader9 *> PixelShaders;
+	std::unordered_map<DWORD, VertexShaderInfo *> VertexShaders;
+	std::unordered_map<DWORD, IDirect3DStateBlock9 *> StateBlocks;
+	DWORD NextVertexShaderHandle = 0x80000001u;
+	DWORD NextPixelShaderHandle = 1u;
+	DWORD NextStateBlockToken = 1u;
 	unsigned int VertexShaderAndDeclarationCount = 0;
 };
 

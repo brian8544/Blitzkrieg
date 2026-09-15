@@ -107,7 +107,7 @@ void SCheats::CheckPassword( const std::string &szPassword )
 	checksum.reserve( 100 );
 	checksum.insert( checksum.end(), szPassword.begin(), szPassword.end() );
 	checksum.insert( checksum.end(), s_cKey2, s_cKey2 + s_nKey2Length );
-	const uLong uCheckSum = crc32( 0L, &(checksum[0]), checksum.size() );
+	const uLong uCheckSum = crc32( 0L, &(checksum[0]), static_cast<uInt>( checksum.size() ) );
 
 	bPasswordOK = ( uCheckSum == ulPass );
 }

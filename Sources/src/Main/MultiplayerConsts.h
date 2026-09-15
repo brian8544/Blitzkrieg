@@ -5,13 +5,10 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct SMultiplayerConsts
 {
-	enum
-	{
-		NET_PORT = 8889,
-		GS_NET_PORT = 9089,
-		TIME_TO_ASK_PLAYER_INFO = 1000,
-		TIME_TO_LAG_PLAYER = 3000,
-	};
+	static constexpr int NET_PORT = 8889;
+	static constexpr int GS_NET_PORT = 9089;
+	static constexpr int TIME_TO_ASK_PLAYER_INFO = 1000;
+	static constexpr int TIME_TO_LAG_PLAYER = 3000;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif // __MULTIPLAYER_CONSTS_H__

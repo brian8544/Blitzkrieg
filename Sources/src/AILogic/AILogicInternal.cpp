@@ -604,7 +604,7 @@ void CAILogic::LoadEntrenchments( const std::vector<SEntrenchmentInfo> &entrench
 				segments.push_back( CLinkObject::GetObjectByLink( nLink ) );
 			}
 
-			theStatObjs.AddNewEntrencment( &(segments[0]), segments.size(), pFullEntrenchment, true );
+			theStatObjs.AddNewEntrencment( &(segments[0]), static_cast<int>( segments.size() ), pFullEntrenchment, true );
 		}
 	}
 }
@@ -656,7 +656,7 @@ void CAILogic::InitStartCommands()
 	{
 		if ( !iter->unitLinkIDs.empty() )
 		{
-			const int nSize = iter->unitLinkIDs.size();
+			const int nSize = static_cast<int>( iter->unitLinkIDs.size() );
 			std::vector<IRefCount*> unitsBuffer( nSize );
 			for ( int i = 0; i < nSize; ++i )
 				unitsBuffer[i] = CLinkObject::GetObjectByLink( iter->unitLinkIDs[i] );
@@ -673,7 +673,7 @@ void CAILogic::InitStartCommands( const LinkInfo &linksInfo, std::unordered_map<
 		if ( !iter->unitLinkIDs.empty() )
 		{
 			int nActuallyUnits = 0;			
-			const int nSize = iter->unitLinkIDs.size();
+			const int nSize = static_cast<int>( iter->unitLinkIDs.size() );
 			std::vector<IRefCount*> unitsBuffer( nSize );
 			for ( int i = 0; i < nSize; ++i )
 			{
@@ -835,7 +835,7 @@ void CAILogic::LoadScenarioUnits( const SLoadMapInfo &mapInfo, LinkInfo *linksIn
 			continue;
 
 		// подходящий сценарийный объект для юнита k не найден
-		NI_ASSERT_T( i < scenarioObjects.size(), NStr::Format( "Slot for mission unit %d not found", k ) );
+		NI_ASSERT_T( i < static_cast<int>(scenarioObjects.size()), NStr::Format( "Slot for mission unit %d not found", k ) );
 		takenScenarioObjects[i] = true;
 
 		const int nGroup = mapInfo.reinforcements.GetGroupById( scenarioObjects[i].nScriptID );
@@ -878,7 +878,7 @@ void CAILogic::Init( const SLoadMapInfo &mapInfo, IProgressHook *pProgress )
 	CommonInit( mapInfo.terrain );
 	scripts.Init( mapInfo );
 	if ( mapInfo.scriptAreas.size() > 0 )
-		scripts.InitAreas( &(mapInfo.scriptAreas[0]), mapInfo.scriptAreas.size() );
+		scripts.InitAreas( &(mapInfo.scriptAreas[0]), static_cast<int>( mapInfo.scriptAreas.size() ) );
 
 	LinkInfo linksInfo;
 
@@ -1366,7 +1366,7 @@ bool CAILogic::GetNewBridge( IRefCount ***pSpans, int *pnLen )
 	*pnLen = 0;	
 	if ( !bridges.empty() )
 	{
-		*pSpans = GetTempBuffer<IRefCount*>( bridges.front().size() );
+		*pSpans = GetTempBuffer<IRefCount*>( static_cast<int>( bridges.front().size() ) );
 
 		for ( std::list<CPtr<CBridgeSpan> >::iterator iter = bridges.front().begin(); iter != bridges.front().end(); ++iter )
 			(*pSpans)[(*pnLen)++] = *iter;
@@ -1518,7 +1518,7 @@ bool CAILogic::SubstituteUniqueIDs( IRefCount **pUnitsBuffer, const int nLen )
 		else
 		{
 			CLinkObject *pObj = static_cast<CLinkObject*>( pUnitsBuffer[i] );
-			pUnitsBuffer[i] = reinterpret_cast<IRefCount*>( pObj->GetUniqueId() );
+			pUnitsBuffer[i] = reinterpret_cast<IRefCount*>( static_cast<intptr_t>( pObj->GetUniqueId() ) );
 		}
 	}
 

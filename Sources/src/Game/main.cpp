@@ -28,6 +28,7 @@
 
 #include "..\GameTT\CutScenesHelper.h"
 #include "..\Misc\TimeMeter.h"
+#include "..\WheatyExceptionReport\WheatyExceptionReport.h"
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 float Clamp1( float fVal, float fMin, float fMax )
 {
@@ -80,6 +81,7 @@ static std::string szLaunchDirectory;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
+	WheatyExceptionReport crashReporter;
 	CTimeMeter<> timeMeter;
 	// disable system-critical errors displaying - just send it to calling process
 	SetErrorMode( SEM_FAILCRITICALERRORS );
@@ -95,10 +97,6 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	int nLeakId = -1;
 	_CrtSetBreakAlloc( nLeakId );
 	// _CRTDBG_ALLOC_MEM_DF | _CRTDBG_CHECK_CRT_DF | _CRTDBG_LEAK_CHECK_DF
-#if defined( _DO_SEH ) && !defined( _DEBUG )
-	// set StructuredExceptionHandler 
-	SetCrashHandlerFilter( CrashHandlerFilter );
-#endif // defined( _DO_SEH ) && !defined( _DEBUG )
 	std::string szLogFileName, szErrorFileName;
 	{
 		char buffer[1024];
@@ -481,10 +479,6 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	NMain::Finalize();
 	
 	//
-#if defined( _DO_SEH ) && !defined( _DEBUG )
-	// reset StructuredExceptionHandler 
-	SetCrashHandlerFilter( 0 );
-#endif // defined( _DO_SEH ) && !defined( _DEBUG )
 
 	return 0;
 }

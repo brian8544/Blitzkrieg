@@ -36,7 +36,7 @@ void CBasicObjectFactory::RegisterType( int nObjectTypeID, ObjectFactoryNewFunc 
 void CBasicObjectFactory::Aggregate( IObjectFactory *pFactory )
 {
 	std::vector<SObjectFactoryTypeInfo> types( pFactory->GetNumKnownTypes() );
-	pFactory->GetKnownTypes( &(types[0]), types.size() );
+	pFactory->GetKnownTypes( &(types[0]), static_cast<int>( types.size() ) );
 	for ( std::vector<SObjectFactoryTypeInfo>::const_iterator pos = types.begin(); pos != types.end(); ++pos )
 		RegisterType( pos->nTypeID, reinterpret_cast<const type_info*>(pos->pTypeInfo), pos->newFunc );
 }

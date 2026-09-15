@@ -158,7 +158,7 @@ void CMeshSkeleton::Init( SMeshSkeletonData *_pSkeleton )
 	pSkeleton = _pSkeleton;
 	::CreateNodeFrom( &topnode, pSkeleton->nTopNode, &( pSkeleton->nodes[0] ) );
 	// form 'nodes' vector for fast indexed access to nodes
-	RetrieveAllNodes( nodes, &topnode, pSkeleton->nodes.size() );
+	RetrieveAllNodes( nodes, &topnode, static_cast<int>( pSkeleton->nodes.size() ) );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static CMatrixStack<32> localmstack;

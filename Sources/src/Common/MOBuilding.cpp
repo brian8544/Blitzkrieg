@@ -163,7 +163,7 @@ bool CMOBuilding::Load( IMOUnit *pMO, bool bEnter )
 			pIcon->UnlockBarColor();
 	}
 
-	GetSingleton<IInput>()->AddMessage( SGameMessage(MC_UPDATE_WHO_IN_CONTAINER, (int)static_cast<IMOContainer*>(this)) );
+	GetSingleton<IInput>()->AddMessage( SGameMessage::WithPointer(MC_UPDATE_WHO_IN_CONTAINER, static_cast<IMOContainer*>(this)) );
 	UpdatePassangers();
 	return true;
 }
@@ -206,7 +206,7 @@ int CMOBuilding::GetPassangers( IMOUnit **pBuffer, const bool bCanSelectOnly ) c
 			for ( CPassangersList::const_iterator it = passangers.begin(); it != passangers.end(); ++it )
 				*pBuffer++ = it->pUnit;
 		}
-		return passangers.size();
+		return static_cast<int>( passangers.size() );
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

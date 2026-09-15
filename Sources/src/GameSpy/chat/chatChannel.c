@@ -562,7 +562,7 @@ void ciSetChannelPassword(CHAT chat, const char * channel, const char * password
 	////////////////////
 	if(password == NULL)
 		password = "";
-	len = (strlen(password) + 1);
+	len = ((int)(strlen(password)) + 1);
 	chatChannel->password = (char *)gsimalloc(len);
 	if(chatChannel->password == NULL)
 		return; //ERRCON

@@ -236,14 +236,14 @@ void CUpdater::UpdateActions( SAINotifyAction **pActionsBuffer, int *pnLen )
 		int nTotalSize = 0;
 		for ( int i = 0; i < simpleUpdates.size(); ++i )
 		{
-			nTotalSize += simpleUpdates[i].size();
+			nTotalSize += static_cast<int>( simpleUpdates[i].size() );
 			nTotalSize += theSuspendedUpdates.GetNRecalled( EActionNotify( (i<<4)|1 ) );
 		}
 
 		nTotalSize += 
-			complexUpdates[ACTION_NOTIFY_DEAD_UNIT >> 4].size() + 
+			static_cast<int>( complexUpdates[ACTION_NOTIFY_DEAD_UNIT >> 4].size() ) +
 			theSuspendedUpdates.GetNRecalled( ACTION_NOTIFY_DEAD_UNIT ) +
-			unitAnimation.size();
+			static_cast<int>( unitAnimation.size() );
 
 		*pnLen = 0;
 		*pActionsBuffer = GetTempBuffer<SAINotifyAction>( nTotalSize );
@@ -264,15 +264,7 @@ void CUpdater::UpdateActions( SAINotifyAction **pActionsBuffer, int *pnLen )
 				(*pActionsBuffer)[*pnLen].typeID = eAction;
 				(*pActionsBuffer)[*pnLen].pObj = update.pObj;
 
-					// в nParam нужно послать IRefCount*
-				if ( eAction == ACTION_NOTIFY_SERVED_ARTILLERY || eAction == ACTION_NOTIFY_SELECT_CHECKED ||
-						 eAction == ACTION_SET_SELECTION_GROUP )
-				{
-					if ( update.nParam == -1 )
-						(*pActionsBuffer)[*pnLen].nParam = 0;
-					else
-						(*pActionsBuffer)[*pnLen].nParam = reinterpret_cast<int>( CLinkObject::GetObjectByUniqueIdSafe( update.nParam ) );
-				}
+				// Keep the stable 32-bit unique object ID in the action payload.
 				(*pActionsBuffer)[*pnLen].nParam = update.nParam;
 				
 				if ( !theSuspendedUpdates.CheckToSuspend( eAction, update.pObj, (*pActionsBuffer)[(*pnLen)] ) )
@@ -321,7 +313,7 @@ void CUpdater::UpdatePlacements( SAINotifyPlacement **pObjPosBuffer, int *pnLen 
 		const NTimer::STime timeDiff = GetAIGetSegmTime( pGameSegment ) - pGameTimer->GetGameTime();
 		
 		*pnLen = 0;
-		*pObjPosBuffer = GetTempBuffer<SAINotifyPlacement>( complexUpdates[ACTION_NOTIFY_PLACEMENT >> 4].size() );
+		*pObjPosBuffer = GetTempBuffer<SAINotifyPlacement>( static_cast<int>( complexUpdates[ACTION_NOTIFY_PLACEMENT >> 4].size() ) );
 		for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_PLACEMENT >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_PLACEMENT >> 4].end(); ++iter )
 		{
 			IUpdatableObj *pObj = iter->second;
@@ -353,7 +345,7 @@ void CUpdater::UpdateRPGParams( SAINotifyRPGStats **pUnitRPGBuffer, int *pnLen )
 	if ( !theDipl.IsNetGame() || pAILogic->IsNetGameStarted() )
 	{
 		const int nSize = 
-			complexUpdates[ACTION_NOTIFY_RPG_CHANGED >> 4].size() + 
+			static_cast<int>( complexUpdates[ACTION_NOTIFY_RPG_CHANGED >> 4].size() ) +
 			theSuspendedUpdates.GetNRecalled( ACTION_NOTIFY_RPG_CHANGED );
 
 		*pUnitRPGBuffer = GetTempBuffer<SAINotifyRPGStats>( nSize );
@@ -381,7 +373,7 @@ void CUpdater::UpdateHits( SAINotifyHitInfo **pHits, int *pnLen )
 	*pnLen = 0;
 	if ( !theDipl.IsNetGame() || pAILogic->IsNetGameStarted() )
 	{
-		*pHits = GetTempBuffer<SAINotifyHitInfo>( complexUpdates[ACTION_NOTIFY_HIT >> 4].size() );
+		*pHits = GetTempBuffer<SAINotifyHitInfo>( static_cast<int>( complexUpdates[ACTION_NOTIFY_HIT >> 4].size() ) );
 
 		for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_HIT >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_HIT >> 4].end(); ++iter )
 		{
@@ -400,7 +392,7 @@ void CUpdater::UpdateStObjPlacements( SAINotifyPlacement **pObjPosBuffer, int *p
 	*pnLen = 0;
 	if ( !theDipl.IsNetGame() || pAILogic->IsNetGameStarted() )
 	{
-		*pObjPosBuffer= GetTempBuffer<SAINotifyPlacement>( complexUpdates[ACTION_NOTIFY_ST_OBJ_PLACEMENT >> 4].size() );
+		*pObjPosBuffer= GetTempBuffer<SAINotifyPlacement>( static_cast<int>( complexUpdates[ACTION_NOTIFY_ST_OBJ_PLACEMENT >> 4].size() ) );
 
 		for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_ST_OBJ_PLACEMENT >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_ST_OBJ_PLACEMENT >> 4].end(); ++iter )
 		{
@@ -421,7 +413,7 @@ void CUpdater::GetNewProjectiles( struct SAINotifyNewProjectile **pProjectiles, 
 	*pnLen = 0;
 	if ( !theDipl.IsNetGame() || pAILogic->IsNetGameStarted() )
 	{
-		*pProjectiles = GetTempBuffer<SAINotifyNewProjectile>( complexUpdates[ACTION_NOTIFY_NEW_PROJECTILE >> 4].size() );
+		*pProjectiles = GetTempBuffer<SAINotifyNewProjectile>( static_cast<int>( complexUpdates[ACTION_NOTIFY_NEW_PROJECTILE >> 4].size() ) );
 			
 		for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_NEW_PROJECTILE >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_NEW_PROJECTILE >> 4].end(); ++iter )
 			iter->second->GetProjectileInfo( &(*pProjectiles)[(*pnLen)++] );
@@ -435,7 +427,7 @@ void CUpdater::GetDeadProjectiles( IRefCount ***pProjectilesBuf, int *pnLen )
 	*pnLen = 0;
 	if ( !theDipl.IsNetGame() || pAILogic->IsNetGameStarted() )
 	{
-		*pProjectilesBuf = GetTempBuffer<IRefCount*>( complexUpdates[ACTION_NOTIFY_DEAD_PROJECTILE >> 4].size() );	
+		*pProjectilesBuf = GetTempBuffer<IRefCount*>( static_cast<int>( complexUpdates[ACTION_NOTIFY_DEAD_PROJECTILE >> 4].size() ) );
 
 		for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_DEAD_PROJECTILE >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_DEAD_PROJECTILE >> 4].end(); ++iter )
 		{
@@ -454,7 +446,7 @@ void CUpdater::GetNewUnits( SNewUnitInfo **pNewUnitBuffer, int *pnLen )
 	*pnLen = 0;
 	if ( !theDipl.IsNetGame() || pAILogic->IsNetGameStarted() )
 	{
-		*pNewUnitBuffer = GetTempBuffer<SNewUnitInfo>( complexUpdates[ACTION_NOTIFY_NEW_UNIT >> 4].size() );	
+		*pNewUnitBuffer = GetTempBuffer<SNewUnitInfo>( static_cast<int>( complexUpdates[ACTION_NOTIFY_NEW_UNIT >> 4].size() ) );
 		
 		for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_NEW_UNIT >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_NEW_UNIT >> 4].end(); ++iter )
 		{
@@ -477,7 +469,7 @@ void CUpdater::GetDisappearedUnits( IRefCount ***pUnitsBuffer, int *pnLen )
 	*pnLen = 0;
 	if ( !theDipl.IsNetGame() || pAILogic->IsNetGameStarted() )
 	{
-		*pUnitsBuffer = GetTempBuffer<IRefCount*>( complexUpdates[ACTION_NOTIFY_DISSAPEAR_UNIT >> 4].size() );
+		*pUnitsBuffer = GetTempBuffer<IRefCount*>( static_cast<int>( complexUpdates[ACTION_NOTIFY_DISSAPEAR_UNIT >> 4].size() ) );
 
 		for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_DISSAPEAR_UNIT >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_DISSAPEAR_UNIT >> 4].end(); ++iter )
 		{
@@ -523,7 +515,7 @@ void CUpdater::GetDisappearedUnits( IRefCount ***pUnitsBuffer, int *pnLen )
 void CUpdater::GetNewStaticObjects( struct SNewUnitInfo **pObjects, int *pnLen )
 {
 	const int nSize = 
-		complexUpdates[ACTION_NOTIFY_NEW_ST_OBJ >> 4].size() +
+		static_cast<int>( complexUpdates[ACTION_NOTIFY_NEW_ST_OBJ >> 4].size() ) +
 		theSuspendedUpdates.GetNRecalled( ACTION_NOTIFY_NEW_ST_OBJ );
 
 	*pObjects = GetTempBuffer<SNewUnitInfo>( nSize );	
@@ -547,7 +539,7 @@ void CUpdater::GetNewStaticObjects( struct SNewUnitInfo **pObjects, int *pnLen )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CUpdater::GetDeletedStaticObjects( IRefCount ***pObjBuffer, int *pnLen )
 {
-	*pObjBuffer = GetTempBuffer<IRefCount*>( complexUpdates[ACTION_NOTIFY_DELETED_ST_OBJ >> 4].size() );
+	*pObjBuffer = GetTempBuffer<IRefCount*>( static_cast<int>( complexUpdates[ACTION_NOTIFY_DELETED_ST_OBJ >> 4].size() ) );
 	*pnLen = 0;
 
 	for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_DELETED_ST_OBJ >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_DELETED_ST_OBJ >> 4].end(); ++iter )
@@ -561,7 +553,7 @@ void CUpdater::UpdateTurretTurn( SAINotifyTurretTurn **pTurretsBuffer, int *pnLe
 	*pnLen = 0;
 	if ( !theDipl.IsNetGame() || pAILogic->IsNetGameStarted() )
 	{
-		*pTurretsBuffer = GetTempBuffer<SAINotifyTurretTurn>( complexUpdates[ACTION_NOTIFY_TURRET_HOR_TURN >> 4].size() );
+		*pTurretsBuffer = GetTempBuffer<SAINotifyTurretTurn>( static_cast<int>( complexUpdates[ACTION_NOTIFY_TURRET_HOR_TURN >> 4].size() ) );
 
 		for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_TURRET_HOR_TURN >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_TURRET_HOR_TURN >> 4].end(); ++iter )
 		{
@@ -588,7 +580,7 @@ void CUpdater::UpdateShots( SAINotifyMechShot **pShots, int *pnLen )
 	{
 		const NTimer::STime time = GetAIGetSegmTime( pGameSegment );	
 		
-		*pShots = GetTempBuffer<SAINotifyMechShot>( complexUpdates[ACTION_NOTIFY_MECH_SHOOT >> 4].size() );
+		*pShots = GetTempBuffer<SAINotifyMechShot>( static_cast<int>( complexUpdates[ACTION_NOTIFY_MECH_SHOOT >> 4].size() ) );
 
 		for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_MECH_SHOOT >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_MECH_SHOOT >> 4].end(); ++iter )
 		{
@@ -611,7 +603,7 @@ void CUpdater::UpdateShots( SAINotifyInfantryShot **pShots, int *pnLen )
 	{
 		const NTimer::STime time = GetAIGetSegmTime( pGameSegment );	
 		
-		*pShots = GetTempBuffer<SAINotifyInfantryShot>( complexUpdates[ACTION_NOTIFY_INFANTRY_SHOOT >> 4].size() );
+		*pShots = GetTempBuffer<SAINotifyInfantryShot>( static_cast<int>( complexUpdates[ACTION_NOTIFY_INFANTRY_SHOOT >> 4].size() ) );
 
 		for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_INFANTRY_SHOOT >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_INFANTRY_SHOOT >> 4].end(); ++iter )
 		{
@@ -632,7 +624,7 @@ void CUpdater::UpdateEntranceStates( SAINotifyEntranceState **pUnits, int *pnLen
 	*pnLen = 0;
 	if ( !theDipl.IsNetGame() || pAILogic->IsNetGameStarted() )
 	{
-		*pUnits = GetTempBuffer<SAINotifyEntranceState>( complexUpdates[ACTION_NOTIFY_ENTRANCE_STATE >> 4].size() );
+		*pUnits = GetTempBuffer<SAINotifyEntranceState>( static_cast<int>( complexUpdates[ACTION_NOTIFY_ENTRANCE_STATE >> 4].size() ) );
 
 		for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_ENTRANCE_STATE >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_ENTRANCE_STATE >> 4].end(); ++iter )
 		{
@@ -653,7 +645,7 @@ void CUpdater::GetEntrenchments( SSegment2Trench **pEntrenchemnts, int *pnLen )
 	*pnLen = 0;
 	if ( !theDipl.IsNetGame() || pAILogic->IsNetGameStarted() )
 	{
-		*pEntrenchemnts = GetTempBuffer<SSegment2Trench>( complexUpdates[ACTION_NOTIFY_NEW_ENTRENCHMENT >> 4].size() );
+		*pEntrenchemnts = GetTempBuffer<SSegment2Trench>( static_cast<int>( complexUpdates[ACTION_NOTIFY_NEW_ENTRENCHMENT >> 4].size() ) );
 
 		for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_NEW_ENTRENCHMENT >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_NEW_ENTRENCHMENT >> 4].end(); ++iter )
 		{
@@ -679,7 +671,7 @@ void CUpdater::GetFormations( struct SSoldier2Formation **pFormations, int *pnLe
 	*pnLen = 0;
 	if ( !theDipl.IsNetGame() || pAILogic->IsNetGameStarted() )
 	{
-		*pFormations = GetTempBuffer<SSoldier2Formation>( complexUpdates[ACTION_NOTIFY_NEW_FORMATION >> 4].size() );
+		*pFormations = GetTempBuffer<SSoldier2Formation>( static_cast<int>( complexUpdates[ACTION_NOTIFY_NEW_FORMATION >> 4].size() ) );
 
 		for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_NEW_FORMATION >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_NEW_FORMATION >> 4].end(); ++iter )
 		{
@@ -702,7 +694,7 @@ void CUpdater::GetFormations( struct SSoldier2Formation **pFormations, int *pnLe
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CUpdater::GetNewBridgeSpans( SNewUnitInfo **pObjects, int *pnLen )
 {
-	*pObjects = GetTempBuffer<SNewUnitInfo>( complexUpdates[ACTION_NOTIFY_NEW_BRIDGE_SPAN >> 4].size() );
+	*pObjects = GetTempBuffer<SNewUnitInfo>( static_cast<int>( complexUpdates[ACTION_NOTIFY_NEW_BRIDGE_SPAN >> 4].size() ) );
 	*pnLen = 0;	
 
 	for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_NEW_BRIDGE_SPAN >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_NEW_BRIDGE_SPAN >> 4].end(); ++iter )
@@ -716,7 +708,7 @@ void CUpdater::GetRevealCircles( CCircle **pCircleBuffer, int *pnLen )
 	*pnLen = 0;
 	if ( !theDipl.IsNetGame() || pAILogic->IsNetGameStarted() )
 	{
-		*pCircleBuffer = GetTempBuffer<CCircle>( complexUpdates[ACTION_NOTIFY_REVEAL_ARTILLERY >> 4].size() );
+		*pCircleBuffer = GetTempBuffer<CCircle>( static_cast<int>( complexUpdates[ACTION_NOTIFY_REVEAL_ARTILLERY >> 4].size() ) );
 
 		for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_REVEAL_ARTILLERY >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_REVEAL_ARTILLERY >> 4].end(); ++iter )
 			iter->second->GetRevealCircle( &(*pCircleBuffer)[(*pnLen)++] );
@@ -731,7 +723,7 @@ void CUpdater::UpdateDiplomacies( SAINotifyDiplomacy **pDiplomaciesBuffer, int *
 	if ( !theDipl.IsNetGame() || pAILogic->IsNetGameStarted() )
 	{
 		const int nSize = 
-			complexUpdates[ACTION_NOTIFY_UPDATE_DIPLOMACY >> 4].size() +
+			static_cast<int>( complexUpdates[ACTION_NOTIFY_UPDATE_DIPLOMACY >> 4].size() ) +
 			theSuspendedUpdates.GetNRecalled( ACTION_NOTIFY_UPDATE_DIPLOMACY );
 
 		*pDiplomaciesBuffer = GetTempBuffer<SAINotifyDiplomacy>( nSize );
@@ -763,7 +755,7 @@ void CUpdater::UpdateShootAreas( SShootAreas **pShootAreas, int *pnLen )
 	*pnLen = 0;
 	if ( !theDipl.IsNetGame() || pAILogic->IsNetGameStarted() )
 	{
-		*pShootAreas = GetTempBuffer<SShootAreas>( complexUpdates[ACTION_NOTIFY_SHOOT_AREA >> 4].size() * 15 );
+		*pShootAreas = GetTempBuffer<SShootAreas>( static_cast<int>( complexUpdates[ACTION_NOTIFY_SHOOT_AREA >> 4].size() ) * 15 );
 
 		for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_SHOOT_AREA >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_SHOOT_AREA >> 4].end(); ++iter )
 		{
@@ -793,7 +785,7 @@ void CUpdater::UpdateRangeAreas( SShootAreas **pRangeAreas, int *pnLen )
 	*pnLen = 0;
 	if ( !theDipl.IsNetGame() || pAILogic->IsNetGameStarted() )
 	{
-		*pRangeAreas = GetTempBuffer<SShootAreas>( complexUpdates[ACTION_NOTIFY_RANGE_AREA >> 4].size() );
+		*pRangeAreas = GetTempBuffer<SShootAreas>( static_cast<int>( complexUpdates[ACTION_NOTIFY_RANGE_AREA >> 4].size() ) );
 
 		for ( CComplexUpdatesSet::iterator iter = complexUpdates[ACTION_NOTIFY_RANGE_AREA >> 4].begin(); iter != complexUpdates[ACTION_NOTIFY_RANGE_AREA >> 4].end(); ++iter )
 		{
@@ -836,7 +828,7 @@ void CUpdater::AddFeedBack( const SAIFeedBack &feedBack )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CUpdater::UpdateFeedBacks( SAIFeedBack **pFeedBacksBuffer, int *pnLen )
 {
-	*pFeedBacksBuffer = GetTempBuffer<SAIFeedBack>( feedBacks.size() );
+	*pFeedBacksBuffer = GetTempBuffer<SAIFeedBack>( static_cast<int>( feedBacks.size() ) );
 	*pnLen = 0;
 
 	for ( std::list<SAIFeedBack>::iterator iter = feedBacks.begin(); iter != feedBacks.end(); ++iter )

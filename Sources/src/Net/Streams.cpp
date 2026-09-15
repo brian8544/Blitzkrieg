@@ -46,7 +46,7 @@ bool CDataStream::ReadString( std::string &res, int nMaxSize )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CDataStream::WriteString( const std::string &res )
 {
-	int nSize = res.size(), nVal;
+	int nSize = static_cast<int>( res.size() ), nVal;
 	if ( nSize >= 128 )
 	{
 		nVal = nSize * 2 + 1;

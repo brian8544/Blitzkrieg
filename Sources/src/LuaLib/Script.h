@@ -56,7 +56,7 @@ public:
 		float GetNumber() const				{  return (float)lua_tonumber(GetState(), m_stackIndex);  }
 		const char* GetString() const		{  return lua_tostring(GetState(), m_stackIndex);  }
 		operator const char *() const		{ return GetString(); }
-		int StrLen() const					{  return lua_strlen(GetState(), m_stackIndex);  }
+		int StrLen() const					{  return static_cast<int>( lua_strlen(GetState(), m_stackIndex) );  }
 		CFunction GetCFunction() const		{  return lua_tocfunction(GetState(), m_stackIndex);  }
 		void* GetUserData() const			{  return lua_touserdata(GetState(), m_stackIndex);  }
 		const void* GetPointer() const		{  return lua_topointer(GetState(), m_stackIndex);  }

@@ -76,7 +76,10 @@ static LRESULT CALLBACK WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
       break;
 		case WM_SETCURSOR:
 			if ( NMain::IsInitialized() ) 
+			{
 				GetSingleton<ICursor>()->OnSetCursor();
+				return TRUE;
+			}
 			//SetCursor( 0 );
 //			SetCursor( LoadCursor(0, IDC_ARROW) );
 			break;
@@ -212,7 +215,7 @@ static LRESULT CALLBACK WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 				CHARSETINFO csi;
 				Zero( csi );
 				DWORD dwCharSet = wParam;
-				BOOL bSuccess = TranslateCharsetInfo( (DWORD*)dwCharSet, &csi, TCI_SRCCHARSET );
+				BOOL bSuccess = TranslateCharsetInfo( reinterpret_cast<DWORD*>( static_cast<ULONG_PTR>(dwCharSet) ), &csi, TCI_SRCCHARSET );
 				if ( bSuccess )
 				{
 					if ( IInput *pInput = GetSingleton<IInput>() )
@@ -426,7 +429,7 @@ void Exit( int nExitCode )
 // **
 // ************************************************************************************************************************ //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BOOL CALLBACK SplashScreenDialogProc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
+INT_PTR CALLBACK SplashScreenDialogProc( HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
 	switch ( uMsg ) 
 	{

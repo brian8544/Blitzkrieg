@@ -79,6 +79,6 @@ LONG CRegistrySection::SaveString( LPCTSTR pszRegistryKey, const std::string &sz
 													0,
 													REG_SZ,
 													reinterpret_cast<const BYTE*>( szSaveValue.c_str() ),
-													szSaveValue.size() + 1 );
+													static_cast<DWORD>( szSaveValue.size() ) + 1 );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

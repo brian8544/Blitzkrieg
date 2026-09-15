@@ -73,8 +73,8 @@ bool CGeometryMesh::Load( const bool bPreLoad )
 	int nTotalNumIndices = 0;
 	for ( std::vector<SMeshFormat>::const_iterator it = meshes.begin(); it != meshes.end(); ++it )
 	{
-		nTotalNumVertices += it->components.size();
-		nTotalNumIndices += it->indices.size();
+		nTotalNumVertices += static_cast<int>( it->components.size() );
+		nTotalNumIndices += static_cast<int>( it->indices.size() );
 	}
 	//
 	IGFX *pGFX = GetSingleton<IGFX>();
@@ -84,7 +84,7 @@ bool CGeometryMesh::Load( const bool bPreLoad )
 	for ( std::vector<SMeshFormat>::iterator it = meshes.begin(); it != meshes.end(); ++it )
 	{
 		const SMeshFormat &mesh = *it;
-		const int nNumVertices = mesh.components.size();
+		const int nNumVertices = static_cast<int>( mesh.components.size() );
 		CPtr<IGFXVertices> pVertices = pGFX->CreateVertices( nNumVertices, SGFXVertex::format, GFXPT_TRIANGLELIST, GFXD_STATIC );
 		{
 			CVerticesLock<SGFXVertex> verts( pVertices );
@@ -97,7 +97,7 @@ bool CGeometryMesh::Load( const bool bPreLoad )
 			}
 		}
 		// create and fill indices
-		const int nNumIndices = mesh.indices.size();
+		const int nNumIndices = static_cast<int>( mesh.indices.size() );
 		CPtr<IGFXIndices> pIndices = pGFX->CreateIndices( nNumIndices, GFXIF_INDEX16, GFXPT_TRIANGLELIST, GFXD_STATIC );
 		{
 			CIndicesLock<WORD> inds( pIndices );

@@ -101,7 +101,7 @@ struct SVACalculateAverageHeightFunctional
 		: pAltidude( _pAltidude ), fTotalHeight( 0.0f ), nPointCount( 0 )
 	{
 		NI_ASSERT_T( pAltidude != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pAltidude ) );
+								 NStr::Format( "Wrong parameter: %p\n", pAltidude ) );
 	}
 
 	bool operator()( int nXIndex, int nYIndex, float fValue )
@@ -129,7 +129,7 @@ struct SVALevelFunctional
 		: pAltidude( _pAltidude ), fAverageHeight( _fAverageHeight ), fLevelRatio( _fLevelRatio )
 	{
 		NI_ASSERT_T( pAltidude != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pAltidude ) );
+								 NStr::Format( "Wrong parameter: %p\n", pAltidude ) );
 	}
 
 	bool operator()( int nXIndex, int nYIndex, float fValue )
@@ -156,9 +156,9 @@ struct SVALevelAndCreateUndoPatternFunctional
 		: pAltidude( _pAltidude ), fAverageHeight( _fAverageHeight ), fLevelRatio( _fLevelRatio ), pUndoPattern( _pUndoPattern )
 	{
 		NI_ASSERT_T( pAltidude != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pAltidude ) );
+								 NStr::Format( "Wrong parameter: %p\n", pAltidude ) );
 		NI_ASSERT_T( pUndoPattern != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pUndoPattern ) );
+								 NStr::Format( "Wrong parameter: %p\n", pUndoPattern ) );
 	}
 
 	bool operator()( int nXIndex, int nYIndex, float fValue )
@@ -184,7 +184,7 @@ struct SVASetPatternFunctional
 		: pAltidude( _pAltidude ), bLevel( _bLevel )
 	{
 		NI_ASSERT_T( pAltidude != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pAltidude ) );
+								 NStr::Format( "Wrong parameter: %p\n", pAltidude ) );
 	}
 
 	bool operator()( int nXIndex, int nYIndex, float fValue )
@@ -207,7 +207,7 @@ struct SVAAddPatternFunctional
 		: pAltidude( _pAltidude )
 	{
 		NI_ASSERT_T( pAltidude != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pAltidude ) );
+								 NStr::Format( "Wrong parameter: %p\n", pAltidude ) );
 	}
 
 	bool operator()( int nXIndex, int nYIndex, float fValue )
@@ -227,7 +227,7 @@ struct SVASubstractPatternFunctional
 		: pAltidude( _pAltidude )
 	{
 		NI_ASSERT_T( pAltidude != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pAltidude ) );
+								 NStr::Format( "Wrong parameter: %p\n", pAltidude ) );
 	}
 
 	bool operator()( int nXIndex, int nYIndex, float fValue )
@@ -247,7 +247,7 @@ struct SVASetMaxPatternFunctional
 		: pAltidude( _pAltidude )
 	{
 		NI_ASSERT_T( pAltidude != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pAltidude ) );
+								 NStr::Format( "Wrong parameter: %p\n", pAltidude ) );
 	}
 
 	bool operator()( int nXIndex, int nYIndex, float fValue )
@@ -375,7 +375,7 @@ bool ApplyVAPatternInChain( const CTRect<int> &rRect,
 														std::vector<CTRect<int> > *pIgnoreRects = 0 )
 {
 	NI_ASSERT_T( pPattern != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pPattern ) );
+							 NStr::Format( "Wrong parameter: %p\n", pPattern ) );
 
 	for ( int nPointIndex = 0; nPointIndex < rPointsChain.size(); ++nPointIndex )
 	{
@@ -451,9 +451,9 @@ struct SVACreatePatternByGradientFunctional
 		: pPattern( _pPattern ), pGradient( _pGradient ), fRatio( _fRatio )
 	{
 		NI_ASSERT_T( pPattern != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pPattern ) );
+								 NStr::Format( "Wrong parameter: %p\n", pPattern ) );
 		NI_ASSERT_T( pGradient != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pGradient ) );
+								 NStr::Format( "Wrong parameter: %p\n", pGradient ) );
 	}
 
 	bool operator()( int nXIndex, int nYIndex, float fValue )
@@ -472,7 +472,7 @@ struct SVASetPatternToValueFunctional
 		: pPattern( _pPattern ), fSetValue( _fSetValue )
 	{
 		NI_ASSERT_T( pPattern != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pPattern ) );
+								 NStr::Format( "Wrong parameter: %p\n", pPattern ) );
 	}
 
 	bool operator()( int nXIndex, int nYIndex, float fValue )

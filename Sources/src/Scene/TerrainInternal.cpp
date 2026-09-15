@@ -354,7 +354,7 @@ void AddVertices( const std::vector<TVertex> &src, std::vector<TVertex> &dst,
 		if ( (dwPoint0 & dwPoint1 & dwPoint2 & dwPoint3) != 0 ) 
 			continue;
 		//
-		const int nNumVertices = dst.size();
+		const int nNumVertices = static_cast<int>( dst.size() );
 		// 
 		dst.push_back( v0 );
 		dst.push_back( v1 );
@@ -375,7 +375,7 @@ void CountLayerCrosses( std::vector<int> &counts, const std::vector<STerrainPatc
 {
 	counts.resize( Max(counts.size(), layers.size()) );
 	for ( int i = 0; i != layers.size(); ++i )
-		counts[i] += layers[i].size();
+		counts[i] += static_cast<int>( layers[i].size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTerrain::ReBuildMeshes()
@@ -384,10 +384,10 @@ void CTerrain::ReBuildMeshes()
 	std::vector<int> nNumLayerCrosses, nNumLayerNoises;
 	for ( CPatchesList::iterator it = patches.begin(); it != patches.end(); ++it )
 	{
-		nNumMainVerts1 += it->mainverts1.size();
-		nNumMainVerts2 += it->mainverts2.size();
-		nNumBaseCrosses += it->basecrossverts.size();
-		nNumNoises += it->noiseverts.size();
+		nNumMainVerts1 += static_cast<int>( it->mainverts1.size() );
+		nNumMainVerts2 += static_cast<int>( it->mainverts2.size() );
+		nNumBaseCrosses += static_cast<int>( it->basecrossverts.size() );
+		nNumNoises += static_cast<int>( it->noiseverts.size() );
 		CountLayerCrosses( nNumLayerCrosses, it->layercrossverts );
 		CountLayerCrosses( nNumLayerNoises, it->layernoiseverts );
 		nNumLayers = Max( nNumLayers, int(it->layercrossverts.size()) );
@@ -413,7 +413,7 @@ void CTerrain::ReBuildMeshes()
 		AddVertices( it->mainverts2, mshCurrent.mshNoNoiseTiles.vertices, mshCurrent.mshNoNoiseTiles.indices, rcScreen );
 		AddVertices( it->basecrossverts, mshCurrent.mshBaseCrosses.vertices, mshCurrent.mshBaseCrosses.indices, rcScreen );
 		AddVertices( it->noiseverts, mshCurrent.mshNoises.vertices, mshCurrent.mshNoises.indices, rcScreen );
-		const int nNumLocalLayers = it->layercrossverts.size();
+		const int nNumLocalLayers = static_cast<int>( it->layercrossverts.size() );
 		for ( int i = 0; i != nNumLocalLayers; ++i )
 		{
 			AddVertices( it->layercrossverts[i], mshCurrent.mshCrossLayers[i].mshCrosses.vertices, mshCurrent.mshCrossLayers[i].mshCrosses.indices, rcScreen );
@@ -425,22 +425,22 @@ void CTerrain::ReBuildMeshes()
 void CTerrain::ReservePatchesData()
 {
 	std::vector<int> numLayerCrosses;
-	const int nNumPatches = patches.size();
+	const int nNumPatches = static_cast<int>( patches.size() );
 	const int nNumTilesInPatch = STerrainPatchInfo::nSizeX * STerrainPatchInfo::nSizeY;
 	int nNumBaseCrosses = 0, nNumNoises = 0, nNumLayers = 0;
 	for ( CPatchesList::const_iterator it = patches.begin(); it != patches.end(); ++it )
 	{
 		const STerrainPatchInfo &patch = terrainInfo.patches[it->nY][it->nX];
-		nNumBaseCrosses += patch.basecrosses.size();
-		nNumNoises += patch.noisecrosses.size();
-		const int nNumLayerCrosses = patch.layercrosses.size();
+		nNumBaseCrosses += static_cast<int>( patch.basecrosses.size() );
+		nNumNoises += static_cast<int>( patch.noisecrosses.size() );
+		const int nNumLayerCrosses = static_cast<int>( patch.layercrosses.size() );
 		if ( nNumLayers < nNumLayerCrosses ) 
 		{
 			nNumLayers = nNumLayerCrosses;
 			numLayerCrosses.resize( nNumLayerCrosses );
 		}
 		for ( int nLayer = 0; nLayer < nNumLayerCrosses; ++nLayer ) 
-			numLayerCrosses[nLayer] += patch.layercrosses[nLayer].size();
+			numLayerCrosses[nLayer] += static_cast<int>( patch.layercrosses[nLayer].size() );
 	}
 	mshCurrent.mshNoiseTiles.Reserve( nNumPatches * nNumTilesInPatch*4, nNumPatches * nNumTilesInPatch*6 );
 	mshCurrent.mshNoNoiseTiles.Reserve( nNumPatches * nNumTilesInPatch*4, nNumPatches * nNumTilesInPatch*6 );

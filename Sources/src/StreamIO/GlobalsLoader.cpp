@@ -10,9 +10,9 @@ typedef ISingleton* (STDCALL *GETSINGLETONGLOBAL_HOOK)();
 typedef void* (STDCALL *GETTEMPRAWBUFFER_HOOK)( int nAmount, int nBufferIndex );
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef _STREAMIO_DLL
-ISaveLoadSystem* STDCALL GetSLS_Hook();
-ISingleton* STDCALL GetSingletonGlobal_Hook();
-void* STDCALL GetTempRawBuffer_Hook( int nSize, int nIndex );
+extern "C" ISaveLoadSystem* STDCALL GetSLS_Hook();
+extern "C" ISingleton* STDCALL GetSingletonGlobal_Hook();
+extern "C" void* STDCALL GetTempRawBuffer_Hook( int nSize, int nIndex );
 #endif // _STREAMIO_DLL
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IRandomGen *g_pGlobalRandomGen = 0;

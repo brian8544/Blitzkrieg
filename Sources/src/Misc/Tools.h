@@ -7,7 +7,11 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include <math.h>
 #include <algorithm>
+#include <cmath>
 #include <cstdlib>
+#include <cstdint>
+#include <cstring>
+#include <intrin.h>
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 namespace NAlgorithms
 {
@@ -263,34 +267,12 @@ inline TYPE Sign( const TYPE x )
 template <>
 inline int Sign<int>( const int nVal )
 {
-	int nRes;
-	_asm
-	{
-		xor ecx, ecx
-		mov eax, nVal
-		test eax, 0x7FFFFFFF
-		setne cl
-		sar eax, 31
-		or eax, ecx
-		mov nRes, eax
-	}
-	return nRes;
+	return (nVal > 0) - (nVal < 0);
 }
 template <>
 inline short int Sign<short int>( const short int nVal )
 {
-	short int nRes;
-	_asm
-	{
-		xor ecx,ecx
-		mov ax, nVal
-		test ax, 0x7FFF
-		setne cl
-		sar ax, 15
-		or ax, cx
-		mov nRes, ax
-	}
-	return nRes;
+	return static_cast<short int>( (nVal > 0) - (nVal < 0) );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ************************************************************************************************************************ //
@@ -332,24 +314,12 @@ inline float SignumNormalizeAngleInRadian( const float angle )
 // ************************************************************************************************************************ //
 inline void MemSetDWord( DWORD* lpData, const DWORD value, const int nCount )
 {
-	_asm
-	{
-		mov ecx, nCount
-		mov edi, lpData
-		mov eax, value
-		rep stosd
-	}
+	std::fill_n( lpData, nCount, value );
 }
 
 inline void MemSetInt( int* lpData, const int value, const int nCount )
 {
-	_asm
-	{
-		mov ecx, nCount
-		mov edi, lpData
-		mov eax, value
-		rep stosd
-	}
+	std::fill_n( lpData, nCount, value );
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -359,13 +329,7 @@ inline void MemSetInt( int* lpData, const int value, const int nCount )
 // very fast float-to-int conversion. uses current FPU rounding state
 int __forceinline Float2Int( const float fpVar )
 {
-	int nRet;
-	__asm 
-	{
-		fld dword ptr fpVar
-		fistp nRet
-	}
-	return nRet;
+	return static_cast<int>( std::nearbyint( fpVar ) );
 }
 inline int MINT( const float f ) { return Float2Int(f); }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -375,186 +339,37 @@ inline int MINT( const float f ) { return Float2Int(f); }
 // very fast comparison: 'x' < 'y' ? val1 : val2
 inline float select_lt( const float x, const float y, const float val1, const float val2 )
 {
-	float z;
-	_asm
-	{
-		// loading 'x' and compare with 'y'
-		xor					eax, eax
-		fld         dword ptr [x]
-		fcomp       dword ptr [y]
-		// store compare flags
-		fnstsw      ax
-		// test comparison result and set '1' or '0'
-		// load 'val1' and 'val2'
-		mov					ebx, [val1]
-		mov					ecx, [val2]
-		// create mask for merging
-		and					eax, 0100h
-		shl					eax, 23
-		sar					eax, 31
-		// merging: (val1 & mask) | (val2 & ~mask)
-		and					ebx, eax
-		not					eax
-		and					ecx, eax
-		or					ebx, ecx
-
-		mov					[z], ebx
-	}
-	return z;
+	return x < y ? val1 : val2;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // very fast comparison: 'x' > 'y' ? val1 : val2
 inline float select_gt( const float x, const float y, const float val1, const float val2 )
 {
-	float z;
-	_asm
-	{
-		// loading 'x' and compare with 'y'
-		xor					eax, eax
-		fld         dword ptr [x]
-		fcomp       dword ptr [y]
-		// store compare flags
-		fnstsw      ax
-		// test comparison result and set '1' or '0'
-		// load 'val1' and 'val2'
-		mov					ebx, [val1]
-		mov					ecx, [val2]
-		// create mask for merging
-		test        ah, 41h
-		sete				al
-		shl					eax, 31
-		sar					eax, 31
-		// merging: (val1 & mask) | (val2 & ~mask)
-		and					ebx, eax
-		not					eax
-		and					ecx, eax
-		or					ebx, ecx
-
-		mov					[z], ebx
-	}
-	return z;
+	return x > y ? val1 : val2;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // very fast comparison: 'x' <= 'y' ? val1 : val2
 inline float select_le( const float x, const float y, const float val1, const float val2 )
 {
-	float z;
-	_asm
-	{
-		// loading 'x' and compare with 'y'
-		xor					eax, eax
-		fld         dword ptr [x]
-		fcomp       dword ptr [y]
-		// store compare flags
-		fnstsw      ax
-		// test comparison result and set '1' or '0'
-		// load 'val1' and 'val2'
-		mov					ebx, [val1]
-		mov					ecx, [val2]
-		// create mask for merging
-		test        ah, 41h
-		setne				al
-		shl					eax, 31
-		sar					eax, 31
-		// merging: (val1 & mask) | (val2 & ~mask)
-		and					ebx, eax
-		not					eax
-		and					ecx, eax
-		or					ebx, ecx
-
-		mov					[z], ebx
-	}
-	return z;
+	return x <= y ? val1 : val2;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // very fast comparison: 'x' >= 'y' ? val1 : val2
 inline float select_ge( const float x, const float y, const float val1, const float val2 )
 {
-	float z;
-	_asm
-	{
-		// loading 'x' and compare with 'y'
-		xor					eax, eax
-		fld         dword ptr [x]
-		fcomp       dword ptr [y]
-		// store compare flags
-		fnstsw      ax
-		// test comparison result and set '1' or '0'
-		// load 'val1' and 'val2'
-		mov					ebx, [val1]
-		mov					ecx, [val2]
-		// create mask for merging
-		and					eax, 0100h
-		xor					eax, 0100h
-		shl					eax, 23
-		sar					eax, 31
-		// merging: (val1 & mask) | (val2 & ~mask)
-		and					ebx, eax
-		not					eax
-		and					ecx, eax
-		or					ebx, ecx
-
-		mov					[z], ebx
-	}
-	return z;
+	return x >= y ? val1 : val2;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // very fast comparison: 'x' == 'y' ? val1 : val2
 inline float select_eq( const float x, const float y, const float val1, const float val2 )
 {
-	float z;
-	_asm
-	{
-		// loading 'x' and compare with 'y'
-		xor					eax, eax
-		mov ebx, [x]
-		cmp ebx, [y]
-		// test comparison result and set '1' or '0'
-		// load 'val1' and 'val2'
-		// create mask for merging
-		sete				al
-		mov					ebx, [val1]
-		shl					eax, 31
-		mov					ecx, [val2]
-		sar					eax, 31
-		// merging: (val1 & mask) | (val2 & ~mask)
-		and					ebx, eax
-		not					eax
-		and					ecx, eax
-		or					ebx, ecx
-
-		mov					[z], ebx
-	}
-	return z;
+	return std::memcmp( &x, &y, sizeof(float) ) == 0 ? val1 : val2;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // very fast comparison: 'x' != 'y' ? val1 : val2
 inline float select_ne( const float x, const float y, const float val1, const float val2 )
 {
-	float z;
-	_asm
-	{
-		// loading 'x' and compare with 'y'
-		xor					eax, eax
-		mov ebx, [x]
-		cmp ebx, [y]
-		// test comparison result and set '1' or '0'
-		// load 'val1' and 'val2'
-		// create mask for merging
-		setne				al
-		mov					ebx, [val1]
-		shl					eax, 31
-		mov					ecx, [val2]
-		sar					eax, 31
-		// merging: (val1 & mask) | (val2 & ~mask)
-		and					ebx, eax
-		not					eax
-		and					ecx, eax
-		or					ebx, ecx
-
-		mov					[z], ebx
-	}
-	return z;
+	return std::memcmp( &x, &y, sizeof(float) ) != 0 ? val1 : val2;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // performs the next check:
@@ -566,48 +381,13 @@ inline float select_ne( const float x, const float y, const float val1, const fl
 //			( (zp >   wp) << 5 );
 inline const BYTE CheckForViewingFrustum( float xp, float yp, const float zp, const float wp )
 {
-	float wp2 = wp + wp;
-	BYTE value;
-
-	xp += wp;
-	yp += wp;
-
-	_asm
-	{
- 		// xp <= 0, yp <= 0, zp <= 0
- 		mov 	edx, xp
- 		mov 	eax, yp
- 		shr 	edx, 31
- 		mov 	ecx, zp
- 		shr 	eax, 31
- 		shr 	ecx, 31
- 		shl 	eax, 2
- 		shl 	ecx, 4
- 		or 		edx, eax
- 		// xp > wp2, yp > wp2, zp > wp
- 		fld 	[wp2]
- 		fcomp [xp]
- 		or 		edx, ecx
- 		fnstsw ax
- 		fld 	[wp2]
- 		and 	eax, 0100h
- 		fcomp [yp]
- 		shr 	eax, 7
- 		or 		edx, eax
- 		fnstsw ax
- 		fld 	[wp]
- 		and 	eax, 0100h
- 		fcomp [zp]
- 		shr 	eax, 5
- 		or 		edx, eax
- 		fnstsw ax
- 		and 	eax, 0100h
- 		shr 	eax, 3
-		// form return value in eax and move it to 'value'
-		or 		eax, edx
-		mov [value], al
-	};
-
+	BYTE value = 0;
+	if ( xp <= -wp ) value |= 1u << 0;
+	if ( xp >   wp ) value |= 1u << 1;
+	if ( yp <= -wp ) value |= 1u << 2;
+	if ( yp >   wp ) value |= 1u << 3;
+	if ( zp <= 0.0f ) value |= 1u << 4;
+	if ( zp >   wp ) value |= 1u << 5;
 	return value;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -627,47 +407,13 @@ inline const TYPE Max( const TYPE val1, const TYPE val2 )
 template<>
 inline const float Min<float>( const float a, const float b )
 {
-	float fpRet;
-	_asm
-	{
-		// comparing
-		fld     dword ptr [b]
-		fcomp		dword ptr [a]
-		fnstsw  ax
-		mov			ecx, dword ptr [b]
-		shl			eax, 23
-		sar			eax, 31
-		// merging: (val1 & mask) | (val2 & ~mask)
-		and			ecx, eax
-		not			eax
-		and			eax, dword ptr [a]
-		or			eax, ecx
-		mov			[fpRet], eax
-	}
-	return fpRet;
+	return a < b ? a : b;
 }
-// returns minimum of two float values
+// returns maximum of two float values
 template<>
 inline const float Max<float>( const float a, const float b )
 {
-	float fpRet;
-	_asm
-	{
-		// comparing
-		fld     dword ptr [a]
-		fcomp		dword ptr [b]
-		fnstsw  ax
-		mov			ecx, dword ptr [b]
-		shl			eax, 23
-		sar			eax, 31
-		// merging: (val1 & mask) | (val2 & ~mask)
-		and			ecx, eax
-		not			eax
-		and			eax, dword ptr [a]
-		or			eax, ecx
-		mov			[fpRet], eax
-	}
-	return fpRet;
+	return a > b ? a : b;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <class TYPE>
@@ -784,99 +530,32 @@ inline float acos( float fVal ) { return static_cast<float>( acos( double(fVal) 
 inline float asin( float fVal ) { return static_cast<float>( asin( double(fVal) ) ); }
 #endif
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define MINIMIZE_INT( nToMin, nHow )  \
-	_asm mov ecx, nToMin                \
-	_asm cmp ecx, nHow                  \
-	_asm setl al                        \
-	_asm shl eax, 31                    \
-	_asm sar eax, 31                    \
-	_asm and ecx, eax                   \
-	_asm not eax                        \
-	_asm and eax, nHow                  \
-	_asm or ecx, eax                    \
-	_asm mov nToMin, ecx
+#define MINIMIZE_INT( nToMin, nHow ) do { if ( (nToMin) > (nHow) ) (nToMin) = (nHow); } while (0)
 
-#define MINIMIZE_UINT( nToMin, nHow ) \
-	_asm mov ecx, nToMin                \
-	_asm cmp ecx, nHow                  \
-	_asm setb al                        \
-	_asm shl eax, 31                    \
-	_asm sar eax, 31                    \
-	_asm and ecx, eax                   \
-	_asm not eax                        \
-	_asm and eax, nHow                  \
-	_asm or ecx, eax                    \
-	_asm mov nToMin, ecx
+#define MINIMIZE_UINT( nToMin, nHow ) do { if ( (nToMin) > (nHow) ) (nToMin) = (nHow); } while (0)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline void Copy8Bytes( void* fpDst, const void* fpSrc )
 {
-	_asm
-	{
-		mov ecx, [ fpSrc ]
-		mov edx, [ fpDst ]
-		fild qword ptr [ ECX ]
-		fistp qword ptr [ EDX ]
-	}
+	std::memcpy( fpDst, fpSrc, 8 );
 }
 
 inline void Copy16Bytes( void* fpDst, const void* fpSrc )
 {
-	_asm
-	{
-		mov ecx, [ fpSrc ]
-		mov edx, [ fpDst ]
-		fild qword ptr [ ECX ]
-		fistp qword ptr [ EDX ]
-		fild qword ptr [ ECX + 8 ]
-		fistp qword ptr [ EDX + 8 ]
-	}
+	std::memcpy( fpDst, fpSrc, 16 );
 }
 
 inline void Copy32Bytes( void* fpDst, const void* fpSrc )
 {
-	_asm
-	{
-		mov ecx, [ fpSrc ]
-		mov edx, [ fpDst ]
-		fild qword ptr [ ECX ]
-		fistp qword ptr [ EDX ]
-		fild qword ptr [ ECX + 8 ]
-		fistp qword ptr [ EDX + 8 ]
-		fild qword ptr [ ECX + 16 ]
-		fistp qword ptr [ EDX + 16 ]
-		fild qword ptr [ ECX + 24 ]
-		fistp qword ptr [ EDX + 24 ]
-	}
+	std::memcpy( fpDst, fpSrc, 32 );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const DWORD CPUID_MMX_FEATURE_PRESENT = 0x00800000;
 const DWORD CPUID_SSE_FEATURE_PRESENT = 0x02000000;
-#define GET_CPUID __asm _emit 0x0f __asm _emit 0xa2
 inline DWORD GetCPUID()
 {
-	DWORD dwRes;
-	_asm
-	{
-		pusha                               // keep compiler happy
-		pushfd 															// get extended flags
-		pop eax 														// store extended flags in eax
-		mov ebx, eax 												// save current flags
-		xor eax, 200000h 										// toggle bit 21
-		push eax 														// put new flags on stack
-		popfd 															// flags updated now in flags
-		pushfd 															// get extended flags
-		pop eax 														// store extended flags in eax
-		xor eax, ebx 												// if bit 21 r/w then eax <> 0
-		je q  															// can't toggle id bit (21) no cpuid here
-
-		mov	eax, 1                          // configure eax to retrieve CPUID
-		GET_CPUID                           // perform CPUID command
-		mov dwRes, edx                      // store CPUID in dwRes1
-	q:
-		popa
-	}
-	return dwRes;
+	int cpuInfo[4] = { 0, 0, 0, 0 };
+	__cpuid( cpuInfo, 1 );
+	return static_cast<DWORD>( cpuInfo[3] );
 }
-#undef GET_CPUID
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif // __TOOLS_H__

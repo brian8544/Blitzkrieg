@@ -54,7 +54,7 @@ LUA_API lua_Hook lua_setlinehook (lua_State *L, lua_Hook func) {
 
 static StkId aux_stackedfunction (lua_State *L, int level, StkId top) {
   int i;
-  for (i = (top-1) - L->stack; i>=0; i--) {
+  for (i = (int)((top-1) - L->stack); i>=0; i--) {
     if (is_T_MARK(L->stack[i].ttype)) {
       if (level == 0)
         return L->stack+i;
@@ -122,7 +122,7 @@ static int currentpc (StkId f) {
   CallInfo *ci = infovalue(f);
   LUA_ASSERT(isLmark(f), "function has no pc");
   if (ci->pc)
-    return (*ci->pc - ci->func->f.l->code) - 1;
+    return (int)(*ci->pc - ci->func->f.l->code) - 1;
   else
     return -1;  /* function is not active */
 }
@@ -385,7 +385,7 @@ static const char *getobjname (lua_State *L, StkId obj, const char **name) {
   else {
     Proto *p = infovalue(func)->func->f.l;
     int pc = currentpc(func);
-    int stackpos = obj - (func+1);  /* func+1 == function base */
+    int stackpos = (int)(obj - (func+1));  /* func+1 == function base */
     Instruction i = luaG_symbexec(p, pc, stackpos);
     LUA_ASSERT(pc != -1, "function must be active");
     switch (GET_OPCODE(i)) {

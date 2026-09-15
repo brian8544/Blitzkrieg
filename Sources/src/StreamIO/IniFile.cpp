@@ -38,7 +38,7 @@ bool CIniFile::Open( const char *pszIniFileName, DWORD _dwAccessMode )
 	int nLength = _filelength( _fileno( file ) );
 	std::string szString;
 	szString.resize( nLength );
-	nLength = fread( &(szString[0]), 1, nLength, file );
+	nLength = static_cast<int>( fread( &(szString[0]), 1, nLength, file ) );
 	fclose( file );
 	//
 	szString.resize( nLength );
@@ -69,7 +69,7 @@ void CIniFile::LoadTables( const std::string &szString )
 			continue;
 		else
 		{
-			int nPos = line->find( '=' );
+			int nPos = static_cast<int>( line->find( '=' ) );
 			NI_ASSERT( nPos != std::string::npos );
 			szEntry = line->substr( 0, nPos );
 			TrimBoth( szEntry );
@@ -106,7 +106,7 @@ int CIniFile::GetRowNames( char *pszBuffer, int nBufferSize )
 	for ( STable::CValList::const_iterator pos = table.elist.begin(); pos != table.elist.end(); ++pos )
 	{
 		memcpy( pszBuffer + nCurrPos, pos->key.c_str(), pos->key.size() );
-		nCurrPos += pos->key.size();
+		nCurrPos += static_cast<int>( pos->key.size() );
 		*( pszBuffer + nCurrPos ) = '\0';
 		++nCurrPos;
 	}
@@ -121,7 +121,7 @@ int CIniFile::GetEntryNames( const char *pszRow, char *pszBuffer, int nBufferSiz
 	for ( SRow::CValList::const_iterator pos = row.elist.begin(); pos != row.elist.end(); ++pos )
 	{
 		memcpy( pszBuffer + nCurrPos, pos->key.c_str(), pos->key.size() );
-		nCurrPos += pos->key.size();
+		nCurrPos += static_cast<int>( pos->key.size() );
 		*( pszBuffer + nCurrPos ) = '\0';
 		++nCurrPos;
 	}

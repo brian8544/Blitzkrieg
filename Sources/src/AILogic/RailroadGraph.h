@@ -126,7 +126,7 @@ public:
 	virtual IEdge* CreateReversedEdge() const;
 
 	virtual void SetNodesNumbers( const int _v1, const int _v2 ) { v1 = _v1; v2 = _v2; }
-	virtual const int GetNParts() const { return edgeParts.size(); }
+	virtual const int GetNParts() const { return static_cast<int>( edgeParts.size() ); }
 	virtual const CVec2 GetCoordinate( const int nPart, const float fT ) const;
 	virtual const CVec2 GetTangent( const int nPart, const float fT ) const;
 

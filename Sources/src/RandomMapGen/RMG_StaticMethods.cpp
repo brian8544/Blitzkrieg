@@ -18,10 +18,10 @@ bool SRMPlacedPatch::GetAndRemoveClosestVSOPoints( int nType,
 																									 SVSOPoint *pEndVSOPoint )
 {
 	NI_ASSERT_TF( pBeginVSOPoint != 0,
-							  NStr::Format( "SRMPlacedPatch::GetAndRemoveClosestVSOPoints, Invalid parameter: pBeginVSOPoint: %x\n", pBeginVSOPoint ),
+							  NStr::Format( "SRMPlacedPatch::GetAndRemoveClosestVSOPoints, Invalid parameter: pBeginVSOPoint: %p\n", pBeginVSOPoint ),
 							  return false );
 	NI_ASSERT_TF( pEndVSOPoint != 0,
-							  NStr::Format( "SRMPlacedPatch::GetAndRemoveClosestVSOPoints, Invalid parameter: pEndVSOPoint: %x\n", pEndVSOPoint ),
+							  NStr::Format( "SRMPlacedPatch::GetAndRemoveClosestVSOPoints, Invalid parameter: pEndVSOPoint: %p\n", pEndVSOPoint ),
 							  return false );
 
 	if ( ( ( nType != SRMGraphLink::TYPE_ROAD ) ? rBeginPlacedPatch.riversPoints.empty() : rBeginPlacedPatch.roadsPoints.empty() ) ||

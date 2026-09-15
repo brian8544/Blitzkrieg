@@ -235,7 +235,7 @@ void CRandomGenSeed::FillRandRsl()
 	for ( i = 0; i < nSize; )
 	{
 		char* pDrive = buf + i;
-		i += strlen( pDrive ) + 1;
+		i += static_cast<int>( strlen( pDrive ) ) + 1;
 		if ( GetDriveType(pDrive) == DRIVE_FIXED || GetDriveType(pDrive) == DRIVE_REMOTE )
 		{
 			strcpy_s( pszMaskToFindFiles, pDrive );
@@ -261,18 +261,15 @@ void CRandomGenSeed::FillRandRsl()
 				continue;
 		}
 		bSuccess = TRUE;
-		OFSTRUCT ofStruct;
-		Zero( ofStruct );
-		ofStruct.cBytes = sizeof( ofStruct );
-		HFILE hFile = OpenFile( pszFindedName, &ofStruct, OF_READ | OF_SHARE_DENY_NONE );
-		if ( hFile != HFILE_ERROR )
+		HANDLE hFile = CreateFileA( pszFindedName, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0 );
+		if ( hFile != INVALID_HANDLE_VALUE )
 		{
 			srand( timeGetTime() );
-			SetFilePointer( HANDLE(hFile), N_FROM_START - rand() % ( N_FROM_START - 512 ), 0, FILE_BEGIN );
+			SetFilePointer( hFile, N_FROM_START - rand() % ( N_FROM_START - 512 ), 0, FILE_BEGIN );
 			DWORD dwReadBytes = 0;
-			if ( ReadFile( HANDLE(hFile), rnd.randrsl, sizeof(rnd.randrsl), &dwReadBytes, 0 ) != TRUE || (dwReadBytes != sizeof(rnd.randrsl)) )
+			if ( ReadFile( hFile, rnd.randrsl, sizeof(rnd.randrsl), &dwReadBytes, 0 ) != TRUE || (dwReadBytes != sizeof(rnd.randrsl)) )
 				bSuccess = FALSE;
-			CloseHandle( HANDLE(hFile) );
+			CloseHandle( hFile );
 		}
 		else
 			bSuccess = FALSE;

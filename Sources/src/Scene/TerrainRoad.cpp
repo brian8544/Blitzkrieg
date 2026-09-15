@@ -50,9 +50,9 @@ void CTerrainRoad::BuildLayers()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTerrainRoad::SelectPatches( const std::vector<DWORD> &sels )
 {
-	road.center.SelectPatches( sels, GetDesc().points.size() );
+	road.center.SelectPatches( sels, static_cast<int>( GetDesc().points.size() ) );
 	for ( std::vector<STVOLayer>::iterator layer = road.borders.begin(); layer != road.borders.end(); ++layer )
-		layer->SelectPatches( sels, GetDesc().points.size() );
+		layer->SelectPatches( sels, static_cast<int>( GetDesc().points.size() ) );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CTerrainRoad::DrawBorder( IGFX *pGFX ) const

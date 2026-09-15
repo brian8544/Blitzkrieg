@@ -65,8 +65,8 @@ struct lua_State {
   struct Ref *refArray;  /* locked objects */
   int refSize;  /* size of refArray */
   int refFree;  /* list of free positions in refArray */
-  unsigned long GCthreshold;
-  unsigned long nblocks;  /* number of `bytes' currently allocated */
+  size_t GCthreshold;
+  size_t nblocks;  /* number of `bytes' currently allocated */
   lua_Hook callhook;
   lua_Hook linehook;
   int allowhooks;

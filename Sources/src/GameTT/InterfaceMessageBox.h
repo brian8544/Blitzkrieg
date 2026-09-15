@@ -51,7 +51,7 @@ public:
 		{
 			std::vector<std::string> strings;
 			NStr::SplitString( pszConfig, strings, ';' );
-			NI_ASSERT_T( strings.size() == 4, NStr::Format( "wrong number of parameters %d", strings.size() ) );
+			NI_ASSERT_T( static_cast<int>(strings.size()) == 4, NStr::Format( "wrong number of parameters %d", static_cast<int>(strings.size()) ) );
 			szCaptionKey = strings[0];
 			szMessageKey = strings[1];
 			bDoubleButton = NStr::ToInt( strings[2] );

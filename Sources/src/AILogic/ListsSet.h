@@ -38,7 +38,7 @@ class CListsSet
 	int GetFreePos();
 	void AddToFree( int pos )
 	{	
-		NI_ASSERT_T( pos < nexts.size(), NStr::Format( "Wrong pos (%d)", pos ) );
+		NI_ASSERT_T( pos < static_cast<int>(nexts.size()), NStr::Format( "Wrong pos (%d)", pos ) );
 		nexts[pos] = freePtr;
 		freePtr = pos;
 	}
@@ -52,7 +52,7 @@ public:
 	const int GetSize( const int nList ) const { if ( nList >= sizes.size() ) return 0; else return sizes[nList]; }
 
 	void IncreaseListsNum( const int nSize ) { if ( fronts.size() <= nSize * 1.5 ) { fronts.resize( nSize * 1.5 ); sizes.resize( nSize * 1.5 ); } }
-	const int GetListsNum() const { return fronts.size(); }
+	const int GetListsNum() const { return static_cast<int>( fronts.size() ); }
 	
 	typedef int tEnumerator;
 	const int Add( const int listNum, const T &value );

@@ -143,7 +143,7 @@ void CICLoad::Exec( IMainLoop *pML )
 			pStream = new CStreamRangeAdaptor( pStream, pStream->GetPos(), pStream->GetSize() );
 		}
 		else
-			pStream->Seek( -sizeof(dwSignature), STREAM_SEEK_CUR );
+			pStream->Seek( -static_cast<int>( sizeof(dwSignature) ), STREAM_SEEK_CUR );
 	}
 	// load structurized game context
 	{

@@ -189,8 +189,8 @@ void EnumFilesInDataStorage( std::vector<SEnumFilesInDataStorageParameter> *pPar
 				NStr::ToLower( rParameter.szPath );
 				NStr::ToLower( rParameter.szExtention );
 
-				rParameter.nPathLength = rParameter.szPath.size();
-				rParameter.nExtentionLength = rParameter.szExtention.size();
+				rParameter.nPathLength = static_cast<int>( rParameter.szPath.size() );
+				rParameter.nExtentionLength = static_cast<int>( rParameter.szExtention.size() );
 			}
 		}
 		/**
@@ -214,7 +214,7 @@ void EnumFilesInDataStorage( std::vector<SEnumFilesInDataStorageParameter> *pPar
 						++nCount;
 						if ( pParameters )
 						{
-							const int nStatsLength = strlen( pStats->pszName );
+							const int nStatsLength = static_cast<int>( strlen( pStats->pszName ) );
 							for ( int nParameterElement = 0; nParameterElement < pParameters->size(); ++nParameterElement )
 							{
 								SEnumFilesInDataStorageParameter &rParameter = ( *pParameters )[nParameterElement];

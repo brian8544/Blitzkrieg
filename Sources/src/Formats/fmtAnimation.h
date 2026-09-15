@@ -37,7 +37,7 @@ public:
 		//
 		const SSpriteRect& GetRect( const int nDirection, const int nTime ) const
 		{
-			const int nNumDirs = dirs.size();
+			const int nNumDirs = static_cast<int>( dirs.size() );
 			NI_ASSERT_SLOW_TF( nNumDirs != 0, "Number of directions == 0 in sprite animation data", return rects[0] );
 			const int nDir = ( ( ( nDirection + (32768 / nNumDirs) ) & 0xffff ) / (65536 / nNumDirs) ) % nNumDirs;
 			const SDir &dir = dirs[nDir];
@@ -49,19 +49,19 @@ public:
 				if ( nTime < nFrameTime * dir.frames.size() )
 					nFrame = nTime / nFrameTime;
 				else
-					nFrame = dir.frames.size() - 1;
+					nFrame = static_cast<int>( dir.frames.size() ) - 1;
 			}
 			return rects[ dir.frames[nFrame] ];
 		}
 		const SSpriteRect& GetRect( int nIndex ) const { return rects[ dirs[0].frames[nIndex] ]; }
-		const int GetLength() const { return nFrameTime * dirs[0].frames.size(); }
+		const int GetLength() const { return nFrameTime * static_cast<int>( dirs[0].frames.size() ); }
 	};
 	typedef std::vector<SSpriteAnimation> CAnimations;
 	CAnimations animations;
 	//
 	const SSpriteAnimation* GetAnimation( int nAnim ) const
 	{
-		NI_ASSERT_SLOW_TF( nAnim < animations.size(), NStr::Format("Can't find animation %d for \"%s\"", nAnim, GetSharedResourceName()), return 0 );
+		NI_ASSERT_SLOW_TF( nAnim < static_cast<int>(animations.size()), NStr::Format("Can't find animation %d for \"%s\"", nAnim, GetSharedResourceName()), return 0 );
 		return nAnim < animations.size() ? &( animations[nAnim] ) : 0;
 	}
 	virtual void STDCALL SwapData( ISharedResource *pResource )

@@ -16,7 +16,7 @@
 #include "IniFile.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CSaveLoadSystem theSaveLoadSystem;
-ISaveLoadSystem* STDCALL GetSLS_Hook()
+extern "C" ISaveLoadSystem* STDCALL GetSLS_Hook()
 {
 	return &theSaveLoadSystem;
 }

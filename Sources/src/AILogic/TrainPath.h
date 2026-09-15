@@ -38,7 +38,7 @@ public:
 	virtual const SVector GetFinishTile() const;
 	virtual const CVec2& GetFinishPoint() const;
 
-	virtual const int GetLength() const { return edges.size(); }
+	virtual const int GetLength() const { return static_cast<int>( edges.size() ); }
 	virtual void MoveFinishPointBy( const CVec2 &vMove ) { }
 
 	std::list< SPathEdge >::iterator GetStartEdgeIter() { return edges.begin(); }	

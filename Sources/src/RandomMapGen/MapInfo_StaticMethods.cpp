@@ -137,7 +137,7 @@ void CMapInfo::UnpackFrameIndex( IObjectsDB *pGDB, SMapObjectInfo *pInfo, int *p
 bool CMapInfo::GetTerrainTileIndices( const STerrainInfo &rTerrainInfo, const CVec3 &rPoint, CTPoint<int> *pPoint )
 {
 	NI_ASSERT_T( pPoint != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pPoint ) );
+							 NStr::Format( "Wrong parameter: %p\n", pPoint ) );
 	return GetTileIndicesInternal( rPoint, &( pPoint->x ), &( pPoint->y ), CTPoint<int>( rTerrainInfo.tiles.GetSizeX(), rTerrainInfo.tiles.GetSizeY() ), fWorldCellSize,	true );
 }
 
@@ -145,7 +145,7 @@ bool CMapInfo::GetTerrainTileIndices( const STerrainInfo &rTerrainInfo, const CV
 bool CMapInfo::GetTileIndices( const STerrainInfo &rTerrainInfo, const CVec3 &rPoint, CTPoint<int> *pPoint )
 {
 	NI_ASSERT_T( pPoint != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pPoint ) );
+							 NStr::Format( "Wrong parameter: %p\n", pPoint ) );
 	return GetTileIndicesInternal( rPoint, &( pPoint->x ), &( pPoint->y ), CTPoint<int>( rTerrainInfo.tiles.GetSizeX(), rTerrainInfo.tiles.GetSizeY() ), fWorldCellSize,	false );
 }
 
@@ -153,7 +153,7 @@ bool CMapInfo::GetTileIndices( const STerrainInfo &rTerrainInfo, const CVec3 &rP
 bool CMapInfo::GetAITileIndices( const STerrainInfo &rTerrainInfo, const CVec3 &rPoint, CTPoint<int> *pPoint )
 {
 	NI_ASSERT_T( pPoint != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pPoint ) );
+							 NStr::Format( "Wrong parameter: %p\n", pPoint ) );
 	return GetTileIndicesInternal( rPoint, &( pPoint->x ), &( pPoint->y ), CTPoint<int>( rTerrainInfo.tiles.GetSizeX(), rTerrainInfo.tiles.GetSizeY() ), fWorldCellSize / 2.0f,	false );
 }
 
@@ -161,7 +161,7 @@ bool CMapInfo::GetAITileIndices( const STerrainInfo &rTerrainInfo, const CVec3 &
 void CMapInfo::InvertYTile( const STerrainInfo &rTerrainInfo, CTPoint<int> *pPoint )
 {
 	NI_ASSERT_T( pPoint != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pPoint ) );
+							 NStr::Format( "Wrong parameter: %p\n", pPoint ) );
 	pPoint->y = rTerrainInfo.tiles.GetSizeY() - pPoint->y - 1;
 }
 
@@ -169,7 +169,7 @@ void CMapInfo::InvertYTile( const STerrainInfo &rTerrainInfo, CTPoint<int> *pPoi
 void CMapInfo::InvertYPosition( const STerrainInfo &rTerrainInfo, CTPoint<float> *pPoint )
 {
 	NI_ASSERT_T( pPoint != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pPoint ) );
+							 NStr::Format( "Wrong parameter: %p\n", pPoint ) );
 	pPoint->y = ( rTerrainInfo.tiles.GetSizeY() * fWorldCellSize ) - pPoint->y;
 }
 	
@@ -204,7 +204,7 @@ void CMapInfo::FillDefaultDiplomacies( SLoadMapInfo *pLoadMapInfo )
 void CMapInfo::Clear( SLoadMapInfo *pLoadMapInfo )
 {
 	NI_ASSERT_T( pLoadMapInfo != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pLoadMapInfo ) );
+							 NStr::Format( "Wrong parameter: %p\n", pLoadMapInfo ) );
 
 	pLoadMapInfo->szSeasonFolder.clear();
 	pLoadMapInfo->szMODName.clear();
@@ -271,7 +271,7 @@ void CMapInfo::Clear( SLoadMapInfo *pLoadMapInfo )
 bool CMapInfo::Create( SLoadMapInfo *pLoadMapInfo, const CTPoint<int> &rSize, int _nSeason, const std::string &rszSeasonFolder, int nPlayersCount, int _nType )
 {
 	NI_ASSERT_TF( pLoadMapInfo != 0,
-							  NStr::Format( "CMapInfo::Create(): Wrong parameter pLoadMapInfo %x\n", pLoadMapInfo ),
+							  NStr::Format( "CMapInfo::Create(): Wrong parameter pLoadMapInfo %p\n", pLoadMapInfo ),
 							  return false );
 	NI_ASSERT_TF( ( _nSeason >= 0 ) && ( _nSeason < REAL_SEASONS_COUNT ),
 							  NStr::Format( "CMapInfo::Create(): Invalid season: %d\n", _nSeason ),
@@ -387,7 +387,7 @@ int CMapInfo::GetSelectedSeason( int nSeason, const std::string &rszSeasonFolder
 bool CMapInfo::RemoveObject( SLoadMapInfo *pLoadMapInfo, int nObjectIndex )
 {
 	NI_ASSERT_TF( pLoadMapInfo != 0,
-							NStr::Format( "Wrong parameter: %x\n", pLoadMapInfo ),
+							NStr::Format( "Wrong parameter: %p\n", pLoadMapInfo ),
 							return false );
 	NI_ASSERT_TF( ( nObjectIndex >= 0 ) && ( nObjectIndex < pLoadMapInfo->objects.size() ),
 							NStr::Format( "Wrong object index: %d\n", nObjectIndex ),
@@ -402,7 +402,7 @@ bool CMapInfo::RemoveObject( SLoadMapInfo *pLoadMapInfo, int nObjectIndex )
 bool CMapInfo::RemoveObjects( SLoadMapInfo *pLoadMapInfo, const std::list<CVec2> &rClearPolygon )
 {
 	NI_ASSERT_TF( pLoadMapInfo != 0,
-							NStr::Format( "Wrong parameter: %x\n", pLoadMapInfo ),
+							NStr::Format( "Wrong parameter: %p\n", pLoadMapInfo ),
 							return false );
 	
 	//масив для разметки тайлов входящих в полигон
@@ -437,7 +437,7 @@ bool CMapInfo::RemoveObjects( SLoadMapInfo *pLoadMapInfo, const std::list<CVec2>
 bool CMapInfo::UpdateTerrain( struct STerrainInfo *pTerrainInfo, const CTRect<int> &rUpdateRect, const struct STilesetDesc &rTilesetDesc, const struct SCrossetDesc &rCrossetDesc, /*const struct SRoadsetDesc &rRoadsetDesc,*/ const struct SGFXLightDirectional &rSunlight )
 {
 	NI_ASSERT_TF( pTerrainInfo != 0,
-							  NStr::Format( "Wrong parameter: %x\n", pTerrainInfo ),
+							  NStr::Format( "Wrong parameter: %p\n", pTerrainInfo ),
 							  return false );
 	bool result = UpdateTerrainCrosses( pTerrainInfo, rUpdateRect, rTilesetDesc, rCrossetDesc/*, rRoadsetDesc*/ );
 	if ( result )
@@ -471,7 +471,7 @@ bool CMapInfo::UpdateTerrain( struct STerrainInfo *pTerrainInfo, const CTRect<in
 bool CMapInfo::UpdateTerrainCrosses( STerrainInfo *pTerrainInfo, const CTRect<int> &rUpdateRect, const STilesetDesc &rTilesetDesc, const SCrossetDesc &rCrossetDesc/*, const SRoadsetDesc &rRoadsetDesc*/ )
 {
 	NI_ASSERT_TF( pTerrainInfo != 0,
-							  NStr::Format( "Wrong parameter: %x\n", pTerrainInfo ),
+							  NStr::Format( "Wrong parameter: %p\n", pTerrainInfo ),
 							  return false );
 	
 	int nTerrainSizeX = pTerrainInfo->patches.GetSizeX() * STerrainPatchInfo::nSizeX;
@@ -517,7 +517,7 @@ bool CMapInfo::UpdateTerrainCrosses( STerrainInfo *pTerrainInfo, const CTRect<in
 bool CMapInfo::UpdateTerrainRivers( STerrainInfo *pTerrainInfo, const CTRect<int> &rUpdateRect )
 {
 	NI_ASSERT_TF( pTerrainInfo != 0,
-							  NStr::Format( "Wrong parameter: %x\n", pTerrainInfo ),
+							  NStr::Format( "Wrong parameter: %p\n", pTerrainInfo ),
 							  return false );
 	//переписываем ID'шники рек
 	for ( int nRiverIndex = 0; nRiverIndex < pTerrainInfo->rivers.size(); ++nRiverIndex )
@@ -532,7 +532,7 @@ bool CMapInfo::UpdateTerrainRivers( STerrainInfo *pTerrainInfo, const CTRect<int
 bool CMapInfo::UpdateTerrainRoads3D( STerrainInfo *pTerrainInfo, const CTRect<int> &rUpdateRect )
 {
 	NI_ASSERT_TF( pTerrainInfo != 0,
-							  NStr::Format( "Wrong parameter: %x\n", pTerrainInfo ),
+							  NStr::Format( "Wrong parameter: %p\n", pTerrainInfo ),
 							  return false );
 	//переписываем ID'шники дорог
 	for ( int nRoad3DIndex = 0; nRoad3DIndex < pTerrainInfo->roads3.size(); ++nRoad3DIndex )
@@ -547,7 +547,7 @@ bool CMapInfo::UpdateTerrainRoads3D( STerrainInfo *pTerrainInfo, const CTRect<in
 bool CMapInfo::UpdateTerrainShades( STerrainInfo *pTerrainInfo, const CTRect<int> &rUpdateRect, const SGFXLightDirectional &rSunlight )
 {
 	NI_ASSERT_TF( pTerrainInfo != 0,
-							  NStr::Format( "Wrong parameter: %x\n", pTerrainInfo ),
+							  NStr::Format( "Wrong parameter: %p\n", pTerrainInfo ),
 							  return false );
 	
 	return CVertexAltitudeInfo::UpdateShades( &( pTerrainInfo->altitudes ), rUpdateRect, rSunlight );
@@ -557,7 +557,7 @@ bool CMapInfo::UpdateTerrainShades( STerrainInfo *pTerrainInfo, const CTRect<int
 int CMapInfo::UpdateObjects( SLoadMapInfo *pLoadMapInfo, const CTRect<int> &rUpdateRect )
 {
 	NI_ASSERT_TF( pLoadMapInfo != 0,
-							  NStr::Format( "Wrong parameter: %x\n", pLoadMapInfo ),
+							  NStr::Format( "Wrong parameter: %p\n", pLoadMapInfo ),
 							  return false );
 
 	//UPDATE_LINK_ID
@@ -1049,7 +1049,7 @@ public:
 bool CMapInfo::RemoveNonExistingObjects( struct SLoadMapInfo *pLoadMapInfo, IDataStorage *pDataStorage, IObjectsDB *pObjectsDB, std::string *pszOutputString )
 {
 	NI_ASSERT_TF( ( pDataStorage != 0 ) && ( pObjectsDB != 0 ),
-							  NStr::Format( "Wrong parameters: pDataStorage %x, pObjectsDB %x\n", pDataStorage, pObjectsDB ),
+							  NStr::Format( "Wrong parameters: pDataStorage %p, pObjectsDB %p\n", pDataStorage, pObjectsDB ),
 							  return false );
 
 	bool bSomeRemoved = false;
@@ -1182,7 +1182,7 @@ bool CMapInfo::RemoveNonExistingObjects( struct SLoadMapInfo *pLoadMapInfo, IDat
 bool CMapInfo::TerrainHitTest( const STerrainInfo &rTerrainInfo, const CVec3 &rPoint, TERRAIN_HIT_TEST_TYPE type, std::vector<int> *pTerrainObjects )
 {
 	NI_ASSERT_TF( pTerrainObjects != 0,
-							  NStr::Format( "Wrong parameter: %x\n", pTerrainObjects ),
+							  NStr::Format( "Wrong parameter: %p\n", pTerrainObjects ),
 							  return false );
 
 	pTerrainObjects->clear();
@@ -1255,7 +1255,7 @@ bool CMapInfo::GetScenarioObjects( const std::string &rszMapInfoFileName, std::v
 		return false;
 	}
 	NI_ASSERT_TF( pMapObjects != 0,
-							  NStr::Format( "GetScenarioObjects, Wrong parameter pMapObjects: %x\n", pMapObjects ),
+							  NStr::Format( "GetScenarioObjects, Wrong parameter pMapObjects: %p\n", pMapObjects ),
 							  return false );
 
 	const std::string szMapInfoFileName = rszMapInfoFileName.substr( 0, rszMapInfoFileName.rfind( '.' ) );
@@ -1291,7 +1291,7 @@ bool CMapInfo::GetScenarioObjects( const std::string &rszMapInfoFileName, std::v
 bool CMapInfo::GetUsedLinkIDs( const SLoadMapInfo &rLoadMapInfo, CUsedLinkIDs *pUsedLinkIDs )
 {
 	NI_ASSERT_TF( pUsedLinkIDs != 0,
-							  NStr::Format( "GetUsedLinkIDs, Wrong parameter pUsedLinkIDs: %x\n", pUsedLinkIDs ),
+							  NStr::Format( "GetUsedLinkIDs, Wrong parameter pUsedLinkIDs: %p\n", pUsedLinkIDs ),
 							  return false );
 	
 	for ( int nObjectIndex = 0; nObjectIndex < rLoadMapInfo.objects.size(); ++nObjectIndex )
@@ -1372,7 +1372,7 @@ bool CMapInfo::GetUsedLinkIDs( const SLoadMapInfo &rLoadMapInfo, CUsedLinkIDs *p
 bool CMapInfo::GetUsedScriptIDs( const SLoadMapInfo &rLoadMapInfo, CUsedScriptIDs *pUsedScriptIDs )
 {
 	NI_ASSERT_TF( pUsedScriptIDs != 0,
-							  NStr::Format( "GetUsedScriptIDs, Wrong parameter pUsedScriptIDs: %x\n", pUsedScriptIDs ),
+							  NStr::Format( "GetUsedScriptIDs, Wrong parameter pUsedScriptIDs: %p\n", pUsedScriptIDs ),
 							  return false );
 	
 	for ( int nObjectIndex = 0; nObjectIndex < rLoadMapInfo.objects.size(); ++nObjectIndex )
@@ -1396,7 +1396,7 @@ bool CMapInfo::GetUsedScriptIDs( const SLoadMapInfo &rLoadMapInfo, CUsedScriptID
 bool CMapInfo::GetUsedScriptAreas( const SLoadMapInfo &rLoadMapInfo, CUsedScriptAreas *pUsedScriptAreas )
 {
 	NI_ASSERT_TF( pUsedScriptAreas != 0,
-							  NStr::Format( "GetUsedScriptAreas, Wrong parameter pUsedScripAreas: %x\n", pUsedScriptAreas ),
+							  NStr::Format( "GetUsedScriptAreas, Wrong parameter pUsedScripAreas: %p\n", pUsedScriptAreas ),
 							  return false );
 
 	for ( int nScriptAreaIndex = 0; nScriptAreaIndex < rLoadMapInfo.scriptAreas.size(); ++nScriptAreaIndex )
@@ -1414,7 +1414,7 @@ bool CMapInfo::GetUsedScriptAreas( const SLoadMapInfo &rLoadMapInfo, CUsedScript
 bool CMapInfo::UpdateTerrainRoads( STerrainInfo *pTerrainInfo, const CTRect<int> &rUpdateRect, const SRoadsetDesc &rRoadsetDesc )
 {
 	NI_ASSERT_TF( pTerrainInfo != 0,
-							  NStr::Format( "Wrong parameter: %x\n", pTerrainInfo ),
+							  NStr::Format( "Wrong parameter: %p\n", pTerrainInfo ),
 							  return false );
 	// сотрем все дороги по всем патчам
 	for ( int nPatchXIndex = 0; nPatchXIndex < pTerrainInfo->patches.GetSizeX(); ++nPatchXIndex )
@@ -1616,7 +1616,7 @@ bool CMapInfo::UpdateTerrainRoads( STerrainInfo *pTerrainInfo, const CTRect<int>
 bool CMapInfo::AddRoad( SLoadMapInfo *pLoadMapInfo, const CTRect<int> &rRoadRect, int nRoadType, int nRoadDirection, std::vector<SRoadItem> *pRoad )
 {
 	NI_ASSERT_TF( pLoadMapInfo != 0,
-							  NStr::Format( "Wrong parameter: %x\n", pLoadMapInfo ),
+							  NStr::Format( "Wrong parameter: %p\n", pLoadMapInfo ),
 							  return false );
 
 	SRoadItem roadItem;
@@ -1688,7 +1688,7 @@ bool CMapInfo::AddRoad( SLoadMapInfo *pLoadMapInfo, const CTRect<int> &rRoadRect
 bool CMapInfo::MakeRoad( SLoadMapInfo *pLoadMapInfo, const SRoadPoint &rFrom, const SRoadPoint &rTo, int nRoadType, const SRoadMakeParameter &rRoadMakeParamerer, std::vector<SRoadItem> *pRoad )
 {
 	NI_ASSERT_TF( pLoadMapInfo != 0,
-							  NStr::Format( "Wrong parameter: %x", pLoadMapInfo ),
+							  NStr::Format( "Wrong parameter: %p", pLoadMapInfo ),
 							  return false );
 	NI_ASSERT_T( ( rFrom.nDirection >= RMGC_HORIZONTAL_TO_ZERO ) &&
 							 ( rFrom.nDirection <= RMGC_VERTICAL_FROM_ZERO ),

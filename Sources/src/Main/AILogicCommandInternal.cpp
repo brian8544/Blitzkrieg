@@ -69,9 +69,9 @@ void CRegisterGroupCommand::Store( IDataStream *pPacket )
 	pPacket->Write( &commandID, sizeof(commandID) );
 	//
 	pPacket->Write( &wID, sizeof(wID) );
-	int nNumObjects = unitsIDs.size();
+	int nNumObjects = static_cast<int>( unitsIDs.size() );
 	pPacket->Write( &nNumObjects, sizeof(nNumObjects) );
-	pPacket->Write( &(unitsIDs[0]), unitsIDs.size() * sizeof(unitsIDs[0]) );
+	pPacket->Write( &(unitsIDs[0]), static_cast<int>( unitsIDs.size() ) * sizeof(unitsIDs[0]) );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CRegisterGroupCommand::Restore( IDataStream *pPacket )
@@ -81,7 +81,7 @@ void CRegisterGroupCommand::Restore( IDataStream *pPacket )
 	int nNumObjects = 0;
 	pPacket->Read( &nNumObjects, sizeof(nNumObjects) );
 	unitsIDs.resize( nNumObjects );
-	pPacket->Read( &(unitsIDs[0]), unitsIDs.size() * sizeof(unitsIDs[0]) );
+	pPacket->Read( &(unitsIDs[0]), static_cast<int>( unitsIDs.size() ) * sizeof(unitsIDs[0]) );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ************************************************************************************************************************ //
@@ -457,7 +457,7 @@ int CControlSumCheckCommand::operator&( IStructureSaver &ss )
 
 	int nCheckSumsSize;
 	if ( !saver.IsReading() )
-		nCheckSumsSize = checkSums.size();
+		nCheckSumsSize = static_cast<int>( checkSums.size() );
 	saver.Add( 3, &nCheckSumsSize );
 
 	if ( saver.IsReading() )

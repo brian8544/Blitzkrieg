@@ -19,7 +19,7 @@ struct STempBufferAutomatic
 };
 static STempBufferAutomatic tempinitautomagic;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void* STDCALL GetTempRawBuffer_Hook( int nSize, int nIndex )
+extern "C" void* STDCALL GetTempRawBuffer_Hook( int nSize, int nIndex )
 {
 	NI_ASSERT_SLOW_TF( nIndex < 10, "Can use only 10 temp buffers", return 0 );
 	tempbuffers[nIndex].reserve( nSize );
@@ -68,7 +68,7 @@ CSingleton::CSingleton()
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CSingleton theSingleton;
-ISingleton* STDCALL GetSingletonGlobal_Hook()
+extern "C" ISingleton* STDCALL GetSingletonGlobal_Hook()
 {
 	return &theSingleton;
 }
@@ -117,7 +117,7 @@ IRefCount* CSingleton::Get( int nID )
 int CSingleton::GetAllObjects( IRefCount ***ppBuffer, int *pnBufferSize )
 {
 	NI_ASSERT_TF( (ppBuffer != 0) && (pnBufferSize != 0), "NULL pointer passed to request", return -1 );
-	*pnBufferSize = objects.size();
+	*pnBufferSize = static_cast<int>( objects.size() );
 	*ppBuffer = GetTempBuffer<IRefCount*>( *pnBufferSize );
 	IRefCount **pBuffer = *ppBuffer;
 	for ( CObjectIDs::iterator it = objects.begin(); it != objects.end(); ++it )

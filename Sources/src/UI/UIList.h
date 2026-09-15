@@ -28,7 +28,7 @@ public:
 	int nUserData;
 	
 	SUIListRow() : nUserData( 0 ) {}
-	virtual int STDCALL GetNumberOfElements() const { return subItems.size(); }
+	virtual int STDCALL GetNumberOfElements() const { return static_cast<int>( subItems.size() ); }
 	virtual IUIElement* STDCALL GetElement( int nIndex ) const;
 	virtual void STDCALL SetUserData( int nData ) { nUserData = nData; }
 	virtual int  STDCALL GetUserData() const { return nUserData; }
@@ -60,7 +60,7 @@ public:
 	int nUserData;
 
 	SUIListHeader() : nUserData( 0 ) {}
-	virtual int STDCALL GetNumberOfElements() const { return subItems.size(); }
+	virtual int STDCALL GetNumberOfElements() const { return static_cast<int>( subItems.size() ); }
 	virtual IUIElement* STDCALL GetElement( int nIndex ) const;
 	virtual void STDCALL SetUserData( int nData ) { nUserData = nData; }
 	virtual int  STDCALL GetUserData() const { return nUserData; }
@@ -136,7 +136,7 @@ public:
 	
 	//Public interface
 	//Get number of items
-	virtual int STDCALL GetNumberOfItems() { return listItems.size(); }
+	virtual int STDCALL GetNumberOfItems() { return static_cast<int>( listItems.size() ); }
 	//Add new line of items
 	virtual void STDCALL AddItem( int nData = 0 );			//добавляет новую строчку VectorElements в конец списка
 	//Remove last line of items

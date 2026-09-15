@@ -60,7 +60,7 @@ CCommonFileSystem::CCommonFileSystem( const char *pszName, DWORD dwAccessMode )
 	// extact file mask to enumerate
 	std::string szName = pszName;
 	std::string szMask;
-	int nPos = szName.rfind( '\\' );
+	int nPos = static_cast<int>( szName.rfind( '\\' ) );
 	if ( nPos == std::string::npos )
 	{
 		szMask = szName.empty() ? "*.zip" : szName;

@@ -700,7 +700,7 @@ template<class PointType>
 void RotateEdgeToPI2( PointType *pvBegin, PointType *pvEnd )
 {
 	NI_ASSERT_T( ( pvBegin != 0 ) && ( pvEnd != 0 ),
-							 NStr::Format( "Wrong parameters: pvBegin %x, pvEnd %x\n", pvBegin, pvEnd ) );
+							 NStr::Format( "Wrong parameters: pvBegin %p, pvEnd %p\n", pvBegin, pvEnd ) );
 
 	const PointType m = 0.5f * ( ( *pvBegin ) + ( *pvEnd ) );
 	const PointType v = ( *pvEnd ) - ( *pvBegin );
@@ -714,7 +714,7 @@ template<class PointType>
 void FlipEdgeToPI( PointType *pvBegin, PointType *pvEnd )
 {
 	NI_ASSERT_T( ( pvBegin != 0 ) && ( pvEnd != 0 ),
-							 NStr::Format( "Wrong parameters: pvBegin %x, pvEnd %x\n", pvBegin, pvEnd ) );
+							 NStr::Format( "Wrong parameters: pvBegin %p, pvEnd %p\n", pvBegin, pvEnd ) );
 
 	const PointType vTemp = ( *pvEnd );
 	( *pvEnd ) = ( *pvBegin );
@@ -882,7 +882,7 @@ template<class Type, class PointType>
 bool CutByPolygonCore( const Type &rPolygon, const Type &rPolygonCore, Type *pCutPolygon )
 {
 	NI_ASSERT_TF( pCutPolygon != 0,
-							  NStr::Format( "CutByPolygonCore() Wrong parameter: pCutPolygon %x\n", pCutPolygon ),
+							  NStr::Format( "CutByPolygonCore() Wrong parameter: pCutPolygon %p\n", pCutPolygon ),
 								return false );
 
 	if ( rPolygonCore.empty() )
@@ -965,7 +965,7 @@ template<class Type, class PointType>
 bool GetVoronoyPolygon( const Type &rBoundingPolygon, const Type &rPoints, const PointType &rPoint, Type *pVoronoyPolygon )
 {
 	NI_ASSERT_TF( pVoronoyPolygon != 0,
-							  NStr::Format( "Wrong parameter: pVoronoyPolygon %x\n", pVoronoyPolygon ),
+							  NStr::Format( "Wrong parameter: pVoronoyPolygon %p\n", pVoronoyPolygon ),
 								return false );
 
 	if ( rBoundingPolygon.empty() )
@@ -1051,7 +1051,7 @@ template<class Type, class PointType>
 void UniquePolygon( Type *pPolygon, float fRange )
 {
 	NI_ASSERT_T( pPolygon != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pPolygon ) );
+							 NStr::Format( "Wrong parameter: %p\n", pPolygon ) );
 
 	pPolygon->erase( std::unique( pPolygon->begin(),
 																pPolygon->end(),
@@ -1065,7 +1065,7 @@ template<class Type>
 void GetPolygonBoundingBox( const Type &rPolygon, CTRect<float> *pBoundingBox )
 {
 	NI_ASSERT_T( pBoundingBox != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pBoundingBox ) );
+							 NStr::Format( "Wrong parameter: %p\n", pBoundingBox ) );
 
 	pBoundingBox->Set( 0.0f, 0.0f, 0.0f, 0.0f );
 	//вырожденный случай
@@ -1139,7 +1139,7 @@ template<class Type, class PointType>
 bool RandomizeEdges( const Type &rSourceSequence, int nDepth, float fMinSideDistanceRatio, const CTPoint<float> &rShiftRatio, Type *pRandomizedSequence, float fMinEdgeLength, float fMaxEdgeLength, bool bPolygon )
 {
 	NI_ASSERT_TF( pRandomizedSequence != 0,
-							  NStr::Format( "Wrong parameter: pRandomizedSequence %x\n", pRandomizedSequence ),
+							  NStr::Format( "Wrong parameter: pRandomizedSequence %p\n", pRandomizedSequence ),
 								return false );
 
 	if ( rSourceSequence.empty() )
@@ -1272,7 +1272,7 @@ template<class Type, class PointType>
 bool EnlargePolygonCore( const Type &rBoundingPolygon, const Type &rPolygon, float fDistance, Type *pEnlargedPolygon )
 {
 	NI_ASSERT_TF( pEnlargedPolygon != 0,
-							  NStr::Format( "Wrong parameter: pEnlargedPolygon %x\n", pEnlargedPolygon ),
+							  NStr::Format( "Wrong parameter: pEnlargedPolygon %p\n", pEnlargedPolygon ),
 								return false );
 
 	Type::const_iterator currentPointIterator0 = rPolygon.begin();
@@ -1442,7 +1442,7 @@ template<class Type>
 bool GetBoundingPolygon( const SVectorStripeObject &rVectorStripeObject, Type *pBoundingPolygon )
 {
 	NI_ASSERT_TF( pBoundingPolygon != 0,
-							  NStr::Format( "Wrong parameter: pBoundingPolygon %x\n", pBoundingPolygon ),
+							  NStr::Format( "Wrong parameter: pBoundingPolygon %p\n", pBoundingPolygon ),
 								return false );
 	pBoundingPolygon->clear();
 	for ( std::vector<SVectorStripeObjectPoint>::const_iterator pointIterator = rVectorStripeObject.points.begin(); pointIterator != rVectorStripeObject.points.end(); ++pointIterator )
@@ -1471,7 +1471,7 @@ bool GetBoundingPolygon( const SVectorStripeObject &rVectorStripeObject, Type *p
 bool NPGeometry::CPolygon::Split( int nPointIndex, CPolygon *pNewPolygon )
 {
 	NI_ASSERT_T( pNewPolygon != 0,
-							 NStr::Format( "Invalid parameter %x", pNewPolygon ) );
+							 NStr::Format( "Invalid parameter %p", pNewPolygon ) );
 	
 	pNewPolygon->Clear();
 	if ( nCurrentPointIndex < nPointIndex )

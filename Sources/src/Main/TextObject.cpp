@@ -46,7 +46,7 @@ bool CTextDialog::Load( const bool bPreLoad )
 	const int nCheck = pStream->Read( &(szString[0]), nSize );
 	NI_ASSERT_SLOW_TF( nCheck == nSize, NStr::Format("Readed size (%d) doesn't match requested (%d)", nCheck, nSize), return false );
 	// cut all CRLF symbols from the end
-	int nPos = szString.find_last_not_of( L'\n' );
+	int nPos = static_cast<int>( szString.find_last_not_of( L'\n' ) );
 	while ( nPos + 1 < szString.size() ) 
 	{
 		if ( nPos == std::string::npos )
@@ -58,7 +58,7 @@ bool CTextDialog::Load( const bool bPreLoad )
 		else
 		{
 			szString.erase( nPos, std::string::npos );
-			nPos = szString.find_last_not_of( L'\n' );
+			nPos = static_cast<int>( szString.find_last_not_of( L'\n' ) );
 		}
 	}
 

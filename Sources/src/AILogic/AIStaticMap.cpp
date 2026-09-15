@@ -228,7 +228,7 @@ void GetRiverTiles( const SVectorStripeObject &vectorStripeObject, const int j, 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CStaticMap::Load3DRoads( const STerrainInfo &terrainInfo )
 {
-	const int nTerrTypes = passabilities.size();
+	const int nTerrTypes = static_cast<int>( passabilities.size() );
 	passabilities.resize( nTerrTypes + terrainInfo.roads3.size() );
 	
 	for ( int i = 0; i < terrainInfo.roads3.size(); ++i )

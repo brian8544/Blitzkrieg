@@ -48,7 +48,7 @@ void RepositionIconsLocal( CIconsList &icons, DWORD placement, const CTRect<floa
 			vStepSign.x = vStepSign.y = -1;
 			break;
 		default:
-			NI_ASSERT_T( false, "unknown horizontal placement" )
+			NI_ASSERT_T( false, "unknown horizontal placement" );
 	}
 	// vertical plcement
 	switch ( placement & (ICON_ALIGNMENT_TOP | ICON_ALIGNMENT_VCENTER | ICON_ALIGNMENT_BOTTOM) ) 
@@ -64,7 +64,7 @@ void RepositionIconsLocal( CIconsList &icons, DWORD placement, const CTRect<floa
 			vPos.z = rcRect.bottom;
 			break;
 		default:
-			NI_ASSERT_T( false, "unknown vertical placement" )
+			NI_ASSERT_T( false, "unknown vertical placement" );
 	}
 	// direction
 	switch ( placement & (ICON_PLACEMENT_VERTICAL | ICON_PLACEMENT_HORIZONTAL) ) 
@@ -80,7 +80,7 @@ void RepositionIconsLocal( CIconsList &icons, DWORD placement, const CTRect<floa
 			vAdd.x = vAdd.y = 1;
 			break;
 		default:
-			NI_ASSERT_T( false, "unknown direction" )
+			NI_ASSERT_T( false, "unknown direction" );
 	}
 	//
 	NI_ASSERT_T( vStep != VNULL3, NStr::Format("Can't reposition icons - placement 0x%x still not realized", placement) );

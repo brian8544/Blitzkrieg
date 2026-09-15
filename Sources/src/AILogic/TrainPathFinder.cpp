@@ -37,7 +37,7 @@ void CTrainPathFinder::AnalyzePath( const int v1, const int v2, const float fDis
 				{
 					fBestPathLen = fFullPathLen;
 					theRailRoadGraph.GetPath( &bestPath );
-					int nSize = bestPath.size();
+					int nSize = static_cast<int>( bestPath.size() );
 					pFinishEdgePoint = pPoint;
 				}
 			}
@@ -54,7 +54,7 @@ void CTrainPathFinder::AnalyzePath( const int v1, const int v2, const float fDis
 				{
 					fBestPathLen = fFullPathLen;
 					theRailRoadGraph.GetPath( &bestPath );
-					int nSize = bestPath.size();
+					int nSize = static_cast<int>( bestPath.size() );
 					pFinishEdgePoint = pPoint;
 				}
 			}
@@ -178,6 +178,6 @@ const int CTrainPathFinder::GetPathLength()	const
 	if ( fBestPathLen == -1.0f )
 		return -1;
 	else
-		return bestPath.size(); 
+		return static_cast<int>( bestPath.size() );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

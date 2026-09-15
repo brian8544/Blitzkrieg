@@ -101,9 +101,9 @@ void CVSOBuilder::SampleCurve( const std::vector<CVec3> &rControlPoints,
 															 float fOpacity )
 {
 	NI_ASSERT_T( rControlPoints.size() > 1 != 0,
-							 NStr::Format( "Invalid size: %d\n", rControlPoints.size() ) );
+							 NStr::Format( "Invalid size: %d\n", static_cast<int>(rControlPoints.size()) ) );
 	NI_ASSERT_T( pPoints != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pPoints ) );
+							 NStr::Format( "Wrong parameter: %p\n", pPoints ) );
 
 	//collect spline points
 	std::vector<CVec3> plots;
@@ -144,7 +144,7 @@ void CVSOBuilder::SampleCurve( const std::vector<CVec3> &rControlPoints,
 void CVSOBuilder::SmoothCurveWidth( std::vector<SVectorStripeObjectPoint> *pPoints )
 {
 	NI_ASSERT_T( pPoints != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pPoints ) );
+							 NStr::Format( "Wrong parameter: %p\n", pPoints ) );
 
 	// count key points
 	// collect key point indices in the vector
@@ -169,8 +169,8 @@ void CVSOBuilder::SmoothCurveWidth( std::vector<SVectorStripeObjectPoint> *pPoin
 	{
 		indices.push_back( nKeyPointIndex );
 	}
-	indices.push_back( keyPoints.size() - 1 );
-	indices.push_back( keyPoints.size() - 1 );
+	indices.push_back( static_cast<int>( keyPoints.size() ) - 1 );
+	indices.push_back( static_cast<int>( keyPoints.size() ) - 1 );
 
 	CAnalyticBSpline spline;
 	for ( int nIndex = 0; nIndex != ( indices.size() - 3 ); ++nIndex )
@@ -206,7 +206,7 @@ void CVSOBuilder::SmoothCurveWidth( std::vector<SVectorStripeObjectPoint> *pPoin
 bool CVSOBuilder::UpdateZ( const STerrainInfo::TVertexAltitudeArray2D &rAltitude, CVec3 *pPos )
 {
 	NI_ASSERT_T( pPos != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pPos ) );
+							 NStr::Format( "Wrong parameter: %p\n", pPos ) );
 	
 	return CVertexAltitudeInfo::GetHeight( rAltitude, pPos->x, pPos->y, &( pPos->z ) );
 	/**
@@ -225,7 +225,7 @@ bool CVSOBuilder::UpdateZ( const STerrainInfo::TVertexAltitudeArray2D &rAltitude
 bool CVSOBuilder::UpdateZ( const STerrainInfo::TVertexAltitudeArray2D &rAltitude, SVectorStripeObject *pVectorStripeObject )
 {
 	NI_ASSERT_T( pVectorStripeObject != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pVectorStripeObject ) );
+							 NStr::Format( "Wrong parameter: %p\n", pVectorStripeObject ) );
 	
 	bool bResult = true;
 	for ( std::vector<CVec3>::iterator controlPointIterator = pVectorStripeObject->controlpoints.begin(); controlPointIterator != pVectorStripeObject->controlpoints.end(); ++controlPointIterator )
@@ -249,7 +249,7 @@ bool CVSOBuilder::UpdateZ( const STerrainInfo::TVertexAltitudeArray2D &rAltitude
 bool CVSOBuilder::Update( SVectorStripeObject *pVectorStripeObject, bool bKeepKeyPoints, float fStep, float fWidth, float fOpacity )
 {
 	NI_ASSERT_T( pVectorStripeObject != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pVectorStripeObject ) );
+							 NStr::Format( "Wrong parameter: %p\n", pVectorStripeObject ) );
 	
 	//сохряняем ширины
 	SBackupKeyPoints backupKeyPoints;
@@ -274,10 +274,10 @@ bool CVSOBuilder::Update( SVectorStripeObject *pVectorStripeObject, bool bKeepKe
 bool CVSOBuilder::GetVSOPointPolygon( const SVectorStripeObject &rVectorStripeObject, int nPointIndex, std::vector<CVec3> *pPolygon, float fRelWidth )
 {
 	NI_ASSERT_T( pPolygon != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pPolygon ) );
+							 NStr::Format( "Wrong parameter: %p\n", pPolygon ) );
 	
 	NI_ASSERT_T( ( nPointIndex >= 0 ) && ( nPointIndex < rVectorStripeObject.points.size() ),
-							 NStr::Format( "Invalid argument: %d (%d)\n", nPointIndex, rVectorStripeObject.points.size() ) );
+							 NStr::Format( "Invalid argument: %d (%d)\n", nPointIndex, static_cast<int>(rVectorStripeObject.points.size()) ) );
 
 	pPolygon->push_back( CVec3( rVectorStripeObject.points[nPointIndex].vPos.x + ( rVectorStripeObject.points[nPointIndex].vNorm.x * rVectorStripeObject.points[nPointIndex].fWidth * fRelWidth ),
 															rVectorStripeObject.points[nPointIndex].vPos.y + ( rVectorStripeObject.points[nPointIndex].vNorm.y * rVectorStripeObject.points[nPointIndex].fWidth * fRelWidth ),
@@ -298,7 +298,7 @@ bool CVSOBuilder::GetVSOPointPolygon( const SVectorStripeObject &rVectorStripeOb
 bool CVSOBuilder::GetPointsSequence( const SVSOCircle &rCircleBegin, const SVSOCircle &rCircleEnd, int nSegmentsCountBegin, int nSegmentsCountEnd, std::list<CVec2> *pPointsSequence )
 {
 	NI_ASSERT_TF( pPointsSequence != 0,
-							  NStr::Format( "Wrong parameter: pPointsSequence %x\n", pPointsSequence ),
+							  NStr::Format( "Wrong parameter: pPointsSequence %p\n", pPointsSequence ),
 								return false );
 
 	CVec2 vBeginTangentPoint( VNULL2 );
@@ -371,7 +371,7 @@ bool CVSOBuilder::GetPointsSequence( const CVec2 &vBegin0, const CVec2 &vEnd0, f
 																		 std::list<CVec2> *pPointsSequence )
 {
 	NI_ASSERT_TF( pPointsSequence != 0,
-							  NStr::Format( "Wrong parameter: pPointsSequence %x\n", pPointsSequence ),
+							  NStr::Format( "Wrong parameter: pPointsSequence %p\n", pPointsSequence ),
 								return false );
 
 	SVSOCircle circle00;

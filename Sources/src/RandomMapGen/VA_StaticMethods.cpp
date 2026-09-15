@@ -63,7 +63,7 @@ const CVec3 CVertexAltitudeInfo::GetNormale( const STerrainInfo::TVertexAltitude
 bool CVertexAltitudeInfo::UpdateShades( STerrainInfo::TVertexAltitudeArray2D *pAltitude, const CTRect<int> &rUpdateRect, const SGFXLightDirectional &rSunlight )
 {
 	NI_ASSERT_TF( pAltitude != 0,
-							  NStr::Format( "Wrong parameter: %x\n", pAltitude ),
+							  NStr::Format( "Wrong parameter: %p\n", pAltitude ),
 							  return false );
 
 	CTRect<int> updateRect( rUpdateRect );
@@ -98,7 +98,7 @@ bool CVertexAltitudeInfo::GetHeight( const STerrainInfo::TVertexAltitudeArray2D 
 bool CVertexAltitudeInfo::GetHeight( const STerrainInfo::TVertexAltitudeArray2D &rAltitude, float fXPos, float fYPos, float *pfHeight )
 {
 	NI_ASSERT_TF( pfHeight != 0,
-							  NStr::Format( "Wrong parameter: %x\n", pfHeight ),
+							  NStr::Format( "Wrong parameter: %p\n", pfHeight ),
 							  return false );
 	
 	*pfHeight = 0.0f;
@@ -304,9 +304,9 @@ bool CVertexAltitudeInfo::IsValidHeight( const STerrainInfo::TVertexAltitudeArra
 bool CVertexAltitudeInfo::ValidateHeights( STerrainInfo::TVertexAltitudeArray2D *pAltitude, int nPosX, int nPosY, int nSize, CTRect<int> *pAffectedRect )
 {
 	NI_ASSERT_T( pAffectedRect != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pAffectedRect ) );
+							 NStr::Format( "Wrong parameter: %p\n", pAffectedRect ) );
 	NI_ASSERT_T( pAltitude != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pAltitude ) );
+							 NStr::Format( "Wrong parameter: %p\n", pAltitude ) );
 	NI_ASSERT_T( ( nPosX >= 0 ) &&
 							 ( nPosY >= 0 ) &&
 							 ( nPosX < ( pAltitude->GetSizeX() - 1 ) ) &&
@@ -331,7 +331,7 @@ bool CVertexAltitudeInfo::ValidateHeights( STerrainInfo::TVertexAltitudeArray2D 
 bool CVertexAltitudeInfo::GetHeightsRange( const STerrainInfo::TVertexAltitudeArray2D &rAltitude, float *pfMinHeight, float *pfMaxHeight )
 {
 	NI_ASSERT_T( ( pfMinHeight != 0 ) && ( pfMaxHeight != 0 ),
-							 NStr::Format( "Wrong parameter: %x %x\n", pfMinHeight, pfMaxHeight ) );
+							 NStr::Format( "Wrong parameter: %p %p\n", pfMinHeight, pfMaxHeight ) );
 
 	const float fZeroHeight = rAltitude[0][0].fHeight;
 	( *pfMinHeight ) = fZeroHeight;
@@ -359,7 +359,7 @@ bool CVertexAltitudeInfo::GetHeightsRange( const STerrainInfo::TVertexAltitudeAr
 bool CVertexAltitudeInfo::GetShadesRange( const STerrainInfo::TVertexAltitudeArray2D &rAltitude, float *pfMinShade, float *pfMaxShade )
 {
 	NI_ASSERT_T( ( pfMinShade != 0 ) && ( pfMaxShade != 0 ),
-							 NStr::Format( "Wrong parameter: %x %x\n", pfMinShade, pfMaxShade ) );
+							 NStr::Format( "Wrong parameter: %p %p\n", pfMinShade, pfMaxShade ) );
 
 	const float fZeroShade = rAltitude[0][0].shade;
 	( *pfMinShade ) = fZeroShade;

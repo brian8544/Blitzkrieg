@@ -61,7 +61,7 @@ void Reserve( std::vector<TVertex> &vertices, const int nReserveSize )
 template <class TVertex>
 TVertex* ResizeToAdd( std::vector<TVertex> &vertices, const int nReSize )
 {
-	const int nNumVertices = vertices.size();
+	const int nNumVertices = static_cast<int>( vertices.size() );
 	vertices.resize( nNumVertices + nReSize );
 	return &( vertices[nNumVertices] );
 }
@@ -155,7 +155,7 @@ void CreateCrosses( const float fX, const float fY, const STerrainPatchInfo &pat
 	const float fNoiseRcprX = 1.0f / fNoiseSizeX;
 	const float fNoiseRcprY = 1.0f / fNoiseSizeY;
 	// create base crosses (w/o noise)
-	Reserve( pPatch->basecrossverts, patch.basecrosses.size()*4 );
+	Reserve( pPatch->basecrossverts, static_cast<int>( patch.basecrosses.size() )*4 );
 	for ( STerrainPatchInfo::CCrossesList::const_iterator it = patch.basecrosses.begin(); it != patch.basecrosses.end(); ++it )
 	{
 		const int i = it->y, j = it->x;
@@ -185,7 +185,7 @@ void CreateCrosses( const float fX, const float fY, const STerrainPatchInfo &pat
 		++pVerts;
 	}
 	// create noises (w/o crosses)
-	Reserve( pPatch->noiseverts, patch.noisecrosses.size()*4 );
+	Reserve( pPatch->noiseverts, static_cast<int>( patch.noisecrosses.size() )*4 );
 	for ( STerrainPatchInfo::CCrossesList::const_iterator it = patch.noisecrosses.begin(); it != patch.noisecrosses.end(); ++it )
 	{
 		const int i = it->y, j = it->x;
@@ -218,8 +218,8 @@ void CreateCrosses( const float fX, const float fY, const STerrainPatchInfo &pat
 	pPatch->layernoiseverts.resize( patch.layercrosses.size() );
 	for ( int nLayer = 0; nLayer != patch.layercrosses.size(); ++nLayer )
 	{
-		Reserve( pPatch->layercrossverts[nLayer], patch.layercrosses[nLayer].size()*4 );
-		Reserve( pPatch->layernoiseverts[nLayer], patch.layercrosses[nLayer].size()*4 );
+		Reserve( pPatch->layercrossverts[nLayer], static_cast<int>( patch.layercrosses[nLayer].size() )*4 );
+		Reserve( pPatch->layernoiseverts[nLayer], static_cast<int>( patch.layercrosses[nLayer].size() )*4 );
 		for ( STerrainPatchInfo::CCrossesList::const_iterator it = patch.layercrosses[nLayer].begin(); it != patch.layercrosses[nLayer].end(); ++it )
 		{
 			const int i = it->y, j = it->x;
@@ -417,7 +417,7 @@ void CreateMarker( const float fX, const float fY, const std::vector< CTPoint<in
 	}
 	// indices
 	{
-		const int nNumMainTiles = marker.size();
+		const int nNumMainTiles = static_cast<int>( marker.size() );
 		CIndicesLock<WORD> indices( pIndices );
 		WORD *pInds = indices.GetBuffer();
 		for ( int i=0, nIndex=0; i<nNumMainTiles; ++i, nIndex+=4 )

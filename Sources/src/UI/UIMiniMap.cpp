@@ -194,7 +194,7 @@ int CUIMiniMap::operator&( IStructureSaver &ss )
 void CUIMiniMap::GetZeroPoint( float *pfXZeroPoint, float *pfYZeroPoint, bool isTopLeft )
 {
 	NI_ASSERT_SLOW_T( ( pfXZeroPoint ) && ( pfYZeroPoint ),
-										NStr::Format( "Wrong parameters: (%x, %x)", pfXZeroPoint, pfYZeroPoint ) );
+										NStr::Format( "Wrong parameters: (%p, %p)", pfXZeroPoint, pfYZeroPoint ) );
 	NI_ASSERT_SLOW_T( ( terrainSize.x > 0 ) && ( terrainSize.y > 0 ),
 										NStr::Format( "Wrong terrainSize: (%d, %d)", terrainSize.x, terrainSize.y ) );
 	if ( terrainSize.x > terrainSize.y )
@@ -232,7 +232,7 @@ void CUIMiniMap::GetZeroPoint( float *pfXZeroPoint, float *pfYZeroPoint, bool is
 void CUIMiniMap::PointToTextureMiniMap( float fXPos, float fYPos, float *pfXMiniMapPos, float *pfYMiniMapPos, bool isLeftTop )
 {
 	NI_ASSERT_SLOW_T( ( pfXMiniMapPos ) && ( pfYMiniMapPos ),
-										NStr::Format( "Wrong parameters: (%x, %x)", pfXMiniMapPos, pfYMiniMapPos ) );
+										NStr::Format( "Wrong parameters: (%p, %p)", pfXMiniMapPos, pfYMiniMapPos ) );
 	NI_ASSERT_SLOW_T( ( terrainSize.x > 0 ) && ( terrainSize.y > 0 ),
 										NStr::Format( "Wrong terrainSize: (%d, %d)", terrainSize.x, terrainSize.y ) );
 
@@ -264,7 +264,7 @@ void CUIMiniMap::PointToTextureMiniMap( float fXPos, float fYPos, float *pfXMini
 void CUIMiniMap::TextureMiniMapToPoint( float fXMiniMapPos, float fYMiniMapPos, float *pfXPos, float *pfYPos , bool isLeftTop )
 {
 	NI_ASSERT_SLOW_T( ( pfXPos ) && ( pfYPos ),
-										NStr::Format( "Wrong parameters: (%x, %x)", pfXPos, pfYPos ) );
+										NStr::Format( "Wrong parameters: (%p, %p)", pfXPos, pfYPos ) );
 	NI_ASSERT_SLOW_T( ( terrainSize.x > 0 ) && ( terrainSize.y > 0 ),
 										NStr::Format( "Wrong terrainSize: (%d, %d)", terrainSize.x, terrainSize.y ) );
 	CTPoint<float> zeroPoint;
@@ -299,7 +299,7 @@ void CUIMiniMap::TextureMiniMapToPoint( float fXMiniMapPos, float fYMiniMapPos, 
 void CUIMiniMap::GetVerticalClippedScreenEdge( const CTPoint<float> &v0, const CTPoint<float> &v1, std::vector<CTPoint<float> > *pvPoints )
 {
 	NI_ASSERT_SLOW_T( pvPoints != 0,
-										NStr::Format( "Wrong parameter: (%x)", pvPoints ) );
+										NStr::Format( "Wrong parameter: (%p)", pvPoints ) );
 
 	float fXMax = terrainSize.x;
 	float fYMax = terrainSize.y;
@@ -402,7 +402,7 @@ void CUIMiniMap::GetVerticalClippedScreenEdge( const CTPoint<float> &v0, const C
 void CUIMiniMap::GetHorizontalClippedScreenEdge( const CTPoint<float> &v1, const CTPoint<float> &v2, std::vector<CTPoint<float> > *pvPoints )
 {
 	NI_ASSERT_SLOW_T( pvPoints != 0,
-										NStr::Format( "Wrong parameter: (%x)", pvPoints ) );
+										NStr::Format( "Wrong parameter: (%p)", pvPoints ) );
 
 	float fXMax = terrainSize.x;
 	float fYMax = terrainSize.y;
@@ -504,7 +504,7 @@ void CUIMiniMap::GetHorizontalClippedScreenEdge( const CTPoint<float> &v1, const
 void CUIMiniMap::GetClippedScreenFrame( std::vector<CTPoint<float> > *pvPoints, IGFX *_pGFX )
 {
 	NI_ASSERT_SLOW_T( pvPoints != 0,
-										NStr::Format( "Wrong parameter: (%x)", pvPoints ) );
+										NStr::Format( "Wrong parameter: (%p)", pvPoints ) );
 
 	//получаем мировые координаты рамки экрана
 	CTRect<float> screenRect = _pGFX->GetScreenRect();
@@ -564,7 +564,7 @@ bool CUIMiniMap::AddWarFogData( const BYTE *pVizBuffer, int nLength )
 	if ( IsInitialized() && nLength != 0 )
 	{
 		NI_ASSERT_SLOW_T( pVizBuffer != 0,
-											NStr::Format( "Wrong parameter: (%x)", pVizBuffer ) );
+											NStr::Format( "Wrong parameter: (%p)", pVizBuffer ) );
 
 		//добавляем к текстуре pWarFog в оперативной памяти данные от AI
 		if ( nFiledVISTiles < ( terrainSize.x * terrainSize.y ) )
@@ -604,7 +604,7 @@ void CUIMiniMap::AddUnitsData( const SMiniMapUnitInfo *pUnitsBuffer, int nUnitsC
 	{
 		if ( nUnitsCount )
 		{
-			NI_ASSERT_SLOW_T( pUnitsBuffer != 0, NStr::Format( "Wrong parameter: (%x)", pUnitsBuffer ) );
+			NI_ASSERT_SLOW_T( pUnitsBuffer != 0, NStr::Format( "Wrong parameter: (%p)", pUnitsBuffer ) );
 		}
 
 		//обновляем юнитов
@@ -628,7 +628,7 @@ void CUIMiniMap::AddFireRangeAreas( const SShootAreas *pShootAreasBuffer, int nS
 	{
 		if ( nShootAreasCount > 0 )
 		{
-			NI_ASSERT_SLOW_T( pShootAreasBuffer != 0, NStr::Format( "Wrong parameter: (%x)", pShootAreasBuffer ) );
+			NI_ASSERT_SLOW_T( pShootAreasBuffer != 0, NStr::Format( "Wrong parameter: (%p)", pShootAreasBuffer ) );
 		}
 		//обновляем линии обстрела
 		shootAreas.clear();
@@ -1066,7 +1066,7 @@ void CUIMiniMap::Draw( IGFX *_pGFX )
 		for ( int textureIndex = 0; textureIndex < 3; ++textureIndex )
 		{
 			// Получаем массивы вертексов и последовательностей обхода вертексов в треугольниках
-			CTempBufferLock<SGFXLVertex> vertices = _pGFX->GetTempVertices( vPoints.size(), SGFXLVertex::format, GFXPT_TRIANGLELIST );
+			CTempBufferLock<SGFXLVertex> vertices = _pGFX->GetTempVertices( static_cast<int>( vPoints.size() ), SGFXLVertex::format, GFXPT_TRIANGLELIST );
 			CTempBufferLock<WORD> indices = _pGFX->GetTempIndices( 6, GFXIF_INDEX16, GFXPT_TRIANGLELIST );
 
 			// Заполняем массив вертексов
@@ -1216,7 +1216,7 @@ void CUIMiniMap::Draw( IGFX *_pGFX )
 		if ( vPoints.size() > 0 )
 		{
 			// Получаем массивы вертексов
-			CTempBufferLock<SGFXLineVertex> vertices = _pGFX->GetTempVertices( vPoints.size() * 2, SGFXLineVertex::format, GFXPT_LINELIST );
+			CTempBufferLock<SGFXLineVertex> vertices = _pGFX->GetTempVertices( static_cast<int>( vPoints.size() ) * 2, SGFXLineVertex::format, GFXPT_LINELIST );
 
 			// заполняем вертексы четырех сторон рамки экрана
 			for ( int index = 0; index < vPoints.size(); ++index )

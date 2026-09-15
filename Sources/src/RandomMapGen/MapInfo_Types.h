@@ -410,7 +410,7 @@ public:
 inline void RMGGetSeasonNameString( int nSeason, const std::string &rszSeasonFolder, std::string *pszSeasonName )
 {
 	NI_ASSERT_T( pszSeasonName != 0,
-							 NStr::Format( "GetSeasonName, Wrong parameter pszSeasonName: %x\n", pszSeasonName ) );
+							 NStr::Format( "GetSeasonName, Wrong parameter pszSeasonName: %p\n", pszSeasonName ) );
 
 	if ( nSeason == 0 )
 	{
@@ -431,7 +431,7 @@ inline void RMGGetSeasonNameString( int nSeason, const std::string &rszSeasonFol
 inline void RMGGetUsedScriptIDsString( const CUsedScriptIDs &rUsedScriptIDs,  std::string *pszUsedScriptIDsString )
 {
 	NI_ASSERT_T( pszUsedScriptIDsString != 0,
-							 NStr::Format( "RMGGetUsedScriptIDsString, Wrong parameter pszUsedScriptIDsString: %x\n", pszUsedScriptIDsString ) );
+							 NStr::Format( "RMGGetUsedScriptIDsString, Wrong parameter pszUsedScriptIDsString: %p\n", pszUsedScriptIDsString ) );
 	
 	pszUsedScriptIDsString->clear();
 	for ( CUsedScriptIDs::const_iterator usedScripIDIterator = rUsedScriptIDs.begin(); usedScripIDIterator != rUsedScriptIDs.end(); ++usedScripIDIterator )
@@ -450,7 +450,7 @@ inline void RMGGetUsedScriptIDsString( const CUsedScriptIDs &rUsedScriptIDs,  st
 inline void RMGGetUsedScriptAreasString( const CUsedScriptAreas &rUsedScriptAreas,  std::string *pszUsedScriptAreasString )
 {
 	NI_ASSERT_T( pszUsedScriptAreasString != 0,
-							 NStr::Format( "RMGGetUsedScriptAreasString, Wrong parameter pszUsedScriptAreasString: %x\n", pszUsedScriptAreasString ) );
+							 NStr::Format( "RMGGetUsedScriptAreasString, Wrong parameter pszUsedScriptAreasString: %p\n", pszUsedScriptAreasString ) );
 	
 	pszUsedScriptAreasString->clear();
 	for ( CUsedScriptAreas::const_iterator usedScripAreaIterator = rUsedScriptAreas.begin(); usedScripAreaIterator != rUsedScriptAreas.end(); ++usedScripAreaIterator )

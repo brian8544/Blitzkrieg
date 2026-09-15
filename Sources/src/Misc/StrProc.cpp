@@ -63,7 +63,7 @@ static void SplitStringT( const std::basic_string<T1, T2, T3> &szString, std::ve
 	//
 	do
 	{
-		nPos = szString.find( tSeparator, nLastPos );
+		nPos = static_cast<int>( szString.find( tSeparator, nLastPos ) );
 		// add string
 		szVector.push_back( szString.substr( nLastPos, nPos - nLastPos ) );
 		nLastPos = nPos + 1;//szString.find_first_not_of( cSeparator, nPos );
@@ -88,12 +88,12 @@ void NStr::SplitStringWithBrackets( const std::string &szString, std::vector<std
 	//
 	do
 	{
-		nPos = szString.find_first_of( cBracketTypes, nLastPos );
+		nPos = static_cast<int>( szString.find_first_of( cBracketTypes, nLastPos ) );
 		if ( nPos != std::string::npos )
 		{
 			if ( szString[nPos] != cSeparator )      // this is a bracket
 			{
-				nPos = szString.find( brackets[szString[nPos]], nPos + 1 );
+				nPos = static_cast<int>( szString.find( brackets[szString[nPos]], nPos + 1 ) );
 				continue;
 			}
 		}
@@ -138,7 +138,7 @@ void NStr::SplitStringWithMultipleBrackets( const std::string &szString, std::ve
 // найти закрывающую скобку без учёта внутренних скобок
 int NStr::FindCloseBracket( const std::string &szString, int nPos, const char cOpenBracket )
 {
-	return szString.find( brackets[cOpenBracket], nPos );
+	return static_cast<int>( szString.find( brackets[cOpenBracket], nPos ) );
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // найти закрывающую скобку с учётом внутренних скобок
@@ -160,13 +160,13 @@ int NStr::FindMultipleCloseBracket( const std::string &szString, int nPos, const
 				return i;
 		}
 	}
-	return std::string::npos;
+	return -1;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // отрезать все символы 'cTrim' справа
 void NStr::TrimRight( std::string &szString, const char cTrim )
 {
-	int nPos = szString.find_last_not_of( cTrim );
+	int nPos = static_cast<int>( szString.find_last_not_of( cTrim ) );
 	if ( nPos == std::string::npos )
 	{
 		if ( szString.find_first_of( cTrim ) == 0 )
@@ -177,7 +177,7 @@ void NStr::TrimRight( std::string &szString, const char cTrim )
 }
 void NStr::TrimRight( std::string &szString, const char *pszTrim )
 {
-	int nPos = szString.find_last_not_of( pszTrim );
+	int nPos = static_cast<int>( szString.find_last_not_of( pszTrim ) );
 	if ( nPos == std::string::npos )
 	{
 		if ( szString.find_first_of( pszTrim ) == 0 )
@@ -305,7 +305,7 @@ bool NStr::IsDecNumber( const std::string &szString )
 	if ( szString.empty() )
 		return false;
 	int i, nFirstDigit = IsSign( szString[0] ) ? 1 : 0;
-	int nNumDigits = szString.size() - nFirstDigit;
+	int nNumDigits = static_cast<int>( szString.size() ) - nFirstDigit;
 	if ( nNumDigits == 0 )
 		return false;												// this is not a number at all => zero length digits
 	if ( (nNumDigits > 1) && (szString[nFirstDigit] == '0') )
@@ -319,7 +319,7 @@ bool NStr::IsOctNumber( const std::string &szString )
 	if ( szString.empty() )
 		return false;
 	int i, nFirstDigit = IsSign( szString[0] ) ? 1 : 0;
-	int nNumDigits = szString.size() - nFirstDigit;
+	int nNumDigits = static_cast<int>( szString.size() ) - nFirstDigit;
 	if ( nNumDigits == 0 )
 		return false;
 	if ( szString[nFirstDigit] != '0' )
@@ -336,7 +336,7 @@ bool NStr::IsHexNumber( const std::string &szString )
 	if ( szString.empty() )
 		return false;
 	int i, nFirstDigit = IsSign( szString[0] ) ? 1 : 0;
-	int nNumDigits = szString.size() - nFirstDigit;
+	int nNumDigits = static_cast<int>( szString.size() ) - nFirstDigit;
 	if ( nNumDigits < 3 )
 		return false;
 	if ( (szString[nFirstDigit] != '0') || (szString[nFirstDigit + 1] != 'x') )
@@ -379,13 +379,13 @@ void NStr::ToAscii( std::string *pRes, const std::wstring &szSrc )
 {
 	const int N_STACK_BUFF_SIZE = 1024;
 	char static_buff[N_STACK_BUFF_SIZE];
-	int nBufLeng = szSrc.length() * 2 + 10;
+	int nBufLeng = static_cast<int>( szSrc.length() ) * 2 + 10;
 	char *pszBuf;
 	if ( nBufLeng < N_STACK_BUFF_SIZE )
 		pszBuf = static_buff;
 	else
 		pszBuf = new char[ nBufLeng ];
-	int nRes = WideCharToMultiByte( nCodePage, 0, szSrc.c_str(), szSrc.length(), pszBuf, nBufLeng, 0, 0 );
+	int nRes = WideCharToMultiByte( nCodePage, 0, szSrc.c_str(), static_cast<int>( szSrc.length() ), pszBuf, nBufLeng, 0, 0 );
 	pszBuf[nRes] = 0;
 	*pRes = pszBuf;
 	if ( nBufLeng >= N_STACK_BUFF_SIZE )
@@ -396,13 +396,13 @@ void NStr::ToUnicode( std::wstring *pRes, const std::string &szSrc )
 {
 	const int N_STACK_BUFF_SIZE = 1024;
 	WCHAR static_buff[N_STACK_BUFF_SIZE];
-	int nBufLeng = szSrc.length() + 3;
+	int nBufLeng = static_cast<int>( szSrc.length() ) + 3;
 	WCHAR *pszBuf;
 	if ( nBufLeng < N_STACK_BUFF_SIZE )
 		pszBuf = static_buff;
 	else
 		pszBuf = new WCHAR[ nBufLeng ];
-	int nRes = MultiByteToWideChar( nCodePage, 0, szSrc.c_str(), szSrc.length(), pszBuf, nBufLeng );
+	int nRes = MultiByteToWideChar( nCodePage, 0, szSrc.c_str(), static_cast<int>( szSrc.length() ), pszBuf, nBufLeng );
 	pszBuf[nRes] = 0;
 	*pRes = pszBuf;
 	if ( nBufLeng >= N_STACK_BUFF_SIZE )

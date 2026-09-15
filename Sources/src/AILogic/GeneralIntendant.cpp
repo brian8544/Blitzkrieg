@@ -550,7 +550,7 @@ void CGeneralIntendant::Give( CCommonUnit *pWorker )
 void CGeneralIntendant::AddReiforcePositions( const struct SAIGeneralParcelInfo &patchInfo )
 {
 	bInitedByParcel = true;
-	const int nFormer = vPositions.size();
+	const int nFormer = static_cast<int>( vPositions.size() );
 	
 	vPositions.resize( vPositions.size() + patchInfo.reinforcePoints.size() );
 	

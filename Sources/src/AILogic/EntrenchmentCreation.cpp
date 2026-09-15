@@ -153,7 +153,7 @@ bool CEntrenchmentCreation::PreCreate( const CVec2 &vFrom, const CVec2 &vTo )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const int CEntrenchmentCreation::GetMaxIndex() const
 {
-	return parts.size();
+	return static_cast<int>( parts.size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const int CEntrenchmentCreation::GetCurIndex() const
@@ -204,7 +204,7 @@ void CEntrenchmentCreation::BuildNext()
 	pEndTerminator = pNewEndTerminator;
 	CreateNewEndTerminator();
 	vEntr.push_back( pEndTerminator );
-	pFullEntrenchment = static_cast<CEntrenchment*>(theStatObjs.AddNewEntrencment( &vEntr[0], vEntr.size(), new CFullEntrenchment(), false ));
+	pFullEntrenchment = static_cast<CEntrenchment*>(theStatObjs.AddNewEntrencment( &vEntr[0], static_cast<int>( vEntr.size() ), new CFullEntrenchment(), false ));
 	if ( GetCurIndex() < GetMaxIndex() )
 		CalcTilesUnder();
 }
@@ -659,7 +659,7 @@ bool CFenceCreation::IsAnyUnitPrevent() const
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const int CFenceCreation::GetMaxIndex() const
 {
-	return fenceSegements.size();
+	return static_cast<int>( fenceSegements.size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const int CFenceCreation::GetCurIndex() const
@@ -850,7 +850,7 @@ CLine2 CBridgeCreation::GetCurLine()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const int CBridgeCreation::GetMaxIndex() const
 {
-	return spans.size();
+	return static_cast<int>( spans.size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const int CBridgeCreation::GetCurIndex() const

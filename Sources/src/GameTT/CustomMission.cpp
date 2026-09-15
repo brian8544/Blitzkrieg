@@ -52,7 +52,7 @@ bool CInterfaceCustomMission::FillListItem( IUIListRow *pRow, const std::string 
 	pElement = pRow->GetElement( 2 );
 	if ( !pElement )
 		return false;
-	pElement->SetWindowText( 0, NStr::ToUnicode( NStr::Format( "%d", mapInfo.playerParties.size() ) ).c_str() );
+	pElement->SetWindowText( 0, NStr::ToUnicode( NStr::Format( "%d", static_cast<int>(mapInfo.playerParties.size()) ) ).c_str() );
 
 	return true;
 }

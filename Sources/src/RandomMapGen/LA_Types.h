@@ -70,7 +70,7 @@ template<class Type>
 inline int ValidateIndices( const Type &rRect, Type *pIndices )
 {
 	NI_ASSERT_T( pIndices != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pIndices ) );
+							 NStr::Format( "Wrong parameter: %p\n", pIndices ) );
 
 	pIndices->Normalize();
 	
@@ -161,7 +161,7 @@ template<class Type, class PointType>
 inline int ValidatePoint( const Type &rRect, PointType *pPoint )
 {
 	NI_ASSERT_T( pPoint != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pPoint ) );
+							 NStr::Format( "Wrong parameter: %p\n", pPoint ) );
 
 	int result = 1;
 	//Определяем границы
@@ -228,13 +228,13 @@ struct ModifyTilesFunctional
 		: bValue ( RMGC_LOCKED ), pLockArray( _pLockArray )
 	{
 		NI_ASSERT_T( pLockArray != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pLockArray ) );
+								 NStr::Format( "Wrong parameter: %p\n", pLockArray ) );
 	}
 	ModifyTilesFunctional( PointType _bValue, Type *_pLockArray )
 		: bValue ( _bValue ), pLockArray( _pLockArray )
 	{
 		NI_ASSERT_T( pLockArray != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pLockArray ) );
+								 NStr::Format( "Wrong parameter: %p\n", pLockArray ) );
 	}
 
 	bool operator()( int nXIndex, int nYIndex )
@@ -257,13 +257,13 @@ struct CheckTilesFunctional
 		: bValue ( RMGC_LOCKED ), pLockArray( _pLockArray ), isPresent( false )
 	{
 		NI_ASSERT_T( pLockArray != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pLockArray ) );
+								 NStr::Format( "Wrong parameter: %p\n", pLockArray ) );
 	}
 	CheckTilesFunctional( PointType _bValue, const Type *_pLockArray )
 		: bValue ( _bValue ), pLockArray( _pLockArray ), isPresent( false )
 	{
 		NI_ASSERT_T( pLockArray != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pLockArray ) );
+								 NStr::Format( "Wrong parameter: %p\n", pLockArray ) );
 	}
 
 	bool operator()( int nXIndex, int nYIndex )
@@ -511,13 +511,13 @@ struct GetTilesCountByTypeFunctional
 		: bValue ( RMGC_LOCKED ), pLockArray( _pLockArray ), nCount( 0 )
 	{
 		NI_ASSERT_T( pLockArray != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pLockArray ) );
+								 NStr::Format( "Wrong parameter: %p\n", pLockArray ) );
 	}
 	GetTilesCountByTypeFunctional( BYTE _bValue, const CArray2D<BYTE> *_pLockArray )
 		: bValue ( _bValue ), pLockArray( _pLockArray ), nCount( 0 )
 	{
 		NI_ASSERT_T( pLockArray != 0,
-								 NStr::Format( "Wrong parameter: %x\n", pLockArray ) );
+								 NStr::Format( "Wrong parameter: %p\n", pLockArray ) );
 	}
 
 	bool operator()( int nXIndex, int nYIndex )

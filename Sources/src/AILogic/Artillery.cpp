@@ -281,7 +281,7 @@ void CArtillery::InitGuns()
 {
 	if ( pStats->platforms.size() > 1 )
 	{
-		const int nTurrets = pStats->platforms.size() - 1;
+		const int nTurrets = static_cast<int>( pStats->platforms.size() ) - 1;
 		turrets.resize( nTurrets );
 
 		for ( int i = 0; i < nTurrets; ++i )

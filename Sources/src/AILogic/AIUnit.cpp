@@ -282,7 +282,7 @@ void CAIUnit::SetScenarioStats()
 	if ( IScenarioUnit *pScenarioUnit = GetScenarioUnit() )
 	{
 		fExperience = pScenarioUnit->GetValue( STUT_EXP );
-		nLevel = pExpLevels->levels.size() - 1;
+		nLevel = static_cast<int>( pExpLevels->levels.size() ) - 1;
 		while ( nLevel > 0 && fExperience < pExpLevels->levels[nLevel].nExp )
 			--nLevel;
 	}
@@ -1273,7 +1273,7 @@ const int CAIUnit::ChooseFatality( const float fDamage )
 	{
 		if ( pStats->animdescs.size() > ANIMATION_DEATH_FATALITY && !pStats->animdescs[ANIMATION_DEATH_FATALITY].empty() && !pStats->aabb_as.empty() )
 		{
-			const int nFatality = Random( pStats->animdescs[ANIMATION_DEATH_FATALITY].size() );
+			const int nFatality = Random( static_cast<unsigned int>( pStats->animdescs[ANIMATION_DEATH_FATALITY].size() ) );
 
 			const int nRect = pStats->animdescs[ANIMATION_DEATH_FATALITY][nFatality].nAABB_A;
 			NI_ASSERT_SLOW_T( nRect != -1, NStr::Format("Wrong fatality %d AABB for unit \"%s\"", nFatality, pStats->szParentName.c_str()) );
@@ -1297,7 +1297,7 @@ const int CAIUnit::ChooseFatality( const float fDamage )
 	if ( pStats->animdescs[ANIMATION_DEATH].empty() )
 		return -1;
 	else
-		return -1 * int( Random( pStats->animdescs[ANIMATION_DEATH].size() ) + 1 );
+		return -1 * int( Random( static_cast<unsigned int>( pStats->animdescs[ANIMATION_DEATH].size() ) ) + 1 );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CAIUnit::SetMoraleSupport()

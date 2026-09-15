@@ -42,8 +42,8 @@ CImageDDS* LoadImageDDS( IDataStream *pStream )
 	for ( int i = 0; i < nNumMipLevels; ++i )
 	{
 		std::vector<BYTE> &level = pImage->GetMipLevel( i );
-		const int nCheck = pStream->Read( &(level[0]), level.size() );
-		NI_ASSERT_T( nCheck == level.size(), NStr::Format("Can't read all data for mip level %d (read %d bytes instead of %d)", i, nCheck, level.size()) );
+		const int nCheck = pStream->Read( &(level[0]), static_cast<int>( level.size() ) );
+		NI_ASSERT_T( nCheck == static_cast<int>(level.size()), NStr::Format("Can't read all data for mip level %d (read %d bytes instead of %d)", i, nCheck, static_cast<int>(level.size())) );
 	}
 	//
 	return pImage;
@@ -82,8 +82,8 @@ bool SaveImageAsDDS( IDataStream *pStream, const IDDSImage *pImg )
 	for ( int i = 0; i < int(header.dwMipMapCount); ++i )
 	{
 		const std::vector<BYTE> &level = pImage->GetMipLevel( i );
-		const int nCheck = pStream->Write( &(level[0]), level.size() );
-		NI_ASSERT_T( nCheck == level.size(), NStr::Format("Can't write mip level %d", i) );
+		const int nCheck = pStream->Write( &(level[0]), static_cast<int>( level.size() ) );
+		NI_ASSERT_T( nCheck == static_cast<int>(level.size()), NStr::Format("Can't write mip level %d", i) );
 		if ( nCheck != level.size() ) 
 			return false;
 	}
@@ -148,7 +148,7 @@ bool CImageDDS::AddMipLevel( const void *pData, int nLength )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CImageDDS::AddMipLevels( const IDDSImage *pImage )
 {
-	if ( ( pImage->GetSizeX(0) != GetSizeX(mips.size()) ) || ( pImage->GetSizeY(0) != GetSizeY(mips.size()) ) )
+	if ( ( pImage->GetSizeX(0) != GetSizeX(static_cast<int>( mips.size() )) ) || ( pImage->GetSizeY(0) != GetSizeY(static_cast<int>( mips.size() )) ) )
 		return false;
 	int nSize = Min( nSizeX, nSizeY );
 	int nMaxMips = GetMSB( nSize );
@@ -157,7 +157,7 @@ bool CImageDDS::AddMipLevels( const IDDSImage *pImage )
 	//
 	int nNumMipLevels = Min( int(nMaxMips - mips.size()), pImage->GetNumMipLevels() );
 	for ( int i=0; i<nNumMipLevels; ++i )
-		AddMipLevel( pImage->GetLFB( i ), GetSizeX(mips.size() + 1) * GetSizeY(mips.size() + 1) * GetBPP() / 8 );
+		AddMipLevel( pImage->GetLFB( i ), GetSizeX(static_cast<int>( mips.size() ) + 1) * GetSizeY(static_cast<int>( mips.size() ) + 1) * GetBPP() / 8 );
 
 	return true;
 }

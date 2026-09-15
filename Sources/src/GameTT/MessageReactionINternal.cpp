@@ -201,7 +201,7 @@ CMessageReaction::CMessageReaction( const SMessageReactionForLoad &loaded, IMess
 	nCustomCheckType = pCustomCheckLH->Get( loaded.customCheck.first );
 	// custom check params
 	customCheckParams = loaded.customCheck.second;
-	NI_ASSERT_T( customCheckParams.size() < 8, NStr::Format( "to many global vars to check %d eg. ECCR_COMMON will not work", customCheckParams.size() ) );
+	NI_ASSERT_T( static_cast<int>(customCheckParams.size()) < 8, NStr::Format( "to many global vars to check %d eg. ECCR_COMMON will not work", static_cast<int>(customCheckParams.size()) ) );
 
 	for ( CAtomReactionSequencesForLoad::const_iterator it = loaded.atomReactions.begin(); it != loaded.atomReactions.end(); ++it )
 	{

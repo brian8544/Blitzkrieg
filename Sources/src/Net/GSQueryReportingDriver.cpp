@@ -122,7 +122,7 @@ void CGSQueryReportingDriver::QRBasicCallBack( char *pszOutBuf, int nMaxLen )
 {
 	CCriticalSectionLock criticalSectionLock( criticalSection );
 	if ( GetSingleton<IGlobalVars>() )
-		sprintf( pszOutBuf, "\\gamename\\%s\\gamever\\%d", GetGlobalVar("GameSpyGameName"), GetGlobalVar("NetGameVersion", 1) );
+		sprintf_s( pszOutBuf, nMaxLen, "\\gamename\\%s\\gamever\\%d", GetGlobalVar("GameSpyGameName"), GetGlobalVar("NetGameVersion", 1) );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGSQueryReportingDriver::QRInfoCallBack( char *pszOutBuf, int nMaxLen )
@@ -156,7 +156,7 @@ void CGSQueryReportingDriver::QRInfoCallBack( char *pszOutBuf, int nMaxLen )
 	if ( gameInfo.bPasswordRequired )
 		szFormatString += NStr::Format( "\\password\\1" );
 
-	strcpy( pszOutBuf, szFormatString.c_str() );
+	strcpy_s( pszOutBuf, nMaxLen, szFormatString.c_str() );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGSQueryReportingDriver::QRRulesCallBack( char *pszOutBuf, int nMaxLen )
@@ -174,7 +174,7 @@ void CGSQueryReportingDriver::QRRulesCallBack( char *pszOutBuf, int nMaxLen )
 										settings.nFlagScoreLimit, settings.nKillScoreLimit, settings.nTimeLimit, 
 										settings.nTimeToCapture, settings.szGameSpeed );
 
-		strcpy( pszOutBuf, szFormatString.c_str() );
+		strcpy_s( pszOutBuf, nMaxLen, szFormatString.c_str() );
 	}
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

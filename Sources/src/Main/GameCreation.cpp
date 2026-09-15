@@ -189,7 +189,7 @@ bool CCommonGameCreationInfo::LoadMapInfo( const bool bServer, const bool bNeedC
 			if ( bNeedCheckSums )
 				fullMapInfo.GetCheckSums( &gameInfo.checkSumRes, &gameInfo.checkSumMap );
 
-			const int nPos = packedInfo.szMapFileName.find_last_of( '\\' );
+			const int nPos = static_cast<int>( packedInfo.szMapFileName.find_last_of( '\\' ) );
 
 			if ( fullMapInfo.szScriptFile.empty() )
 				packedInfo.szScriptFileName = "";
@@ -198,7 +198,7 @@ bool CCommonGameCreationInfo::LoadMapInfo( const bool bServer, const bool bNeedC
 				packedInfo.szScriptFileName.clear();
 				packedInfo.szScriptFileName.assign( packedInfo.szMapFileName.begin(), packedInfo.szMapFileName.begin() + nPos );
 				
-				int nScriptPos = fullMapInfo.szScriptFile.find_last_of( '\\' );
+				int nScriptPos = static_cast<int>( fullMapInfo.szScriptFile.find_last_of( '\\' ) );
 				if ( nScriptPos > fullMapInfo.szScriptFile.size() || nScriptPos < 0 )
 				{
 					nScriptPos = 0;
@@ -263,7 +263,7 @@ void CCommonGameCreationInfo::DistributePlayersNumbers()
 		// choose a random weakest side
 		int n = ( float(rand()) / float(RAND_MAX) ) * float(weakestSides.size());
 		if ( n >= weakestSides.size() )
-			n = weakestSides.size() - 1;
+			n = static_cast<int>( weakestSides.size() ) - 1;
 
 		std::list<int>::iterator iter = weakestSides.begin();
 		std::advance( iter, n );
@@ -292,7 +292,7 @@ void CCommonGameCreationInfo::DistributePlayersNumbers()
 		NAlgorithms::LegacyRandomShuffle( allPlayers.begin(), allPlayers.end() );
 
 		std::vector<int>::const_iterator iter = allPlayers.begin();
-		for ( int nPlayer = mapInfo.playerParties.size() - 1; nPlayer >= 0; --nPlayer )
+		for ( int nPlayer = static_cast<int>( mapInfo.playerParties.size() ) - 1; nPlayer >= 0; --nPlayer )
 		{
 			if ( mapInfo.playerParties[nPlayer] == sides[i].szName )
 			{
@@ -410,10 +410,10 @@ void CCommonGameCreationInfo::SPackedInfo::PackFile( const std::string szFileNam
 		// inflate map
 		z_stream stream;
 		stream.next_in = (Bytef*)(&(realFile[0]));
-		stream.avail_in = realFile.size();
+		stream.avail_in = static_cast<uInt>( realFile.size() );
 
 		stream.next_out = (Bytef*)(&(packedFile[0]));
-		stream.avail_out = packedFile.size();
+		stream.avail_out = static_cast<uInt>( packedFile.size() );
 		stream.zalloc = (alloc_func)0;
 		stream.zfree = (free_func)0;
 
@@ -431,7 +431,7 @@ void CCommonGameCreationInfo::SPackedInfo::PackFile( const std::string szFileNam
 
 			packedFile.resize( stream.next_out - &(packedFile[0]) );
 
-			WriteDebugMessage( NStr::Format( "Map packed, real size %d, packed size %d", nRealSize, packedMap.size() ) );
+			WriteDebugMessage( NStr::Format( "Map packed, real size %d, packed size %d", nRealSize, static_cast<int>(packedMap.size()) ) );
 		}
 	}
 }
@@ -447,7 +447,7 @@ void CCommonGameCreationInfo::SPackedInfo::LoadAllFiles()
 	if ( pStream )
 	{
 		txtFile.resize( pStream->GetSize() );
-		pStream->Read( &(txtFile[0]), txtFile.size() );
+		pStream->Read( &(txtFile[0]), static_cast<int>( txtFile.size() ) );
 	}
 
 	bPacked = true;
@@ -483,7 +483,7 @@ void CServerGameCreation::Init( INetDriver *_pInGameNetDriver, INetDriver *_pOut
 	players.resize( 17 );
 	players[0].nClientID = -1;
 	players[0].nLogicID = 0;
-	players[0].nSide = sides.size() - 1;
+	players[0].nSide = static_cast<int>( sides.size() ) - 1;
 	players[0].bReady = true;
 	players[0].fPing = 0;
 	players[0].eState = SPlayerInfo::EPS_VALID;
@@ -603,7 +603,7 @@ void CServerGameCreation::ProcessNewClient( int nClientID, CStreamAccessor &pkt 
 		players[nLogicID].nClientID = nClientID;
 		players[nLogicID].nLogicID = nLogicID;
 		players[nLogicID].szName = NStr::ToUnicode( "NewPlayer" );
-		players[nLogicID].nSide = sides.size() - 1;
+		players[nLogicID].nSide = static_cast<int>( sides.size() ) - 1;
 		players[nLogicID].eState = SPlayerInfo::EPS_CONNECTED;
 
 		// изменить game info
@@ -649,7 +649,7 @@ void CServerGameCreation::ChoosePlayerName( int nClientID, CStreamAccessor &pkt 
 				bUsed = true;
 			else
 			{
-				const int nLen = szPlayerName.size();
+				const int nLen = static_cast<int>( szPlayerName.size() );
 				int nNumber = -1;
 				if ( nLen >= 1 && szPlayerName[nLen-1] == ')' )
 				{
@@ -874,7 +874,7 @@ void CServerGameCreation::UpdateLoadMap()
 					}
 					
 					{
-						WriteDebugMessage( NStr::Format( "Send real map size %d, packed size %d", packedInfo.nRealMapSize, packedInfo.packedMap.size() ) );
+						WriteDebugMessage( NStr::Format( "Send real map size %d, packed size %d", packedInfo.nRealMapSize, static_cast<int>(packedInfo.packedMap.size()) ) );
 
 						pkt->SetSize( 0 );
 						BYTE cMsg = NGM_PACKED_FILE_INFO;
@@ -886,7 +886,7 @@ void CServerGameCreation::UpdateLoadMap()
 
 					if ( !packedInfo.szScriptFileName.empty() )
 					{
-						WriteDebugMessage( NStr::Format( "Send real script file size %d, packed size %d", packedInfo.nRealScriptSize, packedInfo.packedScript.size() ) );
+						WriteDebugMessage( NStr::Format( "Send real script file size %d, packed size %d", packedInfo.nRealScriptSize, static_cast<int>(packedInfo.packedScript.size()) ) );
 
 						pkt->SetSize( 0 );
 						BYTE cMsg = NGM_PACKED_FILE_INFO;
@@ -897,7 +897,7 @@ void CServerGameCreation::UpdateLoadMap()
 					}
 
 					{
-						WriteDebugMessage( NStr::Format( "Send txt file size %d", packedInfo.txtFile.size() ) );
+						WriteDebugMessage( NStr::Format( "Send txt file size %d", static_cast<int>(packedInfo.txtFile.size()) ) );
 
 						pkt->SetSize( 0 );
 						BYTE cMsg = NGM_FILE_INFO;
@@ -1172,7 +1172,7 @@ void CClientGameCreation::ProcessLogicIDSet( int nClientID, CStreamAccessor &pkt
 
 	nOurLogicID = nLogicID;
 	players[nLogicID].nLogicID = nLogicID;
-	players[nLogicID].nSide = sides.size() - 1;
+	players[nLogicID].nSide = static_cast<int>( sides.size() ) - 1;
 	if ( players[nLogicID].nSide < 0 )
 		players[nLogicID].nSide = 2;
 
@@ -1715,7 +1715,7 @@ void CClientGameCreation::CLoadMap::ProcessMapLoadFinished()
 
 		std::vector<BYTE> inflatedStream( nRealSize + 10000 );
 		zstream.next_out = (Bytef*)(&(inflatedStream[0]));
-		zstream.avail_out = inflatedStream.size();
+		zstream.avail_out = static_cast<uInt>( inflatedStream.size() );
 		zstream.zalloc = (alloc_func)0;
 		zstream.zfree = (free_func)0;
 

@@ -621,7 +621,7 @@ void CUIScreen::UpdateChatString( int nAsciiCode, int nVirtualKey, bool bPressed
 		if ( m_keyboardState == E_KEYBOARD_FREE )
 		{
 			//�� ����� ������
-			nCursorPos = szChatMessage.size();
+			nCursorPos = static_cast<int>( szChatMessage.size() );
 		}
 		break;
 

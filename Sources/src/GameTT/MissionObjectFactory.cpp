@@ -231,7 +231,7 @@ CMissionObjectFactory::CMissionObjectFactory()
 // ************************************************************************************************************************ //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static SModuleDescriptor theModuleDescriptor( "Main game logic", MISSION_BASE_VALUE, 0x0100, &theMissionObjectFactory, 0 );
-const SModuleDescriptor* STDCALL GetModuleDescriptor()
+extern "C" const SModuleDescriptor* STDCALL GetModuleDescriptor()
 {
 	return &theModuleDescriptor;
 }

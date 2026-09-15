@@ -113,7 +113,7 @@ void CGraveyard::GetDeadUnits( SAINotifyDeadAtAll **pDeadUnitsBuffer, int *pnLen
 	NTimer::STime curTime = GetAIGetSegmTime( GetSingleton<IGameTimer>()->GetGameSegmentTimer() );
 
 	*pnLen = 0;
-	const int nSize = killed.size() + theSuspendedUpdates.GetNRecalled( ACTION_NOTIFY_GET_DEAD_UNITS_UPDATE );
+	const int nSize = static_cast<int>( killed.size() ) + theSuspendedUpdates.GetNRecalled( ACTION_NOTIFY_GET_DEAD_UNITS_UPDATE );
 	*pDeadUnitsBuffer = GetTempBuffer<SAINotifyDeadAtAll>( nSize );
 
 	for ( std::list<SKilledUnit>::iterator iter = killed.begin(); iter != killed.end(); ++iter )

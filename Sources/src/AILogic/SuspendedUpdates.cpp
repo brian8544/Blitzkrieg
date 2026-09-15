@@ -189,7 +189,7 @@ const int CSuspendedUpdates::GetNRecalled( const EActionNotify &eAction ) const
 	else
 	{
 		const int nNumeration = numeration[eAction];
-		return recalledUpdates[nNumeration].size();
+		return static_cast<int>( recalledUpdates[nNumeration].size() );
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

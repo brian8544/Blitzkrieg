@@ -140,7 +140,7 @@ bool CZipFile::Init( IDataStream *pZipStream )
 	Fini();
 	// Assuming no extra comment at the end, read the whole end record.
 	SZipCentralDirHeader cdh;
-	pZipStream->Seek( -sizeof(cdh), STREAM_SEEK_END );
+	pZipStream->Seek( -static_cast<int>( sizeof(cdh) ), STREAM_SEEK_END );
 	long cdhOffset = pZipStream->GetPos();
 	pZipStream->Read( &cdh, sizeof(cdh) );
 

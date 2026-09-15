@@ -64,7 +64,7 @@ void CInterfaceBaseList::FillListFromCurrentDir()
 
 			//проверим, что справа нету вложенных директорий
 			std::string szCurrentName = pStats->pszName + szCurrentDir.size();
-			int nPos = szCurrentName.rfind( '\\' );
+			int nPos = static_cast<int>( szCurrentName.rfind( '\\' ) );
 			if ( nPos != std::string::npos )		//правее есть еще директории
 			{
 				//возьмем имя директории
@@ -73,7 +73,7 @@ void CInterfaceBaseList::FillListFromCurrentDir()
 				continue;
 			}
 
-			nPos = szCurrentName.rfind( '.' );
+			nPos = static_cast<int>( szCurrentName.rfind( '.' ) );
 			if ( nPos == std::string::npos )
 			{
 				//это директория, добавляем ее в список директорий
@@ -178,7 +178,7 @@ void CInterfaceBaseList::FillListFromCurrentDir()
 	for ( int i = 0; i < files.size(); i++ )
 	{
 		pList->AddItem();
-		const int nItemNumber = i + dirsList.size();
+		const int nItemNumber = i + static_cast<int>( dirsList.size() );
 		IUIListRow *pRow = pList->GetItem( nItemNumber );
 		pRow->SetUserData( nItemNumber );
 		

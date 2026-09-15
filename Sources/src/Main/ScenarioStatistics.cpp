@@ -117,7 +117,7 @@ int CChapterStatistics::GetValue( const int nType ) const
 // get num missions, ever started in this chapter
 int CChapterStatistics::GetNumMissions() const
 {
-	return missions.size();
+	return static_cast<int>( missions.size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // get particular mission statistics
@@ -233,7 +233,7 @@ int CCampaignStatistics::GetValue( const int nType ) const
 // get num chapters, ever started in this campaign
 int CCampaignStatistics::GetNumChapters() const
 {
-	return chapters.size();
+	return static_cast<int>( chapters.size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // get particular chapter statistics

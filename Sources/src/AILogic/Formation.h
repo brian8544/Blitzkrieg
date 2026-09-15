@@ -284,7 +284,7 @@ public:
 
 	//
 	virtual const bool CanShootToPlanes() const;
-	virtual int GetNGuns() const { return guns.size(); }
+	virtual int GetNGuns() const { return static_cast<int>( guns.size() ); }
 	virtual class CBasicGun* GetGun( const int n ) const;
 
 	virtual class CBasicGun* ChooseGunForStatObj( class CStaticObject *pObj, NTimer::STime *pTime );

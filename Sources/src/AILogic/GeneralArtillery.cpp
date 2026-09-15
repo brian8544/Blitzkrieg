@@ -351,7 +351,7 @@ void CGeneralArtilleryTask::CheckEscapingUnits()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CGeneralArtilleryTask::StartBombardment()
 {
-	const int nUnits = bombardmentUnits.size();
+	const int nUnits = static_cast<int>( bombardmentUnits.size() );
 	const float fShift = ( nUnits == 0 ) ? 0.0f : fBombardmentRadius / 2.0f;
 	WORD wDir = 0;
 

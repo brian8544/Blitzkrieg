@@ -72,7 +72,7 @@ __forceinline bool DrawTemp( IGFX *pGFX, const CRawBuffer<TYPE> &vertices, const
 {
 	if ( vertices.empty() || indices.empty() ) 
 		return false;
-	NI_ASSERT_SLOW_TF( vertices.size() < 65536, NStr::Format("Can't draw more then 65536 vertices, but %d sent to render", vertices.size()), return false );
+	NI_ASSERT_SLOW_TF( static_cast<int>(vertices.size()) < 65536, NStr::Format("Can't draw more then 65536 vertices, but %d sent to render", static_cast<int>(vertices.size())), return false );
 	CTempBufferLock<TYPE> verts = pGFX->GetTempVertices( vertices.size(), TYPE::format, eGFXPT );
 	memcpy( verts.GetBuffer(), &(vertices[0]), vertices.size() * sizeof(TYPE) );
 	CTempBufferLock<WORD> inds = pGFX->GetTempIndices( indices.size(), GFXIF_INDEX16, eGFXPT );
@@ -144,7 +144,7 @@ void DrawArea( IGFX *pGFX, const SShootArea &area, bool bFill )
 			fNextAngle += fAngleStep;
 		}
 		rays.push_back( fmod( fEndAngle, FP_2PI - 0.001 ) );
-		CTempBufferLock<SGFXLineVertex> vertices = pGFX->GetTempVertices( rays.size() * 2, SGFXLineVertex::format, GFXPT_TRIANGLESTRIP );
+		CTempBufferLock<SGFXLineVertex> vertices = pGFX->GetTempVertices( static_cast<int>( rays.size() ) * 2, SGFXLineVertex::format, GFXPT_TRIANGLESTRIP );
 		int idx = 0;
 		for ( std::list<float>::const_iterator it = rays.begin(); it != rays.end(); ++it, ++idx )
 		{
@@ -508,7 +508,7 @@ void CScene::Draw( ICamera *pCamera )
 	// draw lines
 	if ( !pDrawVisitor->boldLines.empty() )
 	{
-		const int nNumLines = pDrawVisitor->boldLines.size();
+		const int nNumLines = static_cast<int>( pDrawVisitor->boldLines.size() );
 		CTempBufferLock<SGFXLineVertex> vertices = pGFX->GetTempVertices( nNumLines * 4, SGFXLineVertex::format, GFXPT_TRIANGLELIST );
 		CTempBufferLock<WORD> indices = pGFX->GetTempIndices( nNumLines * 6, GFXIF_INDEX16, GFXPT_TRIANGLELIST );
 		int nLine = 0;
@@ -553,7 +553,7 @@ void CScene::Draw( ICamera *pCamera )
 		vertices = it->vertices;
 		if ( !it->indices.empty() ) 
 		{
-			CTempBufferLock<WORD> indices = pGFX->GetTempIndices( it->indices.size(), GFXIF_INDEX16, it->ePrimitiveType );
+			CTempBufferLock<WORD> indices = pGFX->GetTempIndices( static_cast<int>( it->indices.size() ), GFXIF_INDEX16, it->ePrimitiveType );
 			indices = it->indices;
 		}
 		pGFX->DrawTemp();
@@ -650,7 +650,7 @@ void CScene::Draw( ICamera *pCamera )
 					pGFX->SetTexture( 0, it->pTexture );
 					if ( it->nShadingEffect != -1 ) 
 						pGFX->SetShadingEffect( it->nShadingEffect );
-					pGFX->DrawRects( &(it->rects[0]), it->rects.size() );
+					pGFX->DrawRects( &(it->rects[0]), static_cast<int>( it->rects.size() ) );
 					break;
 				case SUIObject::TYPE_TEXT:
 					if ( it->dwColor != 0 )
@@ -783,7 +783,7 @@ template <class TDepthCalculator>
 void DrawSprites( CSpriteVisList &sprites, const TDepthCalculator &calculator,
 								  const CTRect<float> &rcScreen, IGFX *pGFX )
 {
-	const int nNumSprites = sprites.size();
+	const int nNumSprites = static_cast<int>( sprites.size() );
 	sprites.sort( CSpritesSortFunctional() );
 	// sort sprites and render
 	ReserveSprites2Draw( nNumSprites );
@@ -1030,7 +1030,7 @@ bool DrawSingleSpritesPack( const std::vector<const SSpriteInfo*> &sprites, cons
 {
 	if ( sprites.empty() )
 		return false;
-	const int nNumSprites = sprites.size();
+	const int nNumSprites = static_cast<int>( sprites.size() );
 	float fTexDiffX = 0, fTexDiffY = 0, fScrDiff = -0.5f;
 	if ( sprites[0]->pTexture != 0 ) 
 	{
@@ -1066,7 +1066,7 @@ bool DrawComplexSpritesPack( const std::vector<const SComplexSpriteInfo*> &sprit
 {
 	if ( sprites.empty() )
 		return false;
-	const int nNumSprites = sprites.size();
+	const int nNumSprites = static_cast<int>( sprites.size() );
 	float fTexDiffX = 0, fTexDiffY = 0, fScrDiff = -0.5f;
 	if ( sprites[0]->pTexture != 0 ) 
 	{
@@ -1077,7 +1077,7 @@ bool DrawComplexSpritesPack( const std::vector<const SComplexSpriteInfo*> &sprit
 	// estimate num squares to draw
 	int nNumSquares = 0;
 	for ( std::vector<const SComplexSpriteInfo*>::const_iterator it = sprites.begin(); it != sprites.end(); ++it )
-		nNumSquares += (*it)->pSprite->squares.size();
+		nNumSquares += static_cast<int>( (*it)->pSprite->squares.size() );
 	drawvertices.resize( 0 );
 	drawvertices.reserve( nNumSquares * 4 );
 	drawindices.resize( 0 );
@@ -1142,7 +1142,7 @@ void CScene::DrawParticles( const CParticlesVisList &particles )
 {
 	if ( particles.empty() )
 		return;
-	int nNumParticles = particles.size();
+	int nNumParticles = static_cast<int>( particles.size() );
 	DrawSingleParticlesPack( particles, nNumParticles );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1203,7 +1203,7 @@ void CScene::DrawSingleParticlesPack( const CParticlesVisList &particles, int nN
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CScene::DrawMechTraces( const std::list<SMechTrace> &traces )
 {
-	const int nNumTraces = traces.size();
+	const int nNumTraces = static_cast<int>( traces.size() );
  
 	if ( pTrackTexture == 0 )
 		pTrackTexture = GetSingleton<ITextureManager>()->GetTexture("units\\technics\\tanktrack");
@@ -1238,7 +1238,7 @@ void CScene::DrawMechTraces( const std::list<SMechTrace> &traces )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CScene::DrawGunTraces( const std::list<SGunTrace> &traces )
 {
-	const int nNumTraces = traces.size();
+	const int nNumTraces = static_cast<int>( traces.size() );
 
 	CTempBufferLock<SGFXLVertex> vertices = pGFX->GetTempVertices( nNumTraces * 4, SGFXLVertex::format, GFXPT_TRIANGLELIST );
 	CTempBufferLock<WORD> indices = pGFX->GetTempIndices( nNumTraces * 6, GFXIF_INDEX16, GFXPT_TRIANGLELIST );
@@ -1272,8 +1272,8 @@ void CScene::DrawRain()
 {
 	if ( rainDrops.size() != 0 )
 	{
-		CTempBufferLock<SGFXLVertex> vertices = pGFX->GetTempVertices( 3 * rainDrops.size(), SGFXLVertex::format, GFXPT_TRIANGLELIST );
-		CTempBufferLock<WORD> indices = pGFX->GetTempIndices( 3 * rainDrops.size(), GFXIF_INDEX16, GFXPT_TRIANGLELIST );
+		CTempBufferLock<SGFXLVertex> vertices = pGFX->GetTempVertices( 3 * static_cast<int>( rainDrops.size() ), SGFXLVertex::format, GFXPT_TRIANGLELIST );
+		CTempBufferLock<WORD> indices = pGFX->GetTempIndices( 3 * static_cast<int>( rainDrops.size() ), GFXIF_INDEX16, GFXPT_TRIANGLELIST );
 		int nCounter = 0;
 		for ( std::vector<SRainDrop>::const_iterator it = rainDrops.begin(); it != rainDrops.end(); ++it )
 		{
@@ -1414,8 +1414,8 @@ void CScene::DrawSnow()
 {
 	if ( snowFlakes.size() != 0 )
 	{
-		CTempBufferLock<SGFXLVertex> vertices = pGFX->GetTempVertices( 3 * snowFlakes.size(), SGFXLVertex::format, GFXPT_TRIANGLELIST );
-		CTempBufferLock<WORD> indices = pGFX->GetTempIndices( 3 * snowFlakes.size(), GFXIF_INDEX16, GFXPT_TRIANGLELIST );
+		CTempBufferLock<SGFXLVertex> vertices = pGFX->GetTempVertices( 3 * static_cast<int>( snowFlakes.size() ), SGFXLVertex::format, GFXPT_TRIANGLELIST );
+		CTempBufferLock<WORD> indices = pGFX->GetTempIndices( 3 * static_cast<int>( snowFlakes.size() ), GFXIF_INDEX16, GFXPT_TRIANGLELIST );
 		int nCounter = 0;
 		for ( std::vector<SSnowFlake>::const_iterator it = snowFlakes.begin(); it != snowFlakes.end(); ++it )
 		{
@@ -1485,8 +1485,8 @@ void CScene::DrawSand()
 	}
 	if ( sandParticles.size() - nNumCone > 0 )
 	{
-		CTempBufferLock<SGFXLVertex> vertices = pGFX->GetTempVertices( 3 * (sandParticles.size() - nNumCone), SGFXLVertex::format, GFXPT_TRIANGLELIST );
-		CTempBufferLock<WORD> indices = pGFX->GetTempIndices( 3 * (sandParticles.size() - nNumCone), GFXIF_INDEX16, GFXPT_TRIANGLELIST );
+		CTempBufferLock<SGFXLVertex> vertices = pGFX->GetTempVertices( 3 * (static_cast<int>( sandParticles.size() ) - nNumCone), SGFXLVertex::format, GFXPT_TRIANGLELIST );
+		CTempBufferLock<WORD> indices = pGFX->GetTempIndices( 3 * (static_cast<int>( sandParticles.size() ) - nNumCone), GFXIF_INDEX16, GFXPT_TRIANGLELIST );
 		int nCounter = 0;
 		int nIndCounter = 0;
 		for ( std::vector<SSandParticle>::const_iterator it = sandParticles.begin(); it != sandParticles.end(); ++it )

@@ -29,8 +29,8 @@ Sumber kompatibilitas Direct3D disertakan di `Sources/sdk`. Letakkan FMOD SDK de
 
 ```text
 Sources/sdk/FMOD/Include/fmod.hpp
-Sources/sdk/FMOD/lib/x86/fmod_vc.lib
-Sources/sdk/FMOD/lib/x86/fmod.dll
+Sources/sdk/FMOD/lib/x64/fmod_vc.lib
+Sources/sdk/FMOD/lib/x64/fmod.dll
 ```
 
 Jalankan `build.bat`. Manifest vcpkg akan memasang FFmpeg, libpng, libsquish, pugixml, dan zlib secara otomatis. SDK `Sources/src/GameSpy` yang disertakan dibangun dari sumber; GameSpy tidak perlu diunduh terpisah. Bink, STLPort, Stingray, dan SDK DirectX 8 lama tidak diperlukan untuk target game saat ini.

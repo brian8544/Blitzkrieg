@@ -80,7 +80,7 @@ EncodeIPAddr(unsigned int ulIPAddr, char * lpszEncodedAddr)
 	for(i=1; i<9; i++)
 		{
 		pch = strchr(digits_hex, ip_cryptbuffer[i]);
-		digit_idx = pch - digits_hex;
+		digit_idx = (int)(pch - digits_hex);
 		if((digit_idx < 0) || (digit_idx > 15)) // sanity check
 			{
 			strcpy(ip_cryptbuffer, "X14saFv19X"); // equivalent to 0.0.0.0
@@ -131,7 +131,7 @@ DecodeIPAddr(const char * lpszEncodedAddr)
 	for(i=0; i<8; i++)
 		{
 		pch = strchr(digits_crypt, szIPAddr[i]);
-		digit_idx = pch - digits_crypt;
+		digit_idx = (int)(pch - digits_crypt);
 		if((digit_idx < 0) || (digit_idx > 15))
 			return(0);
 		szIPAddr[i] = digits_hex[digit_idx];

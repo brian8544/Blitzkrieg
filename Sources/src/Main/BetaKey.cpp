@@ -21,7 +21,7 @@ DWORD MakeCheckSum( const std::string &szUserName, const std::string &szExpiryDa
 	checksum.insert( checksum.end(), szUserName.begin(), szUserName.end() );
 	checksum.insert( checksum.end(), szExpiryDate.begin(), szExpiryDate.end() );
 	checksum.insert( checksum.end(), s_cKey2, s_cKey2 + s_nKey2Length );
-	const uLong uCheckSum = crc32( 0L, &(checksum[0]), checksum.size() );
+	const uLong uCheckSum = crc32( 0L, &(checksum[0]), static_cast<uInt>( checksum.size() ) );
 	return uCheckSum;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

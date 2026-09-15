@@ -33,7 +33,7 @@ public:
 	void Reserve( const int nSize ) { if ( nSize + 1 > heap.size() ) heap.resize( nSize + 1 ); }
 
 	const int Size() const { return nEl; }
-	const int GetReserved() const { return heap.size() - 1; }
+	const int GetReserved() const { return static_cast<int>( heap.size() ) - 1; }
 
 	bool IsEmpty() const { return nEl == 0; }
 

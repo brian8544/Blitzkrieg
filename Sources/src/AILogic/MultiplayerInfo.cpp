@@ -250,8 +250,8 @@ void CMultiplayerInfo::FlagCaptured( const int nParty, const int nFlagID )
 		capturedByPartyFlags[2].erase( nFlagID );
 		capturedByPartyFlags[nParty].insert( nFlagID );
 
-		theStatistics.SetCapturedFlags( 0, capturedByPartyFlags[0].size() );
-		theStatistics.SetCapturedFlags( 1, capturedByPartyFlags[1].size() );
+		theStatistics.SetCapturedFlags( 0, static_cast<int>( capturedByPartyFlags[0].size() ) );
+		theStatistics.SetCapturedFlags( 1, static_cast<int>( capturedByPartyFlags[1].size() ) );
 
 		if ( eGameType == CMapInfo::TYPE_SABOTAGE )
 		{

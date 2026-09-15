@@ -337,7 +337,7 @@ IImage* CSpritesPackBuilder::CreateLockArrayImage( const CArray2D<BYTE> &rLocked
 {
 	IImageProcessor *pImageProcessor = GetImageProcessor();
 	NI_ASSERT_TF( pImageProcessor != 0,
-							  NStr::Format( "Can't get IImageProcessor: %x\n", pImageProcessor ),
+							  NStr::Format( "Can't get IImageProcessor: %p\n", pImageProcessor ),
 							  return 0 );
 
 	IImage *pLockedArrayImage = pImageProcessor->CreateImage( rActualRect.Width(), rActualRect.Height() );
@@ -501,11 +501,11 @@ IImage* CSpritesPackBuilder::CreateLockArrayImage( const CArray2D<BYTE> &rLocked
 IImage* CSpritesPackBuilder::Pack( SSpritesPack *pSpritesPack, const CPackParameters &rPackParameters, int nMaxSquareSideSize, int nDepth )
 {
 	NI_ASSERT_TF( pSpritesPack != 0,
-							  NStr::Format( "Wrong parameter: %x\n", pSpritesPack ),
+							  NStr::Format( "Wrong parameter: %p\n", pSpritesPack ),
 							  return 0 );
 	IImageProcessor *pImageProcessor = GetImageProcessor();
 	NI_ASSERT_TF( pImageProcessor != 0,
-							  NStr::Format( "Can't get IImageProcessor: %x\n", pImageProcessor ),
+							  NStr::Format( "Can't get IImageProcessor: %p\n", pImageProcessor ),
 							  return 0 );
 
 	pSpritesPack->sprites.clear();
@@ -1020,11 +1020,11 @@ IImage* CSpritesPackBuilder::Pack( SSpritesPack *pSpritesPack, const SPackParame
 IImage* CSpritesPackBuilder::Unpack( SSpritesPack *pSpritesPack, IImage *pPackedImage, int nSpriteIndex, CTRect<int> *pActualRect )
 {
 	NI_ASSERT_TF( ( pSpritesPack != 0 ) && ( pPackedImage != 0 ),
-							  NStr::Format( "Wrong parameter: %x or %x\n", pSpritesPack, pPackedImage ),
+							  NStr::Format( "Wrong parameter: %p or %p\n", pSpritesPack, pPackedImage ),
 							  return 0 );
 	IImageProcessor *pImageProcessor = GetImageProcessor();
 	NI_ASSERT_TF( pImageProcessor != 0,
-							  NStr::Format( "Can't get IImageProcessor: %x\n", pImageProcessor ),
+							  NStr::Format( "Can't get IImageProcessor: %p\n", pImageProcessor ),
 							  return 0 );
 
 	if ( nSpriteIndex >= pSpritesPack->sprites.size() )
@@ -1086,7 +1086,7 @@ IImage* CSpritesPackBuilder::UnpackAndMarkEdge( SSpritesPack *pSpritesPack, IIma
 	}
 	IImageProcessor *pImageProcessor = GetImageProcessor();
 	NI_ASSERT_TF( pImageProcessor != 0,
-							  NStr::Format( "Can't get IImageProcessor: %x\n", pImageProcessor ),
+							  NStr::Format( "Can't get IImageProcessor: %p\n", pImageProcessor ),
 							  return 0 );
 
 	CUnsafeImageAccessor imageAccessor = pUnpackedImage;
@@ -1143,7 +1143,7 @@ IImage* CSpritesPackBuilder::UnpackAndMarkBounds( SSpritesPack *pSpritesPack, II
 	}
 	IImageProcessor *pImageProcessor = GetImageProcessor();
 	NI_ASSERT_TF( pImageProcessor != 0,
-							  NStr::Format( "Can't get IImageProcessor: %x\n", pImageProcessor ),
+							  NStr::Format( "Can't get IImageProcessor: %p\n", pImageProcessor ),
 							  return 0 );
 
 	CUnsafeImageAccessor imageAccessor = pUnpackedImage;
@@ -1208,7 +1208,7 @@ IImage* CSpritesPackBuilder::UnpackAndMarkInEdge( SSpritesPack *pSpritesPack, II
 	}
 	IImageProcessor *pImageProcessor = GetImageProcessor();
 	NI_ASSERT_TF( pImageProcessor != 0,
-							  NStr::Format( "Can't get IImageProcessor: %x\n", pImageProcessor ),
+							  NStr::Format( "Can't get IImageProcessor: %p\n", pImageProcessor ),
 							  return 0 );
 
 	CUnsafeImageAccessor imageAccessor = pUnpackedImage;
@@ -1251,7 +1251,7 @@ IImage* CSpritesPackBuilder::UnpackAndMarkDepth( SSpritesPack *pSpritesPack, IIm
 	}
 	IImageProcessor *pImageProcessor = GetImageProcessor();
 	NI_ASSERT_TF( pImageProcessor != 0,
-							  NStr::Format( "Can't get IImageProcessor: %x\n", pImageProcessor ),
+							  NStr::Format( "Can't get IImageProcessor: %p\n", pImageProcessor ),
 							  return 0 );
 
 	CUnsafeImageAccessor imageAccessor = pUnpackedImage;
@@ -1318,7 +1318,7 @@ IImage* CSpritesPackBuilder::UnpackAndMarkAlpha( SSpritesPack *pSpritesPack, IIm
 	}
 	IImageProcessor *pImageProcessor = GetImageProcessor();
 	NI_ASSERT_TF( pImageProcessor != 0,
-							  NStr::Format( "Can't get IImageProcessor: %x\n", pImageProcessor ),
+							  NStr::Format( "Can't get IImageProcessor: %p\n", pImageProcessor ),
 							  return 0 );
 
 	CUnsafeImageAccessor imageAccessor = pUnpackedImage;
@@ -1356,7 +1356,7 @@ IImage* CSpritesPackBuilder::UnpackAndMarkAlpha( SSpritesPack *pSpritesPack, IIm
 bool CRMImageBuilder::ApplyFilter( IImage *pImage, const CArray2D<int> &rFilter, DWORD dwMinAlpha )
 {
 	NI_ASSERT_T( pImage != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pImage ) );
+							 NStr::Format( "Wrong parameter: %p\n", pImage ) );
 
 	CPtr<IImageProcessor> pImageProcessor = GetImageProcessor();
 	if ( !pImageProcessor )
@@ -1450,7 +1450,7 @@ bool CRMImageBuilder::ApplyFilter( IImage *pImage, const CArray2D<int> &rFilter,
 bool CRMImageBuilder::Emboss( IImage *pImage, const CTPoint<int> &rShiftPoint, const CArray2D<int> &rFilter, DWORD dwMinAlpha )
 {
 	NI_ASSERT_T( pImage != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pImage ) );
+							 NStr::Format( "Wrong parameter: %p\n", pImage ) );
 
 	CPtr<IImageProcessor> pImageProcessor = GetImageProcessor();
 	if ( !pImageProcessor )
@@ -1523,7 +1523,7 @@ bool CRMImageBuilder::Emboss( IImage *pImage, const CTPoint<int> &rShiftPoint, c
 bool CRMImageBuilder::Noise( IImage *pImage, IImage *pNoise, DWORD dwMinAlpha )
 {
 	NI_ASSERT_T( ( pImage != 0 ) && ( pNoise != 0 ),
-							 NStr::Format( "Wrong parameter: %x, %x\n", pImage, pNoise ) );
+							 NStr::Format( "Wrong parameter: %p, %p\n", pImage, pNoise ) );
 
 	NI_ASSERT_T( ( pNoise->GetSizeX() * pNoise->GetSizeY() ) > 0,
 							 NStr::Format( "Invalid Noise Size: (%d, %d)\n", pNoise->GetSizeX(), pNoise->GetSizeY() ) );
@@ -1596,7 +1596,7 @@ bool CRMImageBuilder::Noise( IImage *pImage, IImage *pNoise, DWORD dwMinAlpha )
 bool CRMImageBuilder::FastAddImageByAlpha( IImage *pImage, IImage *pImageToAdd, DWORD dwMinAlpha )
 {
 	NI_ASSERT_T( ( pImage != 0 ) && ( pImageToAdd != 0 ),
-							 NStr::Format( "Wrong parameter: %x, %x\n", pImage, pImageToAdd ) );
+							 NStr::Format( "Wrong parameter: %p, %p\n", pImage, pImageToAdd ) );
 
 	CPtr<IImageProcessor> pImageProcessor = GetImageProcessor();
 	if ( !pImageProcessor )
@@ -1625,7 +1625,7 @@ bool CRMImageBuilder::FastAddImageByAlpha( IImage *pImage, IImage *pImageToAdd, 
 bool CRMImageBuilder::FastAddImageByColor( IImage *pImage, IImage *pImageToAdd, SColor color )
 {
 	NI_ASSERT_T( ( pImage != 0 ) && ( pImageToAdd != 0 ),
-							 NStr::Format( "Wrong parameter: %x, %x\n", pImage, pImageToAdd ) );
+							 NStr::Format( "Wrong parameter: %p, %p\n", pImage, pImageToAdd ) );
 
 	CPtr<IImageProcessor> pImageProcessor = GetImageProcessor();
 	if ( !pImageProcessor )
@@ -1655,7 +1655,7 @@ bool CRMImageBuilder::FastAddImageByColor( IImage *pImage, IImage *pImageToAdd, 
 IImage* CRMImageBuilder::GetEdge( IImage *pImage, SColor edgeColor,  SColor nonEdgeColor, DWORD dwMinAlpha )
 {
 	NI_ASSERT_T( pImage != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pImage ) );
+							 NStr::Format( "Wrong parameter: %p\n", pImage ) );
 
 	NI_ASSERT_T( ( pImage->GetSizeX() * pImage->GetSizeY() ) > 0,
 							 NStr::Format( "Invalid Image Size: (%d, %d)\n", pImage->GetSizeX(), pImage->GetSizeY() ) );
@@ -1729,7 +1729,7 @@ IImage* CRMImageBuilder::GetEdge( IImage *pImage, SColor edgeColor,  SColor nonE
 IImage* CRMImageBuilder::GetShadow( IImage *pImage, const CTPoint<int> &rShiftPoint, SColor shadowColor, SColor nonShadowColor, DWORD dwMinAlpha )
 {
 	NI_ASSERT_T( pImage != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pImage ) );
+							 NStr::Format( "Wrong parameter: %p\n", pImage ) );
 
 	NI_ASSERT_T( ( pImage->GetSizeX() * pImage->GetSizeY() ) > 0,
 							 NStr::Format( "Invalid Image Size: (%d, %d)\n", pImage->GetSizeX(), pImage->GetSizeY() ) );
@@ -1776,7 +1776,7 @@ IImage* CRMImageBuilder::GetShadow( IImage *pImage, const CTPoint<int> &rShiftPo
 IImage* CRMImageBuilder::GetAlphaEmboss( IImage *pImage, const CTPoint<int> &rShiftPoint, int nFilterSize, DWORD dwMinAlpha )
 {
 	NI_ASSERT_T( pImage != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pImage ) );
+							 NStr::Format( "Wrong parameter: %p\n", pImage ) );
 
 	NI_ASSERT_T( ( pImage->GetSizeX() * pImage->GetSizeY() ) > 0,
 							 NStr::Format( "Invalid Image Size: (%d, %d)\n", pImage->GetSizeX(), pImage->GetSizeY() ) );
@@ -1885,7 +1885,7 @@ IImage* CRMImageBuilder::GetAlphaEmboss( IImage *pImage, const CTPoint<int> &rSh
 IImage* CRMImageBuilder::FastComposeImagesByAlpha( const std::vector<CPtr<IImage> > &rImages, DWORD dwMinAlpha )
 {
 	NI_ASSERT_T( !rImages.empty(),
-							 NStr::Format( "Invalid size: %d\n", rImages.size() ) );
+							 NStr::Format( "Invalid size: %d\n", static_cast<int>(rImages.size()) ) );
 
 	CPtr<IImageProcessor> pImageProcessor = GetImageProcessor();
 	if ( !pImageProcessor )
@@ -1930,7 +1930,7 @@ IImage* CRMImageBuilder::FastComposeImagesByAlpha( const std::vector<CPtr<IImage
 IImage* CRMImageBuilder::FastComposeImagesByColor( const std::vector<CPtr<IImage> > &rImages, SColor color )
 {
 	NI_ASSERT_T( !rImages.empty(),
-							 NStr::Format( "Invalid size: %d\n", rImages.size() ) );
+							 NStr::Format( "Invalid size: %d\n", static_cast<int>(rImages.size()) ) );
 
 	CPtr<IImageProcessor> pImageProcessor = GetImageProcessor();
 	if ( !pImageProcessor )

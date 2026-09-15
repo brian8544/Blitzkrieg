@@ -84,7 +84,7 @@ public:
 	virtual void RemoveCamouflage( ECamouflageRemoveReason eReason );
 
 	virtual class CTurret* GetTurret( const int nTurret ) const { return turrets[nTurret]; }
-	virtual const int GetNTurrets() const { return turrets.size(); }
+	virtual const int GetNTurrets() const { return static_cast<int>( turrets.size() ); }
 
 	virtual void GetShotInfo( struct SAINotifyMechShot *pShotInfo ) const { pShotInfo->typeID = GetShootAction(); pShotInfo->pObj = const_cast<CArtillery*>(this); }	
 	virtual const EActionNotify GetShootAction() const { return ACTION_NOTIFY_MECH_SHOOT; }

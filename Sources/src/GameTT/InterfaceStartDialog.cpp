@@ -109,7 +109,7 @@ void CInterfacePlayerProfile::OnGetFocus( bool bFocus )
 	{
 		pEdit->SetFocus( true );
 		pEdit->SetSel( 0, -1 );
-		pEdit->SetCursor( wcslen( pEdit->GetWindowText(0) ) );
+		pEdit->SetCursor( static_cast<int>( wcslen( pEdit->GetWindowText(0) ) ) );
 		pInput->SetTextMode( INPUT_TEXT_MODE_TEXTONLY );
 	}
 }

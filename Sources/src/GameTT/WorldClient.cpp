@@ -176,7 +176,7 @@ int GetPassangers( const IMOContainer *pContainer, std::vector<IMOUnit*> &passan
 	const int nNumPassangers = pContainer->GetPassangers( 0, bCanSelectOnly );
 	if ( nNumPassangers == 0 ) 
 		return 0;
-	const int nOldNumPassangers = passangers.size();
+	const int nOldNumPassangers = static_cast<int>( passangers.size() );
 	passangers.resize( nOldNumPassangers + nNumPassangers );
 	pContainer->GetPassangers( &(passangers[nOldNumPassangers]), bCanSelectOnly );
 	return nNumPassangers;
@@ -282,7 +282,7 @@ int CSelector::Register()
 	if ( pTransceiver == 0 ) 
 		return -1;
 	// make new selection group
-	if ( int nNumSelectedObjects = objects.size() )
+	if ( int nNumSelectedObjects = static_cast<int>( objects.size() ) )
 	{
 		IRefCount **ppAIObjects = GetTempBuffer<IRefCount*>( nNumSelectedObjects );
 		IRefCount **ppTempObjects = ppAIObjects;
@@ -746,8 +746,9 @@ void CWorldClient::Update( const NTimer::STime &currTime )
 			{
 				std::string szCmd = "ReturnScriptIDs( ";
 
+				IAILogic *pAILogic = GetSingleton<IAILogic>();
 				for ( CMapObjectsList::const_iterator it = selList.begin(); it != selList.end(); ++it )
-					szCmd += NStr::Format( "%d,", reinterpret_cast<int>((*it)->pAIObj.GetPtr()) );
+					szCmd += NStr::Format( "%d,", pAILogic->GetUniqueID((*it)->pAIObj.GetPtr()) );
 				szCmd.resize( szCmd.size() - 1 );
 				szCmd += " )";
 
@@ -803,7 +804,7 @@ void CWorldClient::SelectType( const CVec2 &vPos )
 				std::vector<IVisObj*> objects;
 				SelectType( *it, objects );
 				if ( !objects.empty() ) 
-					Select( &(objects[0]), objects.size() );
+					Select( &(objects[0]), static_cast<int>( objects.size() ) );
 				return;
 			}
 		}
@@ -955,7 +956,7 @@ int CWorldClient::Select( IVisObj **newObjects, int nNumObjects )
 			else
 				++it;
 		}
-		nNumSelectedObjects = mapObjects.size();
+		nNumSelectedObjects = static_cast<int>( mapObjects.size() );
 	}
 	// check for non-empty selection
 	if ( nNumSelectedObjects == 0 )
@@ -975,7 +976,7 @@ void CWorldClient::Select( CMapObjectsPtrList &mapObjects, bool bMerge )
 	if ( !bMerge )
 		ResetSelection();
 	// form selected objects list
-	const int nNumSelectedObjects = mapObjects.size();
+	const int nNumSelectedObjects = static_cast<int>( mapObjects.size() );
 	CMapObjectsList objects;
 	for ( CMapObjectsPtrList::iterator it = mapObjects.begin(); it != mapObjects.end(); ++it )
 	{
@@ -1499,8 +1500,8 @@ bool CWorldClient::ProcessMessage( const SGameMessage &msg )
 			return true;
 
 		case MC_UPDATE_WHO_IN_CONTAINER:
-			selunits.UpdateSelection( reinterpret_cast<IMOContainer*>(msg.nParam) );
-			selbuildings.UpdateSelection( reinterpret_cast<IMOContainer*>(msg.nParam) );
+			selunits.UpdateSelection( reinterpret_cast<IMOContainer*>(msg.nPointerParam) );
+			selbuildings.UpdateSelection( reinterpret_cast<IMOContainer*>(msg.nPointerParam) );
 			break;
 
 		case WCC_SHOW_AI_INFO:
@@ -1580,13 +1581,13 @@ bool CWorldClient::ProcessMessage( const SGameMessage &msg )
 		case WCC_UI_SQUAD_SEL:
 			{
 				CMapObjectsPtrList lst;
-				lst.push_back( reinterpret_cast<IMOUnit*>(msg.nParam) );
+				lst.push_back( reinterpret_cast<IMOUnit*>(msg.nPointerParam) );
 				Select( lst, false );
 			}
 			break;
 
 		case WCC_UI_SQUAD_DESEL:
-			ResetSelection( reinterpret_cast<IMOUnit*>(msg.nParam) );
+			ResetSelection( reinterpret_cast<IMOUnit*>(msg.nPointerParam) );
 			break;
 
 		case WCC_OBJECTIVES_CLOSED:
@@ -2109,7 +2110,7 @@ void CWorldClient::ReportObjectiveStateChanged( int nObjective, int nState )
 				const std::string szVarName = NStr::Format( "temp.%s.objective%d", szMissionName.c_str(), nObjective );
 				SetGlobalVar( szVarName.c_str(), nState );
 				
-				NI_ASSERT_T( nObjective < pMission->objectives.size(), NStr::Format("Objective index (%d) larger then available objectives (%d) in mission \"%s\"", nObjective, pMission->objectives.size(), szMissionName.c_str()) );
+				NI_ASSERT_T( nObjective < static_cast<int>(pMission->objectives.size()), NStr::Format("Objective index (%d) larger then available objectives (%d) in mission \"%s\"", nObjective, static_cast<int>(pMission->objectives.size()), szMissionName.c_str()) );
 
 				// update scenario tracker
 				// given objectives are count in FinishMission
@@ -2175,7 +2176,7 @@ void CWorldClient::ReportObjectiveStateChanged( int nObjective, int nState )
 			objectives.push_back( SObjectiveText(pHeaderText, pDescriptionText) );
 			if ( bCanShowNextObjective ) 
 			{
-				nCurrObjective = objectives.size() - 2;
+				nCurrObjective = static_cast<int>( objectives.size() ) - 2;
 				pInput->AddMessage( SGameMessage(WCC_OBJECTIVES_CLOSED, 0) );
 			}
 			if ( bSetGlobalVar )

@@ -93,7 +93,7 @@ public:
 	template <class TProc> 
 		TProc GetProcAddress( int nProcID, TProc )
 	{
-		return IsLoaded() ? (TProc)::GetProcAddress( handle, (const char *)nProcID ) : (TProc)0;
+		return IsLoaded() ? (TProc)::GetProcAddress( handle, reinterpret_cast<LPCSTR>( static_cast<ULONG_PTR>(nProcID) ) ) : (TProc)0;
 	}
 	// access & casting
 	HMODULE GetHMdule() const { return handle; }

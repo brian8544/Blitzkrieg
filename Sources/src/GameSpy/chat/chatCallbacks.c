@@ -560,7 +560,7 @@ CHATBool ciAddCallback_(CHAT chat, int type, void * callback, void * callbackPar
 		data.channel = NULL;
 	else
 	{
-		len = (strlen(channel) + 1);
+		len = ((int)(strlen(channel)) + 1);
 		data.channel = (char *)gsimalloc(len);
 		if(data.channel == NULL)
 		{

@@ -302,18 +302,6 @@ SOURCE=.\MatrixEffectorLeveling.cpp
 SOURCE=.\MatrixEffectorLeveling.h
 # End Source File
 # End Group
-# Begin Group "Resource"
-
-# PROP Default_Filter ""
-# Begin Source File
-
-SOURCE=.\anim.rc
-# End Source File
-# Begin Source File
-
-SOURCE=.\resource.h
-# End Source File
-# End Group
 # Begin Source File
 
 SOURCE=.\Animation.def

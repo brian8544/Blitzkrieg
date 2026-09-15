@@ -35,7 +35,7 @@ public:
 	void AddSingleMesh( const SSingleMesh &mesh, int nPriority ) 
 	{ 
 		figures.push_back( mesh ); 
-		figures.back().nMatrixIndex = figures.size() - 1;
+		figures.back().nMatrixIndex = static_cast<int>( figures.size() ) - 1;
 		figures.back().nPriority = nPriority;
 	}
 	void SortMeshes();

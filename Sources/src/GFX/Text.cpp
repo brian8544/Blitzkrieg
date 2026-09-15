@@ -25,7 +25,7 @@ void CGFXText::SetupRedLine()
 int CGFXText::GetNumLines() const 
 { 
 	PreFormat(); 
-	return pft.lines.size(); 
+	return static_cast<int>( pft.lines.size() );
 }
 int CGFXText::GetLineSpace() const 
 { 
@@ -404,7 +404,7 @@ bool CGFXText::FillGeometryData( DWORD dwFlags, const RECT &rect, float sy,
 	const SFontFormat &format = pFont->GetFormat();
   int nY = MINT( sy );
   int nLineSpace = format.GetLineSpace();
-  int nFirstLine = 0, nLastLine = lines.size();
+  int nFirstLine = 0, nLastLine = static_cast<int>( lines.size() );
   bool bClipFirstLine = false, bClipLastLine = false;
   // check for text completelly outside
   if ( (nY >= rect.bottom) || (nY + int(lines.size())*nLineSpace <= rect.top) )

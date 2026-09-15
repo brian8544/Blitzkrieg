@@ -743,7 +743,7 @@ static void GenerateID(char *keyval)
 		seed = (l1.LowPart ^ l1.HighPart);
 	else
 		seed = 0;
-	Util_RandSeed(seed ^ GetTickCount() ^ time(NULL) ^ clock());
+	Util_RandSeed(seed ^ GetTickCount() ^ (unsigned long)time(NULL) ^ (unsigned long)clock());
 #else
 	Util_RandSeed(time(NULL) ^ clock());
 #endif
@@ -801,7 +801,7 @@ const char * GOAGetUniqueID(void)
 		{
 			ret = RegCreateKeyEx(HKEY_CURRENT_USER, REG_KEY, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &thekey, &disp);
 		}
-		RegSetValueEx(thekey, (LPCSTR)"Crypt", 0, REG_SZ, (const LPBYTE)keyval, strlen(keyval)+1);
+		RegSetValueEx(thekey, (LPCSTR)"Crypt", 0, REG_SZ, (const LPBYTE)keyval, (DWORD)(strlen(keyval))+1);
 #else
 		f = fopen("id.bin","w");
 		if (f)

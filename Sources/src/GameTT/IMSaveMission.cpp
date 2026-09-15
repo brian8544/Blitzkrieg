@@ -70,7 +70,7 @@ bool CInterfaceIMSaveMission::FillListItem( IUIListRow *pRow, const std::string 
 		return false;
 
 	std::string szShortName = szFullFileName.substr( szTopDir.size() );
-	const int nExtensionPos = szShortName.find( ".sav" );
+	const int nExtensionPos = static_cast<int>( szShortName.find( ".sav" ) );
 	if ( nExtensionPos != std::string::npos )
 		szShortName.resize( Max(0, int(szShortName.size()) - 4 ) );
 	szSaves[pRow->GetUserData()] = szShortName;

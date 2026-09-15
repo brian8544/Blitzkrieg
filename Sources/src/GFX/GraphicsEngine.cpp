@@ -415,7 +415,6 @@ bool CGraphicsEngine::FillPresentationParams( int nWidth, int nHeight, int nBPP,
 	}
 	else
 	{
-		// d3d8to11 requires a depth surface even for the legacy -1 request
 		pp.EnableAutoDepthStencil = true;
 		pp.AutoDepthStencilFormat = D3DFMT_D24S8;
 		this->nStencilBPP = -1;
@@ -1959,7 +1958,7 @@ bool CGraphicsEngine::TakeScreenShot( IImage *pImage )
 
 	for ( int i = 0; i < nHeight; ++i )
 	{
-		memcpy( pDst, (void*)(DWORD(lrRect.pBits) + i*lrRect.Pitch), nWidth*sizeof(SColor) );
+		memcpy( pDst, static_cast<const BYTE*>(lrRect.pBits) + i*lrRect.Pitch, nWidth*sizeof(SColor) );
 		pDst += nWidth;
 	}
 	pD3DSurface->UnlockRect();

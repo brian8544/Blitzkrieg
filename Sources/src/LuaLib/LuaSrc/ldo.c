@@ -66,7 +66,7 @@ static void restore_stack_limit (lua_State *L) {
 **  otherwise the result of such operation on pointers is undefined)
 */
 void luaD_adjusttop (lua_State *L, StkId base, int extra) {
-  int diff = extra-(L->top-base);
+  int diff = extra-(int)(L->top-base);
   if (diff <= 0)
     L->top = base+extra;
   else {
@@ -81,7 +81,7 @@ void luaD_adjusttop (lua_State *L, StkId base, int extra) {
 ** Open a hole inside the stack at `pos'
 */
 static void luaD_openstack (lua_State *L, StkId pos) {
-  int i = L->top-pos; 
+  int i = (int)(L->top-pos);
   while (i--) pos[i+1] = pos[i];
   incr_top;
 }
@@ -241,7 +241,7 @@ static void f_parser (lua_State *L, void *ud) {
 
 static int protectedparser (lua_State *L, ZIO *z, int bin) {
   struct ParserS p;
-  unsigned long old_blocks;
+  size_t old_blocks;
   int status;
   p.z = z; p.bin = bin;
   luaC_checkGC(L);

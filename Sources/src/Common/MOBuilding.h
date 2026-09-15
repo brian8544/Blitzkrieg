@@ -27,8 +27,8 @@ class CMOBuilding : public CTRefCount<IMOContainer>
 	void SetIcon( const int nType, IVisObjBuilder *pVOB );
 	void RemoveIcon( const int nType );
 	//
-	int GetNumTotalSlots() const { return GetRPGStats()->nMedicalSlots + GetRPGStats()->nRestSlots + GetRPGStats()->slots.size(); }
-	int GetNumFreeSlots() const { return GetNumTotalSlots() - passangers.size(); }
+	int GetNumTotalSlots() const { return GetRPGStats()->nMedicalSlots + GetRPGStats()->nRestSlots + static_cast<int>( GetRPGStats()->slots.size() ); }
+	int GetNumFreeSlots() const { return GetNumTotalSlots() - static_cast<int>( passangers.size() ); }
 	bool CanEnterOrBoard() const;
 	//
 	bool UpdateModelWithHP( const float fNewHP, IVisObjBuilder *pVOB, const bool bForced = false );

@@ -100,7 +100,7 @@ CZipFileSystem::CZipFileSystem( const char *pszName, DWORD dwAccessMode )
 	std::string szName = pszName;
 	std::string szMask;
 	const bool bRecursiveSearch = ( szName.find('*') != std::string::npos ) || ( szName.find('?') != std::string::npos );
-	int nPos = szName.rfind( '\\' );
+	int nPos = static_cast<int>( szName.rfind( '\\' ) );
 	if ( nPos == std::string::npos )
 	{
 		szMask = szName.empty() ? "*.zip" : szName;

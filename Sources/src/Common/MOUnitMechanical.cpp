@@ -209,7 +209,7 @@ bool CMOUnitMechanical::Load( IMOUnit *pMO, bool bEnter )
 		}
 		RemovePassanger( passangers, pMO, GetVisObj() );
 	}
-	GetSingleton<IInput>()->AddMessage( SGameMessage(MC_UPDATE_WHO_IN_CONTAINER, (int)static_cast<IMOContainer*>(this)) );
+	GetSingleton<IInput>()->AddMessage( SGameMessage::WithPointer(MC_UPDATE_WHO_IN_CONTAINER, static_cast<IMOContainer*>(this)) );
 	UpdatePassangers();
 	return true;
 }
@@ -244,7 +244,7 @@ int CMOUnitMechanical::GetPassangers( IMOUnit **pBuffer, const bool bCanSelectOn
 			for ( CPassangersList::const_iterator it = passangers.begin(); it != passangers.end(); ++it )
 				*pBuffer++ = it->pUnit;
 		}
-		return passangers.size();
+		return static_cast<int>( passangers.size() );
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -286,7 +286,7 @@ void CMOUnitMechanical::UpdatePassangers()
 		}
 		else
 		{
-			const int nNumPassangers = passangers.size();
+			const int nNumPassangers = static_cast<int>( passangers.size() );
 			if ( (nNumPassangers >= MAX_NUM_EXT_PASSANGERS) && (nNumExtPassangers < MAX_NUM_EXT_PASSANGERS) ) 
 			{
 				nNumExtPassangers = MAX_NUM_EXT_PASSANGERS;

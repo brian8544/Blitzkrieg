@@ -22,7 +22,7 @@ bool SEnumFolderStructureParameter::IsFolderRelative( const TEnumFolders &rFolde
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void SEnumFolderStructureParameter::SetRelativeFolder( TEnumFolders *pFolders, const std::string &rszFolder, const std::string &rszRelativeFolder )
 {
-	NI_ASSERT_T( pFolders != 0, NStr::Format( "Wrong parameter: %x\n", pFolders ) );
+	NI_ASSERT_T( pFolders != 0, NStr::Format( "Wrong parameter: %p\n", pFolders ) );
 	if ( pFolders )
 	{
 		( *pFolders )[rszFolder].insert( rszRelativeFolder );

@@ -239,7 +239,7 @@ public:
 		{
 			std::string szFileName = it.GetFilePath();
 			szFileName = szFileName.substr( szInitDir.size() );							//обрезаем начальную директорию
-			int nRes = szFileName.rfind( '\\' );
+			int nRes = static_cast<int>( szFileName.rfind( '\\' ) );
 			if ( nRes == std::string::npos )
 				return;
 			szFileName = szFileName.substr( 0, nRes );	//обрезаем имя файла, оставляя только директорию
@@ -297,7 +297,7 @@ template <class TYPE>
 template <>
 	inline NFile::CFile& operator<<( NFile::CFile &file, const std::string &data )
 	{
-		int nLength = data.size();
+		int nLength = static_cast<int>( data.size() );
 		file << nLength;
 		file.Write( data.c_str(), nLength * sizeof(data[0]) );
 		return file;
@@ -314,7 +314,7 @@ template <>
 template <>
 	inline NFile::CFile& operator<<( NFile::CFile &file, const std::wstring &data )
 	{
-		int nLength = data.size();
+		int nLength = static_cast<int>( data.size() );
 		file << nLength;
 		file.Write( data.c_str(), nLength * sizeof(data[0]) );
 		return file;

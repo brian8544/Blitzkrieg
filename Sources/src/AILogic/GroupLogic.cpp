@@ -323,7 +323,7 @@ void CGroupLogic::SetToAmbush( CAmbushGroups::iterator &iter )
 {
 	std::list< std::pair<CCommonUnit*, int> > oldUnitsGroups;
 	
-	IRefCount **pObjects = GetTempBuffer<IRefCount*>( iter->size() );
+	IRefCount **pObjects = GetTempBuffer<IRefCount*>( static_cast<int>( iter->size() ) );
 	int nLen = 0;
 	for ( std::list<SAmbushInfo>::iterator innerIter = iter->begin(); innerIter != iter->end(); ++innerIter )
 	{

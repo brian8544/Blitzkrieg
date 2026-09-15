@@ -201,15 +201,15 @@ const std::string CFile::GetFileName() const
 }
 const std::string CFile::GetFileTitle() const
 {
-	const int nNamePos = szFilePath.rfind( '\\' );
-	const int nExtPos = szFilePath.rfind( '.' );
+	const int nNamePos = static_cast<int>( szFilePath.rfind( '\\' ) );
+	const int nExtPos = static_cast<int>( szFilePath.rfind( '.' ) );
 	if ( (nNamePos != std::string::npos) && (nExtPos != std::string::npos) && (nExtPos > nNamePos) ) 
 		return szFilePath.substr( nNamePos + 1, nExtPos - nNamePos );
 	return "";
 }
 const std::string CFile::GetFileExt() const
 {
-	const int nPos = szFilePath.rfind( '.' );
+	const int nPos = static_cast<int>( szFilePath.rfind( '.' ) );
 	return nPos != std::string::npos ? szFilePath.substr( nPos + 1 ) : "";
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -241,7 +241,7 @@ bool CFile::SetFileTime( const char *pszFileName,
 const CFileIterator& CFileIterator::FindFirstFile( const char *pszMask )
 {
 	szPath = pszMask;
-	int pos = szPath.rfind( '\\' );
+	int pos = static_cast<int>( szPath.rfind( '\\' ) );
 	if ( pos == std::string::npos )
 	{
 		szMask = pszMask;
@@ -294,7 +294,7 @@ const std::string CFileIterator::GetFileTitle() const
 const std::string CFileIterator::GetFileExt() const
 {
 	std::string szExt = findinfo.cFileName;
-	int pos = szExt.rfind( '.' );
+	int pos = static_cast<int>( szExt.rfind( '.' ) );
 	if ( pos == std::string::npos )
 		return "";
 	return szExt.substr( pos + 1 );

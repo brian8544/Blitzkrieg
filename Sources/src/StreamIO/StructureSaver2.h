@@ -6,6 +6,7 @@
 #include "Streams.h"
 #include "StructureSaver.h"
 #include "..\Misc\CheckSums.h"
+#include <cstdint>
 // a) chunk structure
 // b) ptr/ref storage
 // system is able to store ref/ptr only for objectbase ancestors
@@ -73,12 +74,14 @@ class CStructureSaver2 : public IStructureSaver
 	typedef std::list<CChunkLevel>::iterator CChunkLevelIterator;
 	typedef std::list<CChunkLevel>::reverse_iterator CChunkLevelReverseIterator;
 	bool bIsReading;
-	// maps objects addresses during save(first) to addresses during load(second) - during loading
-	// or serves as a sign that some object has been already stored - during storing
-	typedef std::unordered_map<void*, CPtr<IRefCount>, SDefaultPtrHash> CObjectsHash;
+	typedef std::uint32_t SaveObjectToken;
+	typedef std::unordered_map<SaveObjectToken, CPtr<IRefCount> > CObjectsHash;
 	CObjectsHash objects;
 	typedef std::unordered_set<IRefCount*, SDefaultPtrHash> CPObjectsHashSet;
 	CPObjectsHashSet storedObjects;
+	typedef std::unordered_map<IRefCount*, SaveObjectToken, SDefaultPtrHash> CObjectTokenHash;
+	CObjectTokenHash objectTokens;
+	SaveObjectToken nextObjectToken = 1;
 	std::list< CPtr<IRefCount> > toStore;
 	//
 #ifndef _FINALRELEASE
@@ -101,6 +104,7 @@ class CStructureSaver2 : public IStructureSaver
 	//
 	void RawData( void *pData, int nSize );
 	void WriteRawData( const void *pData, int nSize );
+	SaveObjectToken GetObjectToken( IRefCount *pObject );
 	//
 	void Start( IStructureSaver::EAccessMode eAccessMode, interface IProgressHook *pHook );
 	void Finish();

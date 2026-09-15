@@ -62,7 +62,7 @@ int CMemFileStream::Seek( int offset, STREAM_SEEK from )
 			nCurrPos += offset;
 			break;
 		case STREAM_SEEK_END:
-			nCurrPos = data.size() + offset;
+			nCurrPos = static_cast<int>( data.size() ) + offset;
 			break;
 		default:
 			NI_ASSERT_T( 0, "unknown seek position" );
@@ -74,7 +74,7 @@ int CMemFileStream::Seek( int offset, STREAM_SEEK from )
 // получить размер потока
 int CMemFileStream::GetSize() const
 {
-	return data.size() - nBeginPos;
+	return static_cast<int>( data.size() ) - nBeginPos;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // изменить размер потока

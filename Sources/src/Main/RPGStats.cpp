@@ -625,7 +625,7 @@ bool SBuildingRPGStats::Validate()
 {
 	NI_ASSERT_SLOW_TF( nRestSlots <= 100, NStr::Format("Wrong number of rest slots (%d) in \"%s\"", nRestSlots, szKeyName.c_str()), return false );
 	NI_ASSERT_SLOW_TF( nMedicalSlots <= 100, NStr::Format("Wrong number of medical slots (%d) in \"%s\"", nMedicalSlots, szKeyName.c_str()), return false );
-	NI_ASSERT_SLOW_TF( slots.size() <= 100, NStr::Format("Wrong number of fireplaces (%d) in \"%s\"", slots.size(), szKeyName.c_str()), return false );
+	NI_ASSERT_SLOW_TF( static_cast<int>(slots.size()) <= 100, NStr::Format("Wrong number of fireplaces (%d) in \"%s\"", static_cast<int>(slots.size()), szKeyName.c_str()), return false );
 	//
 	std::for_each( slots.begin(), slots.end(), []( SSlot &value ) { value.Validate(); } );
 	//
@@ -1270,7 +1270,7 @@ void SUnitBaseRPGStats::ToAIUnits()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void SUnitBaseRPGStats::RetrieveShortcuts( IObjectsDB *pGDB )
 {
-	const int nSize = szAcksNames.size();
+	const int nSize = static_cast<int>( szAcksNames.size() );
 	for ( int i = 0; i < nSize; ++i )
 	{
 		if ( !szAcksNames[i].empty() )
@@ -2195,7 +2195,7 @@ const int SFenceRPGStats::GetTypeFromIndex( const int nIndex ) const
 const int SFenceRPGStats::GetIndexFromType( const int nType, int *pCurRandomSeed ) const
 {
 	const int nDirection = GetMSB( nType & 0xffff );
-	NI_ASSERT_T( (nDirection >= 0) && (nDirection < dirs.size()), NStr::Format("Wrong direction %d in fence \"%s\" (must be [0..%d])", nDirection, szParentName.c_str(), dirs.size()) );
+	NI_ASSERT_T( (nDirection >= 0) && (nDirection < static_cast<int>(dirs.size())), NStr::Format("Wrong direction %d in fence \"%s\" (must be [0..%d])", nDirection, szParentName.c_str(), static_cast<int>(dirs.size())) );
 	switch ( nType & 0xffff0000 ) 
 	{
 		case FENCE_TYPE_NORMAL:

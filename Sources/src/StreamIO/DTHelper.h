@@ -269,7 +269,7 @@ class CTreeAccessor
 			}
 			else
 			{
-				int nSize = data.size();
+				const std::size_t nSize = data.size();
 				// queue => vector translation (with queue clearing)
 				elements.reserve( nSize );
 				while ( !data.empty() )
@@ -515,7 +515,7 @@ class CTreeAccessor
 				data.resize( nSize );
 			}
 			else
-				nSize = data.size();
+				nSize = NStreamIO::CheckedSizeToInt( data.size() );
 			for ( int i = 0; i < nSize; ++i )
 			{
 				pSS->SetChunkCounter( i );

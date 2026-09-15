@@ -406,11 +406,11 @@ void CInterfaceChapter::InitWindow()
 		vPos.x -= size.x / 2;
 		vPos.y -= size.y / 2;
 		pMissionButton->SetWindowPlacement( &vPos, 0 );
-		pMissionButton->SetWindowID( 1000 + missionIndeces.size() );
+		pMissionButton->SetWindowID( 1000 + static_cast<int>( missionIndeces.size() ) );
 		pMap->AddChild( pMissionButton );
 		missionIndeces.push_back( i );
 	}
-	nNumberOfScenarioMissions = missionIndeces.size();
+	nNumberOfScenarioMissions = static_cast<int>( missionIndeces.size() );
 	
 	//добавляем все темплейтные миссии
 	for ( int i = 0; i < pStats->missions.size(); ++i )
@@ -433,7 +433,7 @@ void CInterfaceChapter::InitWindow()
 		vPos.x -= size.x / 2;
 		vPos.y -= size.y / 2;
 		pMissionButton->SetWindowPlacement( &vPos, 0 );
-		pMissionButton->SetWindowID( 1000 + missionIndeces.size() );
+		pMissionButton->SetWindowID( 1000 + static_cast<int>( missionIndeces.size() ) );
 		pMap->AddChild( pMissionButton );
 		missionIndeces.push_back( i );
 	}
@@ -468,7 +468,7 @@ void CInterfaceChapter::InitWindow()
 			}
 			
 			//найдем активную миссию среди template missions
-			int nNumberOfTemplateMissions = missionIndeces.size() - nNumberOfScenarioMissions;
+			int nNumberOfTemplateMissions = static_cast<int>( missionIndeces.size() ) - nNumberOfScenarioMissions;
 			NI_ASSERT_T( nNumberOfTemplateMissions > 0, "Can not select active missions. Possibly chapter script has error" );
 			if ( nNumberOfTemplateMissions > 0 )
 			{

@@ -226,8 +226,8 @@ void CGameSpyChat::NickErrorCallback( CHAT chat, int nType, const char *pszNick 
 	if ( nNamePostfix >= 0 )
 	{
 		szNamePostfix = NStr::Format( "{%d}", nNamePostfix );
-		const int nNamePostfixSize = szNamePostfix.size();
-		const int nNickSize = szNick.size();
+		const int nNamePostfixSize = static_cast<int>( szNamePostfix.size() );
+		const int nNickSize = static_cast<int>( szNick.size() );
 		NI_ASSERT_T( nNamePostfixSize <= nNickSize, "Wrong size of name postfix" );
 		NI_ASSERT_T( szNick.substr( nNickSize - nNamePostfixSize, nNamePostfixSize ) == szNamePostfix, "Wrong postfix" );
 

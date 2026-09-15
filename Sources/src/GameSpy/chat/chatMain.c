@@ -1493,7 +1493,7 @@ static void ciSendGetKey(CHAT chat,
 	// Start off the buffer.
 	////////////////////////
 	sprintf(buffer, "GETKEY %s %s 0 :", target, cookie);
-	len = strlen(buffer);
+	len = (int)(strlen(buffer));
 
 	// Add the keys.
 	////////////////
@@ -1506,7 +1506,7 @@ static void ciSendGetKey(CHAT chat,
 
 		// Check lengths.
 		/////////////////
-		keyLen = strlen(keys[i]);
+		keyLen = (int)(strlen(keys[i]));
 		if((len + keyLen + 1) >= sizeof(buffer))
 			return;
 
@@ -1620,7 +1620,7 @@ static CHATBool ciSendGetChannelKey(CHAT chat,
 		sprintf(buffer, "GETCHANKEY %s %s 0 :", channel, cookie);
 	else
 		sprintf(buffer, "GETCKEY %s %s %s 0 :", channel, nick, cookie);
-	len = strlen(buffer);
+	len = (int)(strlen(buffer));
 
 	// Add the keys.
 	////////////////
@@ -1641,7 +1641,7 @@ static CHATBool ciSendGetChannelKey(CHAT chat,
 
 		// Check lengths.
 		/////////////////
-		keyLen = strlen(keys[i]);
+		keyLen = (int)(strlen(keys[i]));
 		if((len + keyLen + 1) >= sizeof(buffer))
 			continue;
 

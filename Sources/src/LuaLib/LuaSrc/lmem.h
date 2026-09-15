@@ -13,7 +13,7 @@
 #include "llimits.h"
 #include "lua.h"
 
-void *luaM_realloc (lua_State *L, void *oldblock, lint32 size);
+void *luaM_realloc (lua_State *L, void *oldblock, size_t size);
 void *luaM_growaux (lua_State *L, void *block, size_t nelems,
                     int inc, size_t size, const char *errormsg,
                     size_t limit);
@@ -32,9 +32,9 @@ void *luaM_growaux (lua_State *L, void *block, size_t nelems,
 
 //#ifdef LUA_DEBUG
 extern unsigned long memdebug_numblocks;
-extern unsigned long memdebug_total;
-extern unsigned long memdebug_maxmem;
-extern unsigned long memdebug_memlimit;
+extern size_t memdebug_total;
+extern size_t memdebug_maxmem;
+extern size_t memdebug_memlimit;
 //#endif
 
 

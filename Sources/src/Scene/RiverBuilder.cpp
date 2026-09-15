@@ -66,7 +66,7 @@ void BuildLayer( const std::vector<SVectorStripeObjectPoint> &points,
 								 GetGlobalVar("Scene.SunLight.Direction.Z", -2.0f) );
 	Normalize( &vSunDir );
 	//
-	const int nCounter = points.size();
+	const int nCounter = static_cast<int>( points.size() );
 	const int WIDTH = layer.nNumCells;
 	DWORD colorLeft, colorRight, colorCenter;
 	float fTopWidth, fBottomWidth, fCenterRelWidth;
@@ -240,7 +240,7 @@ void BuildRoadLayer( const std::vector<SVectorStripeObjectPoint> &points, const 
 void CreateRiver( const SVectorStripeObject &river, struct STerrainRiver *pRiver )
 {
 	// create regular vertices and indices
-	const int nCounter = river.points.size();
+	const int nCounter = static_cast<int>( river.points.size() );
 	// determine max width (in tiles)
 	int nMaxNumCells = river.bottom.nNumCells;
 	for ( int k=0; k<river.layers.size(); ++k )

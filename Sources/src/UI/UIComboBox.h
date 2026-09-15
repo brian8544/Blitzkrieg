@@ -44,7 +44,7 @@ public:
 	virtual void STDCALL AddItem( IUIElement *pElement );
 	virtual int STDCALL GetSelectionItem() { return nSelItem; }
 	virtual void STDCALL SetSelectionItem( int nItem );
-	virtual int STDCALL GetNumberOfItems() { return items.size(); }
+	virtual int STDCALL GetNumberOfItems() { return static_cast<int>( items.size() ); }
 	virtual IUIElement* STDCALL GetItem( int nItem );
 	virtual void STDCALL Clear();
 };

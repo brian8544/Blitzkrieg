@@ -125,7 +125,7 @@ void CUIColorTextScroll::AppendMessage( const WORD *pszCaption, const WORD *pszM
 																			const enum IUIColorTextScroll::EColorEntrys color )
 {
 	const int nColorIndex = int(color);
-	NI_ASSERT_T( nColorIndex < colors.size(), NStr::Format("wrong color index %d", nColorIndex) );
+	NI_ASSERT_T( nColorIndex < static_cast<int>(colors.size()), NStr::Format("wrong color index %d", nColorIndex) );
 
 	CTRect<float> rect;
 	GetBorderRect( &rect );

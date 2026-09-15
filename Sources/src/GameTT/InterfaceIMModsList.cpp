@@ -38,7 +38,7 @@ bool CInterfaceIMModsList::FillListItem( IUIListRow *pRow, const std::string &sz
 	IUIElement *pElement = pRow->GetElement( 0 );
 	if ( !pElement )
 		return false;
-	const int nPos = szMODPath.rfind( '\\' );
+	const int nPos = static_cast<int>( szMODPath.rfind( '\\' ) );
 
 	if ( nPos == szMODPath.size() - 1 )
 	{
@@ -75,7 +75,7 @@ bool CInterfaceIMModsList::OnOk( const std::string &szFullFileName )
 	// attach mod
 	IMainLoop *pML = GetSingleton<IMainLoop>();
 
-	const int nPos = szFullFileName.rfind( '\\' );
+	const int nPos = static_cast<int>( szFullFileName.rfind( '\\' ) );
 	NI_ASSERT_T( nPos != std::string::npos, NStr::Format( "wrong directory \"%s\"", szFullFileName.c_str() ) );
 	{
 		const std::string szModName = szFullFileName.substr( nPos + 1 );

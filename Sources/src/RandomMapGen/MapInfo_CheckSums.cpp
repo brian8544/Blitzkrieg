@@ -251,7 +251,7 @@ void CMapInfo::GetUnitCreationCheckSum( uLong *pResourcesCheckSum, uLong *pMapCh
 		//
 		if ( !unitCreation.units[i].szPartyName.empty() )
 		{
-			const int nSize = unitCreation.units[i].szPartyName.size() * sizeof( unitCreation.units[i].szPartyName[0] );
+			const int nSize = static_cast<int>( unitCreation.units[i].szPartyName.size() ) * sizeof( unitCreation.units[i].szPartyName[0] );
 			if ( bufMap.buf.size() <= bufMap.nCnt + nSize )
 				bufMap.buf.resize( bufMap.nCnt + nSize );
 

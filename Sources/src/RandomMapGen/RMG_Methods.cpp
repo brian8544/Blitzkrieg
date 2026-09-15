@@ -137,7 +137,7 @@ int SRMContainer::GetIndices( int nDirection, const std::string &rszPlace, std::
 int SRMContainer::GetSupportedSettings( std::list<std::string> *pSupportedSettingsList ) const
 {
 	NI_ASSERT_TF( pSupportedSettingsList != 0,
-								NStr::Format(	"SRMContainer::GetSupportedSettings() Invalid Parameter pSupportedSettingsList: %x", pSupportedSettingsList ),
+								NStr::Format(	"SRMContainer::GetSupportedSettings() Invalid Parameter pSupportedSettingsList: %p", pSupportedSettingsList ),
 								return 0 );
 
 	std::unordered_map<std::string, std::vector<int> > settings;
@@ -312,7 +312,7 @@ int SRMGraph::operator&( IDataTree &ss )
 int SRMGraph::GetSupportedSettings( std::list<std::string> *pSupportedSettingsList ) const
 {
 	NI_ASSERT_TF( pSupportedSettingsList != 0,
-								NStr::Format(	"SRMGraph::GetSupportedSettings() Invalid Parameter pSupportedSettingsList: %x", pSupportedSettingsList ),
+								NStr::Format(	"SRMGraph::GetSupportedSettings() Invalid Parameter pSupportedSettingsList: %p", pSupportedSettingsList ),
 								return 0 );
 
 	std::unordered_map<std::string, int> settings;
@@ -630,7 +630,7 @@ int SRMTemplate::operator&( IDataTree &ss )
 int SRMTemplate::GetSupportedSettings( std::list<std::string> *pSupportedSettingsList ) const
 {
 	NI_ASSERT_TF( pSupportedSettingsList != 0,
-								NStr::Format(	"SRMGraph::GetSupportedSettings() Invalid Parameter pSupportedSettingsList: %x", pSupportedSettingsList ),
+								NStr::Format(	"SRMGraph::GetSupportedSettings() Invalid Parameter pSupportedSettingsList: %p", pSupportedSettingsList ),
 								return 0 );
 
 	std::unordered_map<std::string, int> settings;
@@ -902,7 +902,7 @@ int CRMFieldGraph::IndexLines()
 			}
 		}
 	}
-	return ( ( nElements / 2 ) +  ( patches.size() * 8 ) );
+	return ( ( nElements / 2 ) +  ( static_cast<int>( patches.size() ) * 8 ) );
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -976,7 +976,7 @@ void CRMFieldGraph::AddBorderLines( const CTRect<int> &rBoundingRect )
 		{
 			if ( ( nSidePatchIndex + 1 ) < borderPatchesInidces[nSideIndex].size() )
 			{
-				const int nLineIndex = lines.size();
+				const int nLineIndex = static_cast<int>( lines.size() );
 				lines.push_back( SLine() );
 				SLine &rLine = lines[nLineIndex];
 				rLine.nID = -1;
@@ -999,7 +999,7 @@ void CRMFieldGraph::AddBorderLines( const CTRect<int> &rBoundingRect )
 				}
 				else
 				{
-					const int nLineIndex = lines.size();
+					const int nLineIndex = static_cast<int>( lines.size() );
 					lines.push_back( SLine() );
 					SLine &rLine = lines[nLineIndex];
 					rLine.nID = -1;

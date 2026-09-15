@@ -91,7 +91,7 @@ bool SVAGradient::CreateFromImage( IImage *pImage, const CTPoint<float> &rRange,
 	heights.clear();
 
 	NI_ASSERT_TF( pImage != 0,
-								NStr::Format( "Wrong parameter: %x\n", pImage ),
+								NStr::Format( "Wrong parameter: %p\n", pImage ),
 								return false );
 
 	NI_ASSERT_TF( ( rRange.max - rRange.min ) > FP_EPSILON,
@@ -133,7 +133,7 @@ float SVAGradient::operator()( float fPosition, bool isSquareInterpolated ) cons
 {
 	NI_ASSERT_T( ( ( heights.size() > 2 ) && isSquareInterpolated ) || 
 							 ( ( heights.size() > 1 ) && !isSquareInterpolated ),
-							 NStr::Format( "Heights size not enough: %d\n", heights.size() ) );
+							 NStr::Format( "Heights size not enough: %d\n", static_cast<int>(heights.size()) ) );
 	NI_ASSERT_T( range.min != range.max,
 							 NStr::Format( "Invalid range: (%g, %g)\n", range.min, range.max ) );
 	NI_ASSERT_T( ( range.min <= fPosition ) && ( range.max >= fPosition ),

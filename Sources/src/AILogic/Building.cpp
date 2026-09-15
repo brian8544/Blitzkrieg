@@ -216,8 +216,8 @@ BASIC_REGISTER_CLASS( CBuilding );
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CBuilding::CBuilding( const SBuildingRPGStats *_pStats, const CVec2 &center, const int dbID, const float fHP, const int nFrameIndex )
 : pStats( _pStats ), CGivenPassabilityStObject( center, dbID, fHP, nFrameIndex ), pLockingUnit( 0 ),
-	nOveralPlaces( _pStats->nRestSlots + _pStats->nMedicalSlots + _pStats->slots.size() ),
-	medical( _pStats->nMedicalSlots ), fire( _pStats->slots.size() ), rest( _pStats->nRestSlots ),
+	nOveralPlaces( _pStats->nRestSlots + _pStats->nMedicalSlots + static_cast<int>( _pStats->slots.size() ) ),
+	medical( _pStats->nMedicalSlots ), fire( static_cast<int>( _pStats->slots.size() ) ), rest( _pStats->nRestSlots ),
 	bAlarm( false ), 
 	turrets( _pStats->slots.size() ), guns( _pStats->slots.size() ),
 	nextSegmTime( curTime ), lastDistibution( 0 ), nLastFreeFireSoldierChoice( 0 ),
@@ -1036,7 +1036,7 @@ void CBuilding::DistributeFiringSoldiers()
 				}
 				else
 				{
-					nLastFreeFireSoldierChoice += Random( 0, pStats->slots.size() );
+					nLastFreeFireSoldierChoice += Random( 0, static_cast<int>( pStats->slots.size() ) );
 					const int nNewFireSlot = GetFreeFireSlot();
 
 					DelSoldierFromFirePlace( pSoldier );
@@ -1406,14 +1406,14 @@ void CBuilding::Unlock( CCommonUnit *pUnit )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const int CBuilding::GetNGunsInFireSlot( const int nSlot )
 {
-	NI_ASSERT_T( nSlot < guns.size(), NStr::Format( "Wrong number of slot (%d)", nSlot ) );
+	NI_ASSERT_T( nSlot < static_cast<int>(guns.size()), NStr::Format( "Wrong number of slot (%d)", nSlot ) );
 
 	return guns[nSlot]->GetNTotalGuns();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CBasicGun* CBuilding::GetGunInFireSlot( const int nSlot, const int nGun )
 {
-	NI_ASSERT_T( nSlot < guns.size(), NStr::Format( "Wrong number of slot (%d)", nSlot ) );
+	NI_ASSERT_T( nSlot < static_cast<int>(guns.size()), NStr::Format( "Wrong number of slot (%d)", nSlot ) );
 
 	if ( nGun >= guns[nSlot]->GetNTotalGuns() )
 		return 0;
@@ -1423,13 +1423,13 @@ CBasicGun* CBuilding::GetGunInFireSlot( const int nSlot, const int nGun )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CTurret* CBuilding::GetTurretInFireSlot( const int nSlot )
 {
-	NI_ASSERT_T( nSlot < guns.size(), NStr::Format( "Wrong number of slot (%d)", nSlot ) );
+	NI_ASSERT_T( nSlot < static_cast<int>(guns.size()), NStr::Format( "Wrong number of slot (%d)", nSlot ) );
 	return turrets[nSlot];
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 float CBuilding::GetMaxFireRangeInSlot( const int nSlot ) const
 {
-	NI_ASSERT_T( nSlot < guns.size(), NStr::Format( "Wrong number of slot (%d)", nSlot ) );
+	NI_ASSERT_T( nSlot < static_cast<int>(guns.size()), NStr::Format( "Wrong number of slot (%d)", nSlot ) );
 	return guns[nSlot]->GetMaxFireRange( 0 );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1541,7 +1541,7 @@ void CBuilding::ExchangeUnitToFireplace( CSoldier *pSoldier, int nFirePlace )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const int CBuilding::GetNFirePlaces() const
 {
-	return pStats->slots.size();
+	return static_cast<int>( pStats->slots.size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CSoldier* CBuilding::GetSoldierInFireplace( const int nFireplace) const

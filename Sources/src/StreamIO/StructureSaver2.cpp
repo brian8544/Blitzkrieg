@@ -292,29 +292,46 @@ void CStructureSaver2::RawData( void *pData, int nSize )
 	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CStructureSaver2::SaveObjectToken CStructureSaver2::GetObjectToken( IRefCount *pObject )
+{
+	if ( pObject == 0 )
+		return 0;
+
+	CObjectTokenHash::const_iterator existing = objectTokens.find( pObject );
+	if ( existing != objectTokens.end() )
+		return existing->second;
+
+	SaveObjectToken token = nextObjectToken++;
+	if ( token == 0 )
+		token = nextObjectToken++;
+	NI_ASSERT_T( token != 0, "Save object token space exhausted" );
+	objectTokens[pObject] = token;
+	return token;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CStructureSaver2::StoreObject( IRefCount *pObject )
 {
 	if ( (pObject != 0) && (storedObjects.find(pObject) == storedObjects.end()) )
 	{
 #ifdef _DO_ASSERT_SLOW
 		CPObjectsHashSet::iterator pos = storedObjects.find( pObject );
-		NI_ASSERT_SLOW_T( (pos == storedObjects.end()) || ((pos != storedObjects.end()) && (*pos == pObject)), NStr::Format("storing object 0x.8x of type \"%s\", but such object of type \"%s\" already exist", pObject, typeid(*pObject).name(), typeid(*(*pos)).name()) );
+		NI_ASSERT_SLOW_T( (pos == storedObjects.end()) || ((pos != storedObjects.end()) && (*pos == pObject)), NStr::Format("storing object %p of type \"%s\", but such object of type \"%s\" already exists", static_cast<void*>(pObject), typeid(*pObject).name(), typeid(*(*pos)).name()) );
 #endif // _DO_ASSERT_SLOW
 		toStore.push_back( pObject );
 		storedObjects.insert( pObject );
 	}
 
-	// nDataSize += 4;
-	RawData( &pObject, 4 );
+	SaveObjectToken token = GetObjectToken( pObject );
+	RawData( &token, sizeof(token) );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IRefCount* CStructureSaver2::LoadObject()
 {
-	void *pServerPtr = 0;
-	RawData( &pServerPtr, 4 );
-	if ( pServerPtr != 0 )
+	SaveObjectToken token = 0;
+	RawData( &token, sizeof(token) );
+	if ( token != 0 )
 	{
-		CObjectsHash::iterator pFound = objects.find( pServerPtr );
+		CObjectsHash::iterator pFound = objects.find( token );
 		if ( pFound != objects.end() )
 		{
 #ifndef _FINALRELEASE
@@ -323,11 +340,9 @@ IRefCount* CStructureSaver2::LoadObject()
 #endif // _FINALRELEASE
 			return pFound->second;
 		}
-		NI_ASSERT_SLOW_T( 0, "Here we are in problem - stored object does not exist. Actually I think we got to throw the exception" );
-		// here we are in problem - stored object does not exist
-		// actually i think we got to throw the exception
+		NI_ASSERT_SLOW_T( 0, "Stored object reference does not exist" );
 	}
-	return reinterpret_cast<IRefCount*>( pServerPtr );
+	return 0;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CStructureSaver2::StartChunk( const SSChunkID idChunk )
@@ -396,15 +411,15 @@ void CStructureSaver2::Start( IStructureSaver::EAccessMode eAccessMode, IProgres
 		while ( obj.GetPosition() < obj.GetSize() )
 		{
 			int nTypeID = 0;
-			void *pServer = 0;
+			SaveObjectToken objectToken = 0;
 			bool bValid;
 			obj.Read( &nTypeID, 4 );
-			obj.Read( &pServer, 4 );
+			obj.Read( &objectToken, sizeof(objectToken) );
 			obj.Read( &bValid, 1 );
 			IRefCount *pObject = pFactory->CreateObject( nTypeID );
 			NI_ASSERT_SLOW( pObject != 0 );
 			toStore.push_back( pObject );
-			objects[pServer] = pObject;
+			objects[objectToken] = pObject;
 			if ( !bValid )
 				CObj<IRefCount> pObj = pObject;
 			//
@@ -421,12 +436,12 @@ void CStructureSaver2::Start( IStructureSaver::EAccessMode eAccessMode, IProgres
 			pLoadHook->SetNumSteps( nCount + 1, 0.75f );
 		for ( int i = 0; i < nCount; ++i )
 		{
-			void *pServer = 0;
+			SaveObjectToken objectToken = 0;
 			IRefCount *pObject;
 			SetChunkCounter( i + 1 );
 			StartChunk( (SSChunkID) 1 );
-			DataChunk( 0, &pServer, 4 );
-			pObject = objects[pServer];
+			DataChunk( 0, &objectToken, sizeof(objectToken) );
+			pObject = objects[objectToken];
 			NI_ASSERT_SLOW_T( pObject != 0, "NULL object during storing" );
 
 #ifndef _FINALRELEASE
@@ -584,13 +599,14 @@ void CStructureSaver2::Finish()
 			{
 				// const int nOldDataSize = nDataSize;
 				
+				SaveObjectToken objectToken = GetObjectToken( pObject );
 				obj.Write( &nTypeID, 4 );
-				obj.Write( &pObject, 4 );
+				obj.Write( &objectToken, sizeof(objectToken) );
 				obj.Write( &bValid, 1 );
 				// nDataSize += 9;
 				// save object data
 				StartChunk( SSChunkID(1) );
-				DataChunk( 0, &pObject, 4 );
+				DataChunk( 0, &objectToken, sizeof(objectToken) );
 				//
 				if ( StartChunk( 1 ) )
 				{
@@ -637,6 +653,8 @@ void CStructureSaver2::Finish()
 	data.Clear();
 	objects.clear();
 	storedObjects.clear();
+	objectTokens.clear();
+	nextObjectToken = 1;
 	toStore.clear();
 	chunks.clear();
 }

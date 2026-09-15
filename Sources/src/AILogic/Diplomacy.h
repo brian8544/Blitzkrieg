@@ -39,7 +39,7 @@ public:
 	
 	void Clear() { bEditorMode = false; }
 
-	const int GetNPlayers() const { return playerParty.size(); }
+	const int GetNPlayers() const { return static_cast<int>( playerParty.size() ); }
 
 	const EDiplomacyInfo GetDiplStatus( const BYTE a, const BYTE b ) const
 	{ 

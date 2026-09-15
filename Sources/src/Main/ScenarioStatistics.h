@@ -55,7 +55,7 @@ public:
 	// get mission finish status
 	EMissionFinishStatus STDCALL GetFinishStatus() const;
 	// number of killed in action (KIA)
-	int STDCALL GetNumKIA() const { return kiaUnits.size(); }
+	int STDCALL GetNumKIA() const { return static_cast<int>( kiaUnits.size() ); }
 	// KIA name (file name with localized name)
 	const std::string& STDCALL GetKIAName( const int nIndex ) const;
 	// KIA new name (file name with localized name)

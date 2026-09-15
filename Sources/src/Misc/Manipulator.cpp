@@ -95,7 +95,7 @@ SBaseProperty* CManipulator::GetProperty( const std::string &szFullName, std::st
 	SBaseProperty *pProp = 0;
 	while ( 1 )
 	{
-		int nPos = szRest.find_first_of( ".[" );
+		int nPos = static_cast<int>( szRest.find_first_of( ".[" ) );
 		szName += szRest.substr( 0, nPos );
 
 		pProp = GetProperty( szName );
@@ -119,13 +119,13 @@ SBaseProperty* CManipulator::GetProperty( const std::string &szFullName, std::st
 	if ( pProp->nodeType == SBaseProperty::VECTOR )
 	{
 		// extract index from property name
-		int nPos = szRest.find( ']' );
+		int nPos = static_cast<int>( szRest.find( ']' ) );
 		NI_ASSERT_TF( nPos != std::string::npos, NStr::Format("VECTOR property \"%s\" must have an index in the form of '[x]'", szName.c_str()), return false );
 		std::string szIndex = szRest.substr( 0, nPos );
 		NI_ASSERT_TF( NStr::IsDecNumber( szIndex ), NStr::Format("index for VECTOR property \"%s\" must be a decimal number", szName.c_str()), return false );
 		int nIndex = NStr::ToInt( szIndex );
 		// extract rest name
-		nPos = szRest.find( '.' );
+		nPos = static_cast<int>( szRest.find( '.' ) );
 		NI_ASSERT_TF( nPos != std::string::npos, NStr::Format("VECTOR property \"%s\" must have rest name, separated by '.'", szName.c_str()), return false );
 		szRest = szRest.substr( nPos + 1 );
 		//
@@ -462,7 +462,7 @@ void CMultiManipulator::BuildProps()
 	if ( bPropsAlreadyBuilt )
 		return;
 	//
-	int nMans = manipulators.size();
+	int nMans = static_cast<int>( manipulators.size() );
 	for ( CPropsMap::iterator it = propsMap.begin(); it != propsMap.end(); ++it )
 	{
 		if ( it->second.nCounter == nMans )

@@ -137,7 +137,7 @@ public:
 	virtual bool EnumEnemy( class CAIUnit *pEnemy );
 
 	const int GetParty() const { return nParty; }
-	const int GetNFreeUnits() const { return freeUnits.size(); }
+	const int GetNFreeUnits() const { return static_cast<int>( freeUnits.size() ); }
 
 	void SetCellInUse( const int nResistanceCell, bool bInUse );
 };

@@ -64,7 +64,7 @@ public:
 	virtual void STDCALL ExecuteSegmentCommands( const int nSegment, interface ITransceiver *pTranceiver );
 	virtual void STDCALL CheckStartMapCheckSum( const int nCheckSum );
 
-	virtual const int GetNumPlayersInMPGame() const { return players.size(); }
+	virtual const int GetNumPlayersInMPGame() const { return static_cast<int>( players.size() ); }
 	virtual const int GetMPPlayerLogicID( const int nPlayer ) const;
 	virtual const int GetMPPlayerSide( const int nPlayer ) const;
 

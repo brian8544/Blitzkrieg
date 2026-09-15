@@ -38,7 +38,7 @@ void CInterfaceCustomList::FillListFromCurrentDir()
 		
 		//проверим, что справа нету вложенных директорий
 		std::string szCurrentName = tutorialFiles[i].c_str() + szCurrentDir.size();
-		int nPos = szCurrentName.rfind( '\\' );
+		int nPos = static_cast<int>( szCurrentName.rfind( '\\' ) );
 		if ( nPos != std::string::npos )		//правее есть еще директории
 		{
 			//возьмем имя директории
@@ -62,7 +62,7 @@ void CInterfaceCustomList::FillListFromCurrentDir()
 			szCurrentName = szCurrentName.substr( szCmpDir.size() );
 			
 			//проверим, что это поддиректория
-			int nPos = szCurrentName.rfind( '\\' );
+			int nPos = static_cast<int>( szCurrentName.rfind( '\\' ) );
 			if ( nPos != std::string::npos )		//правее есть еще директории
 			{
 				szCurrentName = szCurrentName.substr( 0, nPos );
@@ -71,7 +71,7 @@ void CInterfaceCustomList::FillListFromCurrentDir()
 			}
 			
 			//проверим, что это за файл
-			nPos = szCurrentName.rfind( '.' );
+			nPos = static_cast<int>( szCurrentName.rfind( '.' ) );
 			if ( nPos == std::string::npos )
 				continue;
 
@@ -133,7 +133,7 @@ void CInterfaceCustomList::FillListFromCurrentDir()
 		if ( pStorage->IsStreamExist(szName.c_str()) == false )
 			continue;
 		{
-			const int nPos = szName.rfind( '.' );
+			const int nPos = static_cast<int>( szName.rfind( '.' ) );
 			if ( nPos != std::string::npos ) 
 				szName.resize( nPos );
 		}

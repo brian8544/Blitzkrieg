@@ -25,7 +25,7 @@ CNetObjectFactory::CNetObjectFactory()
 // ************************************************************************************************************************ //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static SModuleDescriptor theModuleDescriptor( "Network", NET_NET, 0x0100, &theNetObjectFactory, 0 );
-const SModuleDescriptor* STDCALL GetModuleDescriptor()
+extern "C" const SModuleDescriptor* STDCALL GetModuleDescriptor()
 {
 	return &theModuleDescriptor;
 }

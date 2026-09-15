@@ -2,10 +2,18 @@
 
 #include "SysKeys.h"
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef LLKHF_EXTENDED
 #define LLKHF_EXTENDED       0x00000001
+#endif
+#ifndef LLKHF_INJECTED
 #define LLKHF_INJECTED       0x00000010
+#endif
+#ifndef LLKHF_ALTDOWN
 #define LLKHF_ALTDOWN        0x00000020
+#endif
+#ifndef LLKHF_UP
 #define LLKHF_UP             0x00000080
+#endif
 
 #define LLMHF_INJECTED       0x00000001
 

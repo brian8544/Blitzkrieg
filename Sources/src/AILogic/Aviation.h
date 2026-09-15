@@ -195,7 +195,7 @@ public:
 	virtual IStatesFactory* GetStatesFactory() const;
 	
 	virtual class CTurret* GetTurret( const int nTurret ) const { return turrets[nTurret]; }
-	virtual const int GetNTurrets() const { return turrets.size(); }
+	virtual const int GetNTurrets() const { return static_cast<int>( turrets.size() ); }
 	
 	// הכÿ סענוכüבû
 	virtual void GetShotInfo( struct SAINotifyMechShot *pShotInfo ) const { pShotInfo->typeID = GetShootAction(); pShotInfo->pObj = const_cast<CAviation*>(this); }

@@ -539,7 +539,7 @@ CHATBool ciSocketSend(ciSocket * sock,
 
 	// Get the buffer length.
 	/////////////////////////
-	len = strlen(buffer);
+	len = (int)(strlen(buffer));
 
 	// Make sure the buffer is big enough.
 	//////////////////////////////////////
@@ -800,7 +800,7 @@ static CHATBool ciParseMessage(ciSocket * sock, const char *sText)
 		return CHATFalse; //ERRCON
 	}
 
-	nMessage = strlen(sText);
+	nMessage = (int)(strlen(sText));
 	message->message = gsimalloc(nMessage + 1);
 	if(message->message == NULL)
 		return CHATFalse; //ERRCON
@@ -1042,7 +1042,7 @@ static CHATBool ciParseInput(ciSocket * sock)
 
 				// Take the message out of the buffer.
 				//////////////////////////////////////
-				ciBufferClipFront(&sock->inputQueue, (q - sock->inputQueue.buffer));
+				ciBufferClipFront(&sock->inputQueue, (int)(q - sock->inputQueue.buffer));
 
 				return CHATTrue;
 			}

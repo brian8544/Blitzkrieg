@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CUIScrollTextBox::SetWindowText( int nState, const WORD *pszText )
 {
-	NI_ASSERT_T( nState < states.size(), NStr::Format("Can't set window text for %d stats (max %d)", nState, states.size()) );
+	NI_ASSERT_T( nState < static_cast<int>(states.size()), NStr::Format("Can't set window text for %d stats (max %d)", nState, static_cast<int>(states.size())) );
 	IText *pText = states[nState].pGfxText->GetText();
 	int nCurrentLength = pText->GetLength();
 	pText->SetText( pszText );

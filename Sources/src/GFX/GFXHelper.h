@@ -494,8 +494,8 @@ public:
 	{
 		if ( pTexture->Lock( nLevel, &lockinfo ) )
 		{
-			for ( int i=0; i<rows.size(); ++i )
-				rows[i] = reinterpret_cast<void*>( DWORD(lockinfo.pData) + i*lockinfo.nPitch );
+			for ( int i=0; i<static_cast<int>(rows.size()); ++i )
+				rows[i] = static_cast<void*>( static_cast<BYTE*>(lockinfo.pData) + i*lockinfo.nPitch );
 		}
 		else
 			rows.clear();
@@ -508,7 +508,7 @@ public:
 
 	TColor* operator[]( int nRow ) { return reinterpret_cast<TColor*>( rows[nRow] ); }
 	int GetSizeX() const { return pTexture->GetSizeX( nLevel ); }
-	int GetSizeY() const { return rows.size(); }
+	int GetSizeY() const { return static_cast<int>( rows.size() ); }
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // texture locker with easy and convinient data access
@@ -524,8 +524,8 @@ public:
 	{
 		if ( pSurface->Lock( &lockinfo ) )
 		{
-			for ( int i=0; i<rows.size(); ++i )
-				rows[i] = reinterpret_cast<void*>( DWORD(lockinfo.pData) + i*lockinfo.nPitch );
+			for ( int i=0; i<static_cast<int>(rows.size()); ++i )
+				rows[i] = static_cast<void*>( static_cast<BYTE*>(lockinfo.pData) + i*lockinfo.nPitch );
 		}
 		else
 			rows.clear();
@@ -538,7 +538,7 @@ public:
 
 	TColor* operator[]( int nRow ) { return reinterpret_cast<TColor*>( rows[nRow] ); }
 	int GetSizeX() const { return pSurface->GetSizeX(); }
-	int GetSizeY() const { return rows.size(); }
+	int GetSizeY() const { return static_cast<int>( rows.size() ); }
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ************************************************************************************************************************ //
@@ -691,10 +691,10 @@ inline bool DrawTemp( interface IGFX *pGFX, const std::vector<TYPE> &vertices, c
 {
 	if ( vertices.empty() || indices.empty() ) 
 		return false;
-	NI_ASSERT_SLOW_TF( vertices.size() < 65536, NStr::Format("Can't draw more then 65536 vertices, but %d sent to render", vertices.size()), return false );
-	CTempBufferLock<TYPE> verts = pGFX->GetTempVertices( vertices.size(), TYPE::format, eGFXPT );
+	NI_ASSERT_SLOW_TF( static_cast<int>(vertices.size()) < 65536, NStr::Format("Can't draw more then 65536 vertices, but %d sent to render", static_cast<int>(vertices.size())), return false );
+	CTempBufferLock<TYPE> verts = pGFX->GetTempVertices( static_cast<int>( vertices.size() ), TYPE::format, eGFXPT );
 	verts = vertices;
-	CTempBufferLock<WORD> inds = pGFX->GetTempIndices( indices.size(), GFXIF_INDEX16, eGFXPT );
+	CTempBufferLock<WORD> inds = pGFX->GetTempIndices( static_cast<int>( indices.size() ), GFXIF_INDEX16, eGFXPT );
 	inds = indices;
 	//
 	return pGFX->DrawTemp();

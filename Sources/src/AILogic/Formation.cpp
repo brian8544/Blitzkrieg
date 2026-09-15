@@ -927,7 +927,7 @@ void CFormation::SetGeometryPropertiesToSoldier( CSoldier *pSoldier, const bool 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CFormation::ChangeGeometry( const int nGeometry )
 {
-	NI_ASSERT_T( nGeometry < pStats->formations.size(), NStr::Format("Wrong geometry (%d) for squad \"%s\"", nGeometry, pStats->szParentName.c_str()) );
+	NI_ASSERT_T( nGeometry < static_cast<int>(pStats->formations.size()), NStr::Format("Wrong geometry (%d) for squad \"%s\"", nGeometry, pStats->szParentName.c_str()) );
 	const float fOldSightMultipier = GetSightMultiplier();
 	nCurGeometry = nGeometry;
 
@@ -938,7 +938,7 @@ void CFormation::ChangeGeometry( const int nGeometry )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const int CFormation::GetNGeometries() const
 {
-	return pStats->formations.size();
+	return static_cast<int>( pStats->formations.size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const float CFormation::GetCurSpeedBonus() const
@@ -1103,7 +1103,7 @@ void CFormation::ProcessLoadCommand( CAICommand *pCommand, bool bPlaceInQueue )
 			SGetLoadPoint loadPointFunctor;
 			for ( std::unordered_set<int>::iterator iterForms = formations.begin(); iterForms != formations.end(); ++iterForms )
 			{
-				NI_ASSERT_T( cnt < edges.size(), NStr::Format( "Wrong cnt (%d), size (%d)", cnt, edges.size() ) );
+				NI_ASSERT_T( cnt < static_cast<int>(edges.size()), NStr::Format( "Wrong cnt (%d), size (%d)", cnt, static_cast<int>(edges.size()) ) );
 				edges[cnt].pFormation = ::GetObjectByUniqueIdSafe<CFormation>( *iterForms );
 				edges[cnt].pCmd = object2Command[*iterObjects];
 				edges[cnt].fDist = 
@@ -1111,7 +1111,7 @@ void CFormation::ProcessLoadCommand( CAICommand *pCommand, bool bPlaceInQueue )
 				cnt++;
 			}
 		}
-		NI_ASSERT_T( cnt == edges.size(), NStr::Format( "Wrong cnt (%d), size (%d)", cnt, edges.size() ) );
+		NI_ASSERT_T( cnt == static_cast<int>(edges.size()), NStr::Format( "Wrong cnt (%d), size (%d)", cnt, static_cast<int>(edges.size()) ) );
 
 		std::sort( edges.begin(), edges.end() );
 
@@ -1401,7 +1401,7 @@ BYTE CFormation::GetAIClass() const
 float CFormation::GetPriceMax() const
 {
 	float fPrice = 0;
-	const int nOrderSize = pStats->members.size();
+	const int nOrderSize = static_cast<int>( pStats->members.size() );
 	for ( int i = 0; i < nOrderSize; ++i )
 	{
 		fPrice += pStats->members[i]->fPrice;

@@ -21,7 +21,7 @@ public:
 	// аггрегировать другую factory внутрь этой (перерегистрировать её объекты на эту фабрику)
 	virtual void STDCALL Aggregate( IObjectFactory *pFactory );
 	// получить количество типов объектов, которые эта фабрика (+ все аггрегированные в неё) может создать
-	virtual int STDCALL GetNumKnownTypes() { return newfuncs.size(); }
+	virtual int STDCALL GetNumKnownTypes() { return static_cast<int>( newfuncs.size() ); }
 	// получить type info объектов, которые эта фабрика (+ все аггрегированные в неё) может создать
 	virtual void STDCALL GetKnownTypes( SObjectFactoryTypeInfo *pInfoBuffer, int nBufferSize );
 	// получить typeID объекта по указателю на него

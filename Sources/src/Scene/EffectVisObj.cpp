@@ -162,7 +162,7 @@ void CEffectVisObj::Visit( ISceneVisitor *pVisitor, int nType )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CEffectVisObj::GetSpriteEffects( const SSpriteInfo ***ppEffects, int *pnNumEffects, bool bAll )
 {
-	const SSpriteInfo **pEffects = *ppEffects = GetTempBuffer<const SSpriteInfo*>( sprites.size() );
+	const SSpriteInfo **pEffects = *ppEffects = GetTempBuffer<const SSpriteInfo*>( static_cast<int>( sprites.size() ) );
 	*pnNumEffects = 0;
 	for ( std::vector<SSpriteEffect>::iterator it = sprites.begin(); it != sprites.end(); ++it )
 	{
@@ -173,7 +173,7 @@ void CEffectVisObj::GetSpriteEffects( const SSpriteInfo ***ppEffects, int *pnNum
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CEffectVisObj::GetParticleEffects( IParticleSource ***ppEffects, int *pnNumEffects, bool bAll )
 {
-	IParticleSource **pEffects = *ppEffects = GetTempBuffer<IParticleSource*>( sprites.size() );
+	IParticleSource **pEffects = *ppEffects = GetTempBuffer<IParticleSource*>( static_cast<int>( sprites.size() ) );
 	*pnNumEffects = 0;
 	for ( std::vector<SParticleEffect>::iterator it = particles.begin(); it != particles.end(); ++it )
 	{

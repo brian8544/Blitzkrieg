@@ -23,7 +23,7 @@ void STVOLayer::SelectPatches( const std::vector<DWORD> &sels, const int nNumBas
 		if ( std::binary_search(sels.begin(), sels.end(), it->dwPatch) ) 
 		{
 			selPatches.push_back( &(*it) );
-			nNumPoints += it->points.size();
+			nNumPoints += static_cast<int>( it->points.size() );
 		}
 	}
 	if ( nNumPoints == 0 ) 

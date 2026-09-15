@@ -98,7 +98,7 @@ int CUIEditBox::GetSelection( int nX )
 void CUIEditBox::SetCursor( int nPos )
 {
 	if ( nPos < 0 )
-		nCursorPos = wszFullText.length();
+		nCursorPos = static_cast<int>( wszFullText.length() );
 	else
 		nCursorPos = nPos; 
 }
@@ -149,7 +149,7 @@ bool CUIEditBox::DeleteSelection()
 	if ( m_nBeginSel != -1 )
 	{
 		if ( m_nEndSel < 0 || m_nEndSel > wszFullText.size() )
-			m_nEndSel = wszFullText.size();
+			m_nEndSel = static_cast<int>( wszFullText.size() );
 		if ( m_nBeginSel > m_nEndSel )
 			m_nBeginSel = m_nEndSel;
 		wszFullText.erase( m_nBeginSel, m_nEndSel - m_nBeginSel );
@@ -168,7 +168,7 @@ bool CUIEditBox::IsValidSymbol( int nAsciiCode )
 	{
 		//проверим, что символ удовлетворяет требованиям GameSpy NickName
 		static const char szValidSymbols[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789[]\\`_^{|}-";
-		static const int nLen = strlen( szValidSymbols );
+		static const int nLen = static_cast<int>( strlen( szValidSymbols ) );
 		for ( int i=0; i<nLen; i++ )
 		{
 			if ( nAsciiCode == szValidSymbols[i] )
@@ -181,7 +181,7 @@ bool CUIEditBox::IsValidSymbol( int nAsciiCode )
 	{
 		//проверим, что символ удовлетворяет требованиям FileName symbols
 		static const char szValidSymbols[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789[]`_^{}-!@#$%^&()+=~";
-		static const int nLen = strlen( szValidSymbols );
+		static const int nLen = static_cast<int>( strlen( szValidSymbols ) );
 		for ( int i=0; i<nLen; i++ )
 		{
 			if ( nAsciiCode == szValidSymbols[i] )
@@ -200,7 +200,7 @@ bool CUIEditBox::IsValidSymbol( int nAsciiCode )
 	if ( bLocalPlayerNameMode )
 	{
 		static const char szInValidSymbols[] = "&'\"<>";
-		static const int nLen = strlen( szInValidSymbols );
+		static const int nLen = static_cast<int>( strlen( szInValidSymbols ) );
 		for ( int i = 0; i < nLen; i++ )
 		{
 			if ( nAsciiCode == szInValidSymbols[i] )
@@ -363,7 +363,7 @@ bool CUIEditBox::OnChar( int nAsciiCode, int nVirtualKey, bool bPressed, DWORD k
 		if ( keyState == E_KEYBOARD_FREE )
 		{
 			//на конец строки
-			nCursorPos = wszFullText.size() - nBeginText;
+			nCursorPos = static_cast<int>( wszFullText.size() ) - nBeginText;
 			EnsureCursorVisible();
 		}
 		break;

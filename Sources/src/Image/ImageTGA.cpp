@@ -152,12 +152,12 @@ public:
 		{
 			case 32:
 				palette.resize( hdr.colormap.wColorMapLength );
-				pStream->Read( &(palette[0]), sizeof(SColor) * palette.size() );
+				pStream->Read( &(palette[0]), sizeof(SColor) * static_cast<int>( palette.size() ) );
 				break;
 			case 24:
 				{
 					std::vector<SColor24> palette24( hdr.colormap.wColorMapLength );
-					pStream->Read( &(palette24[0]), sizeof(SColor24) * palette24.size() );
+					pStream->Read( &(palette24[0]), sizeof(SColor24) * static_cast<int>( palette24.size() ) );
 					palette.reserve( hdr.colormap.wColorMapLength );
 					for ( std::vector<SColor24>::const_iterator it = palette24.begin(); it != palette24.end(); ++it )
 						palette.push_back( SColor(0xff, it->r, it->g, it->b) );

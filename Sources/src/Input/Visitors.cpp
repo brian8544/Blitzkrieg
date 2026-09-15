@@ -81,7 +81,7 @@ void CFindBindVisitor::FinalCheck() const
 	if ( (pFoundCombo != 0) || (pFoundBind != 0) ) 
 		return;
 	//
-	const int nNumControls = controls.size();
+	const int nNumControls = static_cast<int>( controls.size() );
 	for ( CBindsMap::const_iterator it = binds.begin(); it != binds.end(); ++it )
 	{
 		if ( it->second.nCounter == nNumControls ) 

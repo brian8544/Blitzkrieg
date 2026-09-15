@@ -96,7 +96,7 @@ public:
 		: COption( pszName, _bInstant ), selections( _selections ) 
 	{  
 		const std::string szDefault = _pszDefault;
-		nSelection = selections.size() - 1;
+		nSelection = static_cast<int>( selections.size() ) - 1;
 		for ( ; nSelection > 0; --nSelection  )
 			if ( selections[nSelection].szProgName == szDefault )
 				break;

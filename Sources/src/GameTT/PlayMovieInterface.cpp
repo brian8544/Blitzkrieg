@@ -4,6 +4,28 @@
 
 #include "iMission.h"
 #include "..\Misc\HPTimer.h"
+
+namespace
+{
+	enum EMovieSkipInput
+	{
+		MOVIE_SKIP_INPUT_SEQUENCE = 1 << 0,
+		MOVIE_SKIP_INPUT_MOVIE = 1 << 1
+	};
+
+	unsigned int GetMovieSkipInputState()
+	{
+		unsigned int nState = 0;
+		if ( GetAsyncKeyState(VK_ESCAPE) & 0x8000 )
+			nState |= MOVIE_SKIP_INPUT_SEQUENCE;
+		if ( (GetAsyncKeyState(VK_RETURN) & 0x8000) ||
+			 (GetAsyncKeyState(VK_SPACE) & 0x8000) ||
+			 (GetAsyncKeyState(VK_LBUTTON) & 0x8000) ||
+			 (GetAsyncKeyState(VK_RBUTTON) & 0x8000) )
+			nState |= MOVIE_SKIP_INPUT_MOVIE;
+		return nState;
+	}
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ************************************************************************************************************************ //
 // **
@@ -87,6 +109,7 @@ CPlayMovieInterface::CPlayMovieInterface()
 : CInterfaceScreenBase( "InterMission" )
 {
 	nCurrMovie = -1;
+	nSkipInputState = 0;
 	nNextInterfaceCommandTypeID = -1;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,6 +149,7 @@ bool CPlayMovieInterface::Init()
 	CInterfaceScreenBase::Init();
 	movieMsgs.Init( pInput, movieCommands );
 	SetBindSection( "play_movies" );
+	nSkipInputState = GetMovieSkipInputState();
 	GetSingleton<ICursor>()->Show( false );
 	pScene->RemoveSceneObject( 0 );
 	// turn haze off
@@ -165,6 +189,19 @@ bool CPlayMovieInterface::ProcessMessage( const SGameMessage &msg )
 void CPlayMovieInterface::Step( bool bAppActive )
 {
 	CInterfaceScreenBase::Step( bAppActive );
+	const unsigned int nInputState = GetMovieSkipInputState();
+	const unsigned int nPressed = nInputState & ~nSkipInputState;
+	nSkipInputState = nInputState;
+	if ( bAppActive && pPlayer && ((nCurrMovie >= 0) && (nCurrMovie < movies.size())) && movies[nCurrMovie].bCanInterupt )
+	{
+		if ( nPressed & MOVIE_SKIP_INPUT_SEQUENCE )
+		{
+			pPlayer->Stop();
+			nCurrMovie = 1000000000;
+		}
+		else if ( nPressed & MOVIE_SKIP_INPUT_MOVIE )
+			pPlayer->Stop();
+	}
 	if ( pPlayer ) 
 	{
 		if ( !pPlayer->IsPlaying() ) 

@@ -2,6 +2,20 @@
 #define __STREAMIO_H__
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma ONCE
+#include <cstddef>
+#include <limits>
+#include <stdexcept>
+
+namespace NStreamIO
+{
+	inline int CheckedSizeToInt( std::size_t value )
+	{
+		if ( value > static_cast<std::size_t>( std::numeric_limits<int>::max() ) )
+			throw std::length_error( "StreamIO size exceeds the 32-bit on-disk/API limit" );
+		return static_cast<int>( value );
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 enum EStorageElementType
 {

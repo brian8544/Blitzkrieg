@@ -29,8 +29,8 @@ Direct3D 兼容层源代码已包含在 `Sources/sdk` 中。请按以下不含�
 
 ```text
 Sources/sdk/FMOD/Include/fmod.hpp
-Sources/sdk/FMOD/lib/x86/fmod_vc.lib
-Sources/sdk/FMOD/lib/x86/fmod.dll
+Sources/sdk/FMOD/lib/x64/fmod_vc.lib
+Sources/sdk/FMOD/lib/x64/fmod.dll
 ```
 
 运行 `build.bat`。vcpkg 清单会自动安装 FFmpeg、libpng、libsquish、pugixml 和 zlib。仓库内的 `Sources/src/GameSpy` SDK 会从源代码构建，无需另行下载 GameSpy。当前游戏目标不再需要 Bink、STLPort、Stingray 或旧版 DirectX 8 SDK。

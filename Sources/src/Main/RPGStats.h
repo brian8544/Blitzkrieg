@@ -212,7 +212,7 @@ struct SHPObjectRPGStats : public SCommonRPGStats
 	float GetHP( const float fHPPercentage ) const { return fMaxHP * fHPPercentage; }
 	int GetDamagedState( const float fHPPercentage ) const
 	{
-		int i = damagedHPs.size();
+		int i = static_cast<int>( damagedHPs.size() );
 		while ( --i >= 0 )
 		{
 			if ( fHPPercentage > damagedHPs[i] )
@@ -1463,22 +1463,22 @@ struct SFenceRPGStats : public SStaticObjectRPGStats
 	//
 	virtual const CVec2& STDCALL GetOrigin( const int nIndex = -1 ) const
 	{
-		NI_ASSERT_SLOW_T( nIndex > -1 && nIndex < stats.size(), NStr::Format("Index %d for the \"%s\"must be in the range [0..%d]", nIndex, szKeyName.c_str(), stats.size()) );
+		NI_ASSERT_SLOW_T( nIndex > -1 && nIndex < static_cast<int>(stats.size()), NStr::Format("Index %d for the \"%s\"must be in the range [0..%d]", nIndex, szKeyName.c_str(), static_cast<int>(stats.size())) );
 		return stats[nIndex].vOrigin;
 	}
 	virtual const CArray2D<BYTE>& STDCALL GetPassability( const int nIndex = -1 ) const
 	{
-		NI_ASSERT_SLOW_T( nIndex > -1 && nIndex < stats.size(), NStr::Format("Index %d for the \"%s\"must be in the range [0..%d]", nIndex, szKeyName.c_str(), stats.size()) );
+		NI_ASSERT_SLOW_T( nIndex > -1 && nIndex < static_cast<int>(stats.size()), NStr::Format("Index %d for the \"%s\"must be in the range [0..%d]", nIndex, szKeyName.c_str(), static_cast<int>(stats.size())) );
 		return stats[nIndex].passability;
 	}
 	virtual const CVec2& STDCALL GetVisOrigin( const int nIndex = -1 ) const
 	{
-		NI_ASSERT_SLOW_T( nIndex > -1 && nIndex < stats.size(), NStr::Format("Index %d for the \"%s\"must be in the range [0..%d]", nIndex, szKeyName.c_str(), stats.size()) );
+		NI_ASSERT_SLOW_T( nIndex > -1 && nIndex < static_cast<int>(stats.size()), NStr::Format("Index %d for the \"%s\"must be in the range [0..%d]", nIndex, szKeyName.c_str(), static_cast<int>(stats.size())) );
 		return stats[nIndex].vVisOrigin;
 	}
 	virtual const CArray2D<BYTE>& STDCALL GetVisibility( const int nIndex = -1 ) const
 	{
-		NI_ASSERT_SLOW_T( nIndex > -1 && nIndex < stats.size(), NStr::Format("Index %d for the \"%s\"must be in the range [0..%d]", nIndex, szKeyName.c_str(), stats.size()) );
+		NI_ASSERT_SLOW_T( nIndex > -1 && nIndex < static_cast<int>(stats.size()), NStr::Format("Index %d for the \"%s\"must be in the range [0..%d]", nIndex, szKeyName.c_str(), static_cast<int>(stats.size())) );
 		return stats[nIndex].visibility;
 	}
 	// helper functions
@@ -1506,43 +1506,43 @@ struct SFenceRPGStats : public SStaticObjectRPGStats
 	//
 	int GetCenterIndex( int nDir, int nIndex = -1 ) const
 	{
-		NI_ASSERT_TF( nDir > -1 && nDir < dirs.size(), NStr::Format("Direction (%d) for fence must be in range [0..%d]", nDir, dirs.size()), return 0 );
+		NI_ASSERT_TF( nDir > -1 && nDir < static_cast<int>(dirs.size()), NStr::Format("Direction (%d) for fence must be in range [0..%d]", nDir, static_cast<int>(dirs.size())), return 0 );
 		return GetIndexLocal( nIndex, dirs[nDir].centers, "center", 0 );
 	}
 	int GetLDamageIndex( int nDir, int nIndex = -1 ) const
 	{
-		NI_ASSERT_TF( nDir > -1 && nDir < dirs.size(), NStr::Format("Direction (%d) for fence must be in range [0..%d]", nDir, dirs.size()), return 0 );
+		NI_ASSERT_TF( nDir > -1 && nDir < static_cast<int>(dirs.size()), NStr::Format("Direction (%d) for fence must be in range [0..%d]", nDir, static_cast<int>(dirs.size())), return 0 );
 		return GetIndexLocal( nIndex, dirs[nDir].ldamages, "ldamage", 0 );
 	}
 	int GetRDamageIndex( int nDir, int nIndex = -1 ) const
 	{
-		NI_ASSERT_TF( nDir > -1 && nDir < dirs.size(), NStr::Format("Direction (%d) for fence must be in range [0..%d]", nDir, dirs.size()), return 0 );
+		NI_ASSERT_TF( nDir > -1 && nDir < static_cast<int>(dirs.size()), NStr::Format("Direction (%d) for fence must be in range [0..%d]", nDir, static_cast<int>(dirs.size())), return 0 );
 		return GetIndexLocal( nIndex, dirs[nDir].rdamages, "rdamage", 0 );
 	}
 	int GetCDamageIndex( int nDir, int nIndex = -1 ) const
 	{
-		NI_ASSERT_TF( nDir > -1 && nDir < dirs.size(), NStr::Format("Direction (%d) for fence must be in range [0..%d]", nDir, dirs.size()), return 0 );
+		NI_ASSERT_TF( nDir > -1 && nDir < static_cast<int>(dirs.size()), NStr::Format("Direction (%d) for fence must be in range [0..%d]", nDir, static_cast<int>(dirs.size())), return 0 );
 		return GetIndexLocal( nIndex, dirs[nDir].cdamages, "cdamage", 0 );
 	}
 	//
 	int GetCenterIndex( int nDir, int *pCurRandomSeed ) const
 	{
-		NI_ASSERT_TF( nDir > -1 && nDir < dirs.size(), NStr::Format("Direction (%d) for fence must be in range [0..%d]", nDir, dirs.size()), return 0 );
+		NI_ASSERT_TF( nDir > -1 && nDir < static_cast<int>(dirs.size()), NStr::Format("Direction (%d) for fence must be in range [0..%d]", nDir, static_cast<int>(dirs.size())), return 0 );
 		return GetIndexLocal( -1, dirs[nDir].centers, "center", pCurRandomSeed );
 	}
 	int GetLDamageIndex( int nDir, int *pCurRandomSeed ) const
 	{
-		NI_ASSERT_TF( nDir > -1 && nDir < dirs.size(), NStr::Format("Direction (%d) for fence must be in range [0..%d]", nDir, dirs.size()), return 0 );
+		NI_ASSERT_TF( nDir > -1 && nDir < static_cast<int>(dirs.size()), NStr::Format("Direction (%d) for fence must be in range [0..%d]", nDir, static_cast<int>(dirs.size())), return 0 );
 		return GetIndexLocal( -1, dirs[nDir].ldamages, "ldamage", pCurRandomSeed );
 	}
 	int GetRDamageIndex( int nDir, int *pCurRandomSeed ) const
 	{
-		NI_ASSERT_TF( nDir > -1 && nDir < dirs.size(), NStr::Format("Direction (%d) for fence must be in range [0..%d]", nDir, dirs.size()), return 0 );
+		NI_ASSERT_TF( nDir > -1 && nDir < static_cast<int>(dirs.size()), NStr::Format("Direction (%d) for fence must be in range [0..%d]", nDir, static_cast<int>(dirs.size())), return 0 );
 		return GetIndexLocal( -1, dirs[nDir].rdamages, "rdamage", pCurRandomSeed );
 	}
 	int GetCDamageIndex( int nDir, int *pCurRandomSeed ) const
 	{
-		NI_ASSERT_TF( nDir > -1 && nDir < dirs.size(), NStr::Format("Direction (%d) for fence must be in range [0..%d]", nDir, dirs.size()), return 0 );
+		NI_ASSERT_TF( nDir > -1 && nDir < static_cast<int>(dirs.size()), NStr::Format("Direction (%d) for fence must be in range [0..%d]", nDir, static_cast<int>(dirs.size())), return 0 );
 		return GetIndexLocal( -1, dirs[nDir].cdamages, "cdamage", pCurRandomSeed );
 	}
 	//
@@ -1868,13 +1868,13 @@ public:
 	//
 	const SSegmentRPGStats& GetSegmentStats( const int nIndex ) const
 	{
-		NI_ASSERT_SLOW_T( nIndex >= 0 && nIndex < segments.size(), NStr::Format("Index %d for the segments of the \"%s\"must be in the range [0..%d]", nIndex, szKeyName.c_str(), segments.size()) );
+		NI_ASSERT_SLOW_T( nIndex >= 0 && nIndex < static_cast<int>(segments.size()), NStr::Format("Index %d for the segments of the \"%s\"must be in the range [0..%d]", nIndex, szKeyName.c_str(), static_cast<int>(segments.size())) );
 		return segments[nIndex];
 	}
 	//
 	const SSpan& GetSpanStats( const int nIndex, const int nState = 0 ) const
 	{
-		NI_ASSERT_SLOW_T( nIndex >= 0 && nIndex < states[nState].spans.size(), NStr::Format("Index %d for the spans of the \"%s\"must be in the range [0..%d]", nIndex, szKeyName.c_str(), states[nState].spans.size()) );
+		NI_ASSERT_SLOW_T( nIndex >= 0 && nIndex < static_cast<int>(states[nState].spans.size()), NStr::Format("Index %d for the spans of the \"%s\"must be in the range [0..%d]", nIndex, szKeyName.c_str(), static_cast<int>(states[nState].spans.size())) );
 		return states[nState].spans[nIndex];
 	}
 	// в следующих четырёх функциях 'nIndex' обозначает не 'segment', а 'span', из которого надо выдернуть 'nSlab' segment и вернуть его данные

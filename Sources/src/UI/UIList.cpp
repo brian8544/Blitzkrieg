@@ -245,7 +245,7 @@ void CUIList::AddItem( int nData )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CUIList::RemoveItem( int nIndex )
 {
-	NI_ASSERT_T( nIndex < listItems.size() && nIndex >= 0, NStr::Format("Wrong item (%d) to remove (max %d)", nIndex, listItems.size()) );
+	NI_ASSERT_T( nIndex < static_cast<int>(listItems.size()) && nIndex >= 0, NStr::Format("Wrong item (%d) to remove (max %d)", nIndex, static_cast<int>(listItems.size())) );
 	if ( nSelection == nIndex )
 	{
 		//delete selected element
@@ -276,7 +276,7 @@ IUIListRow* CUIList::GetItem( int nIndex )
 		return &headers;
 	}
 
-	NI_ASSERT_T( nIndex < listItems.size() && nIndex >= 0, NStr::Format("Wrong item (%d) to get (max %d)", nIndex, listItems.size()) );
+	NI_ASSERT_T( nIndex < static_cast<int>(listItems.size()) && nIndex >= 0, NStr::Format("Wrong item (%d) to get (max %d)", nIndex, static_cast<int>(listItems.size())) );
 	CUIListItems::iterator it = listItems.begin() + nIndex;
 	return *it;
 }
@@ -597,7 +597,7 @@ void CUIList::Visit( interface ISceneVisitor *pVisitor )
 			// selection виден
 			if ( !selSubRects.empty() )
 			{
-				const int nSize = selSubRects.size();
+				const int nSize = static_cast<int>( selSubRects.size() );
 				int top = rect.top + nY + nTopSpace + nHeaderSize + nHeaderTopSpace;
 				int left = rect.left + nLeftSpace;
 				
@@ -669,7 +669,7 @@ void CUIList::Draw( IGFX *pGFX )
 			SGFXRect2 rc;
 			pGFX->SetTexture( 0, pSelectionTexture );
 			
-			int nSize = selSubRects.size();
+			int nSize = static_cast<int>( selSubRects.size() );
 			if ( nSize > 0 )
 			{
 				int top = rect.top + nY + nTopSpace + nHeaderSize + nHeaderTopSpace;

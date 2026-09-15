@@ -44,6 +44,7 @@ class CPlayMovieInterface : public CInterfaceScreenBase
 	CPtr<IVideoPlayer> pPlayer;						// video player with current bink video
 	std::vector<SMovie> movies;						// all movies to play
 	int nCurrMovie;												// current movie to play
+	unsigned int nSkipInputState;						// Win32 fallback for movie-skip input
 	// next interface 
 	int nNextInterfaceCommandTypeID;
 	std::string szNextInterfaceCommandConfig;

@@ -571,7 +571,7 @@ void CScenarioTracker2::ProcessScriptChanges( const bool bPostMission )
 		NStr::DebugTrace( "*** ScenarioScript: New slot \"%s\" added with name \"%s\"\n", it->c_str(), pUnit->GetPersonalNameFileName().c_str() );
 	}
 	if ( bPostMission ) 
-		pUserPlayer->GetMissionStats()->SetValue( STMT_NEW_UNITS, szNewSlots.size() );
+		pUserPlayer->GetMissionStats()->SetValue( STMT_NEW_UNITS, static_cast<int>( szNewSlots.size() ) );
 	szNewSlots.clear();
 	// add new upgrades
 	NI_ASSERT_SLOW_T( newUpgrades.size() <= 1, "Only one upgrade supported by interface at a time. using first" );
@@ -1277,7 +1277,7 @@ void CScenarioTracker2::FinishMission( const EMissionFinishStatus eStatus )
 // number of available random mission templates
 int CScenarioTracker2::GetNumRandomTemplates() const
 {
-	return templateMissions.size();
+	return static_cast<int>( templateMissions.size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // get template by number

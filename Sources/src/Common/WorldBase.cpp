@@ -346,7 +346,7 @@ SMapObject* CWorldBase::CreateMapObject( IRefCount *pAIObj, int nDBID, int nFram
 SMapObject* CWorldBase::AddToWorld( IRefCount *pAIObj, int nDBID, int nFrameIndex, const float fNewHP )
 {
 	// check for such object already exist
-	NI_ASSERT_T( aiobjects.find( pAIObj ) == aiobjects.end(), NStr::Format("object 0x%x (%s) already exist as \"%s\"", pAIObj, typeid(*pAIObj).name(), aiobjects[pAIObj]->pDesc->szKey.c_str()) );
+	NI_ASSERT_T( aiobjects.find( pAIObj ) == aiobjects.end(), NStr::Format("object %p (%s) already exist as \"%s\"", pAIObj, typeid(*pAIObj).name(), aiobjects[pAIObj]->pDesc->szKey.c_str()) );
 	// create
 	SMapObject *pMO = CreateMapObject( pAIObj, nDBID, nFrameIndex, fNewHP );
 	// 
@@ -467,7 +467,7 @@ SBridgeSpanObject* CWorldBase::CreateSpanObject( int nDBID, int nFrameIndex, flo
 SBridgeSpanObject* CWorldBase::AddSpanToWorld( IRefCount *pAIObj, int nDBID, int nFrameIndex, float fNewHP )
 {
 	// check for such object already exist
-	NI_ASSERT_T( aispans.find( pAIObj ) == aispans.end(), NStr::Format("object 0x%x (%s) already exist as \"%s\"", pAIObj, typeid(*pAIObj).name(), aispans[pAIObj]->GetDesc()->szKey.c_str()) );
+	NI_ASSERT_T( aispans.find( pAIObj ) == aispans.end(), NStr::Format("object %p (%s) already exist as \"%s\"", pAIObj, typeid(*pAIObj).name(), aispans[pAIObj]->GetDesc()->szKey.c_str()) );
 	// create
 	SBridgeSpanObject *pSpan = CreateSpanObject( nDBID, nFrameIndex, fNewHP );
 	pSpan->pSlab->pAIObj = pAIObj;
@@ -899,14 +899,14 @@ void CWorldBase::AIUpdateActions( const NTimer::STime &currTime )
 				break;
 			case ACTION_NOTIFY_SELECT_CHECKED:
 				{
-					IMOSelectable *pMOSelectable = dynamic_cast<IMOSelectable*>( FindByAI(reinterpret_cast<IRefCount*>(pObjects[i].nParam)) );
+					IMOSelectable *pMOSelectable = dynamic_cast<IMOSelectable*>( FindByAI(pAILogic->GetObjByUniqueID(pObjects[i].nParam)) );
 					if ( pMOSelectable && pMOSelectable->IsSelected() )
 						Select( pMO );
 				}
 				break;
 			case ACTION_SET_SELECTION_GROUP:
 				{
-					IMOSquad *pMOToCheck = dynamic_cast<IMOSquad*>( FindByAI(reinterpret_cast<IRefCount*>(pAILogic->GetObjByUniqueID(pObjects[i].nParam))) );
+					IMOSquad *pMOToCheck = dynamic_cast<IMOSquad*>( FindByAI(pAILogic->GetObjByUniqueID(pObjects[i].nParam)) );
 					int nSelGroup = -1;
 					bool isSelected = false;
 					if ( pMOToCheck )
@@ -928,7 +928,7 @@ void CWorldBase::AIUpdateActions( const NTimer::STime &currTime )
 					}
 					else
 					{
-						IMOSelectable *pMOTemp = dynamic_cast<IMOSelectable*>( FindByAI(reinterpret_cast<IRefCount*>(pAILogic->GetObjByUniqueID(pObjects[i].nParam))) );
+						IMOSelectable *pMOTemp = dynamic_cast<IMOSelectable*>( FindByAI(pAILogic->GetObjByUniqueID(pObjects[i].nParam)) );
 						if ( pMOTemp )
 						{
 							nSelGroup = pMOTemp->nSelectionGroupID;
@@ -1126,7 +1126,7 @@ void CWorldBase::AIUpdateHits( const NTimer::STime &currTime )
 				}
 				else
 				{
-					NStr::DebugTrace( "Victim 0x%x (%s) for hit is not a valid map object\n", pObjects[i].pVictim, typeid(pObjects[i].pVictim).name() );
+					NStr::DebugTrace( "Victim %p (%s) for hit is not a valid map object\n", pObjects[i].pVictim, typeid(pObjects[i].pVictim).name() );
 				}
 			}
 			else														// to ground

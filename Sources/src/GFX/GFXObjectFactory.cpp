@@ -84,7 +84,7 @@ void STDCALL CGFXModuleChecker::SetModuleFunctionalityLimits() const
 // ************************************************************************************************************************ //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static SModuleDescriptor theModuleDescriptor( "Graphics (DX8)", GFX_GFX, 0x0100, &theGFXObjectFactory, &theGFXModuleChecker );
-const SModuleDescriptor* STDCALL GetModuleDescriptor()
+extern "C" const SModuleDescriptor* STDCALL GetModuleDescriptor()
 {
 	return &theModuleDescriptor;
 }

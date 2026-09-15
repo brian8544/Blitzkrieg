@@ -115,7 +115,7 @@ int CMOSquad::GetPassangers( IMOUnit **pBuffer, const bool bCanSelectOnly ) cons
 		for ( CUnitsList::const_iterator it = passangers.begin(); it != passangers.end(); ++it )
 			*pBuffer++ = it->pUnit;
 	}
-	return passangers.size();
+	return static_cast<int>( passangers.size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // notify about RPG stats changing fot the single squad member

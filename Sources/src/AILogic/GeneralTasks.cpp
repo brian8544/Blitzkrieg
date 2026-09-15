@@ -548,10 +548,10 @@ void CGeneralTaskToSwarmToPoint::Run()
 	if ( !swarmingTanks.empty() )
 	{
 		const int nGroup = theGroupLogic.GenerateGroupNumber();
-		IRefCount **arUnits = GetTempBuffer<IRefCount*>( swarmingTanks.size() );
+		IRefCount **arUnits = GetTempBuffer<IRefCount*>( static_cast<int>( swarmingTanks.size() ) );
 		for ( int i = 0; i < swarmingTanks.size(); ++i )
 			arUnits[i] = swarmingTanks[i];
-		theGroupLogic.RegisterGroup( arUnits, swarmingTanks.size(), nGroup );
+		theGroupLogic.RegisterGroup( arUnits, static_cast<int>( swarmingTanks.size() ), nGroup );
 		theGroupLogic.GroupCommand( SAIUnitCmd(ACTION_COMMAND_SWARM_TO, curResistanceToAttack.GetResistanceCellCenter()), nGroup, false );
 	
 		//CRAP{for testing
@@ -587,7 +587,7 @@ void CGeneralTaskToSwarmToPoint::SendToGroupPoint()
 	if ( !swarmingTanks.empty() )
 	{
 		const int nGroup = theGroupLogic.GenerateGroupNumber();
-		IRefCount **arUnits = GetTempBuffer<IRefCount*>( swarmingTanks.size() );
+		IRefCount **arUnits = GetTempBuffer<IRefCount*>( static_cast<int>( swarmingTanks.size() ) );
 		
 		for ( int i = 0; i < swarmingTanks.size(); ++i )
 		{

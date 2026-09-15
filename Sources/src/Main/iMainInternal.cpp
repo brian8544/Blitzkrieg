@@ -15,6 +15,35 @@
 #include "..\Main\GameStats.h"
 #include "..\Scene\PFX.h"
 #include "..\Input\InputTypes.h"
+#include "..\WheatyExceptionReport\WheatyExceptionReport.h"
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+namespace
+{
+	std::list< CPtr<IBaseCommand> > g_emergencyCommands;
+
+	void ExecuteEmergencyCommands() noexcept
+	{
+		for ( std::list< CPtr<IBaseCommand> >::iterator it = g_emergencyCommands.begin(); it != g_emergencyCommands.end(); ++it )
+		{
+			if ( (*it) != 0 )
+			{
+				try { (*it)->Do(); } catch ( ... ) { }
+			}
+		}
+	}
+
+	void AddEmergencyCommand( IBaseCommand *pCommand )
+	{
+		if ( pCommand )
+			g_emergencyCommands.push_back( pCommand );
+	}
+
+	void ClearEmergencyCommands()
+	{
+		g_emergencyCommands.clear();
+		WheatyExceptionReport::SetCrashCallback( 0 );
+	}
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static const NInput::SRegisterCommandEntry stdCommands[] = 
 {
@@ -102,7 +131,7 @@ bool SerializeConfig( const bool bRead, const DWORD dwSerialize )
 IMainLoop* STDCALL CreateMainLoop()
 {
 	IBaseCommand *pCommand = new CSaveCommandsHistoryCommand( GetSingleton<ICommandsHistory>() );
-	NBugSlayer::AddEmergencyCommand( pCommand );
+	AddEmergencyCommand( pCommand );
 	
 	IMainLoop *pML = new CMainLoop();
 	//
@@ -113,10 +142,11 @@ IMainLoop* STDCALL CreateMainLoop()
 		if ( pSS )
 		{
 			IBaseCommand *pCommand = new CEmergencySave( pML, pSS );
-			NBugSlayer::AddEmergencyCommand( pCommand );
+			AddEmergencyCommand( pCommand );
 		}
 	}
 	//
+	WheatyExceptionReport::SetCrashCallback( &ExecuteEmergencyCommands );
 	return pML;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -482,7 +512,7 @@ void CMainLoop::ProcessStandardMsgs( const SGameMessage &msg )
 			Pause( bPaused, PAUSE_TYPE_USER_PAUSE );
 			break;
 		case CMD_DUMP_MEMORY:
-			NBugSlayer::MemSystemDumpStats();
+			_CrtDumpMemoryLeaks();
 			break;
 		case CMD_EXIT:
 			Command( MAIN_COMMAND_EXIT_GAME, 0 );
@@ -748,7 +778,7 @@ bool CMainLoop::StepApp( bool bActive )
 		cmds.pop_front();
 		if ( (pCmd == 0) || !pCmd->IsValid() )
 		{
-			NBugSlayer::RemoveAllEmergencyCommands();
+			ClearEmergencyCommands();
 			ResetStack();
 			return false;
 		}
@@ -764,7 +794,7 @@ bool CMainLoop::StepApp( bool bActive )
 	if ( interfaces.empty() )
 	{
 		NI_ASSERT_T( !interfaces.empty(), "Can't perform execution more: empty interfaces stack... leaving..." );
-		NBugSlayer::RemoveAllEmergencyCommands();
+		ClearEmergencyCommands();
 		return false;
 	}
 	NI_ASSERT_T( interfaces.back()->IsValid(), NStr::Format("Invalid Interface of class \"%s\"", typeid(*interfaces.back()).name()) );
@@ -921,7 +951,7 @@ void CProgressScreen::Init( EProgressType nType )
 			break;
 	}
 	NI_ASSERT_T( vMovies.size() > 0, "No movies defined!" );
-	const int i = vMovies.size() == 1 ? 0 : NWin32Random::Random( vMovies.size() - 1 );
+	const int i = static_cast<unsigned int>( vMovies.size() ) == 1 ? 0 : NWin32Random::Random( static_cast<unsigned int>( vMovies.size() ) - 1 );
 	Init( "movies\\progress\\" + vMovies[i].szMovieName );
 	SetText( &(vMovies[i]) );
 }

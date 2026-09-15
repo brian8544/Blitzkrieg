@@ -302,7 +302,7 @@ void CAckTracker::SendPktAcks( CBitStream *pBits )
 	(*pBits).Write( &nLast, sizeof(nLast) );
 	(*pBits).Write( &dwBits, 4 );
 	// removing too old ack Pkts
-	for ( i = receivedPkts.size() - 1; i >= 0; i-- )
+	for ( i = static_cast<int>( receivedPkts.size() ) - 1; i >= 0; i-- )
 	{
 		if ( receivedPkts[i] + 32 < nPktLastReceived )
 			receivedPkts.erase( receivedPkts.begin() + i );

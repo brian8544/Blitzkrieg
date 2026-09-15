@@ -1,4 +1,5 @@
 #include <d3d8.hpp>
+#include <cstdint>
 
 #include "..\Misc\Win32Helper.h"
 
@@ -26,7 +27,7 @@ public:
 	void Invalidate() { nRefData |= 0x80000000; }
 	bool IsValid() const { return (nRefData & 0x80000000) == 0; }
 	// unique run-time ID of the object
-	DWORD GetRTID() const { return reinterpret_cast<DWORD>( this ); }
+	std::uintptr_t GetRTID() const { return reinterpret_cast<std::uintptr_t>( this ); }
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <class TUserObj>

@@ -19,6 +19,7 @@ devsupport@gamespy.com
   for this SDK. It also has a change history for the SDK.
 
 ******/
+#include <stdint.h>
 #include "goaceng.h"
 #include "gserver.h"
 #if defined(applec) || defined(THINK_C) || defined(__MWERKS__) && !defined(__KATANA__) && !defined(__mips64)
@@ -276,7 +277,7 @@ static GError SendListRequest(GServerList serverlist, char *filter)
 	sprintf(data, "\\gamename\\%s\\gamever\\%s\\location\\0\\validate\\%s\\enctype\\2\\final\\\\queryid\\1.1\\",
 			serverlist->enginename, ENGINE_VERSION, result); //validate us		
 	
-	len = send ( serverlist->slsocket, data, strlen(data), 0 );
+	len = send ( serverlist->slsocket, data, (int)(strlen(data)), 0 );
 	if (len == SOCKET_ERROR || len == 0)
 		return GE_NOCONNECT;
 
@@ -297,7 +298,7 @@ static GError SendListRequest(GServerList serverlist, char *filter)
 		sprintf(data, "\\list\\%s\\gamename\\%s\\where\\%s\\final\\", modifier, serverlist->gamename, filter);
 	else
 		sprintf(data, "\\list\\%s\\gamename\\%s\\final\\", modifier, serverlist->gamename);
-	len = send ( serverlist->slsocket, data, strlen(data), 0 );
+	len = send ( serverlist->slsocket, data, (int)(strlen(data)), 0 );
 	if (len == SOCKET_ERROR || len == 0)
 		return GE_NOCONNECT;
 
@@ -620,7 +621,7 @@ static int CountSlashOffset(char *data, int len, int slashcount)
 		p++;		
 	}
 	if (slashcount == 0)
-		return p - data;
+		return (int)(p - data);
 	else
 		return -1;
 }
@@ -741,7 +742,7 @@ static GError ServerListReadList(GServerList serverlist)
 		{
 			//xor our key into the buffer
 			p[0] ^= 0xEC;
-			len = strlen(serverlist->seckey);
+			len = (int)(strlen(serverlist->seckey));
 			for (i = 0 ; i < len ; i++)
 			{
 				p[1 + i] ^= serverlist->seckey[i];
@@ -750,7 +751,7 @@ static GError ServerListReadList(GServerList serverlist)
 			init_crypt_key((unsigned char *)(p + 1), p[0], &serverlist->cryptkey);
 			p += (p[0] + 1); //advance the data pointer
 			//decrypt any remaining data
-			crypt_docrypt(&serverlist->cryptkey, p, oldlen - (p - data));
+			crypt_docrypt(&serverlist->cryptkey, p, oldlen - (int)(p - data));
 		} 
 
 	}
@@ -774,7 +775,7 @@ static GError ServerListReadList(GServerList serverlist)
 				break;
 			if (serverlist->querytype == qt_grouprooms || serverlist->querytype == qt_masterinfo)
 			{
-				i = ServerListParseInfoList(serverlist, p,oldlen - (p - data));
+				i = ServerListParseInfoList(serverlist, p, oldlen - (int)(p - data));
 				if (i < 0) //the data was in a bad format, abort!
 					serverlist->abortupdate = 1;
 				else if (i == 0) //not enough info yet, read more!
@@ -795,7 +796,7 @@ static GError ServerListReadList(GServerList serverlist)
 			}
 		}
 	}
-	oldlen = oldlen - (p - data);
+	oldlen = oldlen - (int)(p - data);
 	memmove(data,p,oldlen); //shift it over
 	return 0;
 
@@ -854,7 +855,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 													LIST_PROGRESS, 
 													serverlist->instance,
 													server,
-													(void *)((serverlist->nextupdate * 100) / ArrayLength(serverlist->servers))); //percent done
+													(void *)(intptr_t)((serverlist->nextupdate * 100) / ArrayLength(serverlist->servers))); //percent done
 							serverlist->updatelist[i].currentserver = NULL; //reuse the updatelist
 						} 
 					} else
@@ -870,7 +871,7 @@ static GError ServerListQueryLoop(GServerList serverlist)
 				LIST_PROGRESS, 
 				serverlist->instance,
 				*(GServer *)serverlist->updatelist[i].currentserver,
-				(void *)((serverlist->nextupdate * 100) / ArrayLength(serverlist->servers))); //percent done
+				(void *)(intptr_t)((serverlist->nextupdate * 100) / ArrayLength(serverlist->servers))); //percent done
 				*/
 			serverlist->updatelist[i].currentserver = NULL; //reuse the updatelist
 		}

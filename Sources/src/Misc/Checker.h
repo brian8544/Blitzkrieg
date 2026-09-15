@@ -12,7 +12,7 @@ inline bool CheckFixedRange( const int nIndex, const int nSize, const char *pszN
 template <class TContainer>
 inline bool CheckRange( const TContainer &container, const int nIndex )
 {
-	NI_ASSERT_SLOW_T( nIndex >= 0 && nIndex < container.size(), NStr::Format("Index (%d) must be in the range [0..%d)", nIndex, container.size()) );
+	NI_ASSERT_SLOW_T( nIndex >= 0 && nIndex < static_cast<int>(container.size()), NStr::Format("Index (%d) must be in the range [0..%d)", nIndex, static_cast<int>(container.size())) );
 	return nIndex >= 0 && nIndex < container.size();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

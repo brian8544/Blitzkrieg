@@ -26,7 +26,7 @@ public:
 	// retrieve data
 	//
 	// retrieve number of controls in this bind
-	virtual int STDCALL GetNumControls() const { return controls.size(); }
+	virtual int STDCALL GetNumControls() const { return static_cast<int>( controls.size() ); }
 	// retrieve control name
 	virtual const char* STDCALL GetControl( const int nIndex ) const { return controls[nIndex].c_str(); }
 	// retrieve command name

@@ -305,14 +305,14 @@ public:
 	SMapObject* FindByAI( IRefCount *pObj )
 	{
 		CMapObjectsMap::iterator pos = aiobjects.find( pObj );
-		//NI_ASSERT_SLOW_TF( pos != aiobjects.end(), NStr::Format("Can't find map object by AI (0x%x)", pObj), return 0 );
+		//NI_ASSERT_SLOW_TF( pos != aiobjects.end(), NStr::Format("Can't find map object by AI (%p)", pObj), return 0 );
 		return pos != aiobjects.end() ? pos->second : 0;
 	}
 	// find map object by Vis
 	SMapObject* FindByVis( IVisObj *pObj )
 	{
 		CMapObjectsMap::iterator pos = visobjects.find( pObj );
-		//NI_ASSERT_SLOW_TF( pos != visobjects.end(), NStr::Format("Can't find map object by Vis (0x%x)", pObj), return 0 );
+		//NI_ASSERT_SLOW_TF( pos != visobjects.end(), NStr::Format("Can't find map object by Vis (%p)", pObj), return 0 );
 		return pos != visobjects.end() ? pos->second : 0;
 	}
 	//
@@ -324,7 +324,7 @@ public:
 	SBridgeSpanObject* FindSpanByAI( IRefCount *pObj )
 	{
 		CBridgeSpanObjectsMap::iterator pos = aispans.find( pObj );
-		//NI_ASSERT_SLOW_TF( pos != aiobjects.end(), NStr::Format("Can't find map object by AI (0x%x)", pObj), return 0 );
+		//NI_ASSERT_SLOW_TF( pos != aiobjects.end(), NStr::Format("Can't find map object by AI (%p)", pObj), return 0 );
 		return pos != aispans.end() ? pos->second : 0;
 	}
 	// find map object by Vis

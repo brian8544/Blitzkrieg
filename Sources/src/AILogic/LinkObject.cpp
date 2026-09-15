@@ -42,7 +42,7 @@ void CLinkObject::SetLink( const int _nLink )
 	if ( _nLink > 0 )
 	// }CRAP
 	{
-		NI_ASSERT_T( link2object.size() <= _nLink || link2object[_nLink] == 0, NStr::Format( "Repeated link %d", _nLink ) );
+		NI_ASSERT_T( static_cast<int>(link2object.size()) <= _nLink || link2object[_nLink] == 0, NStr::Format( "Repeated link %d", _nLink ) );
 
 		if ( link2object.size() <= _nLink )
 			link2object.resize( ( nLink + 1 ) * 1.5 );

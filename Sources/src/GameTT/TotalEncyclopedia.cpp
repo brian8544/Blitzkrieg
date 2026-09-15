@@ -81,7 +81,7 @@ void CInterfaceUnitsEncyclopediaBase::FillUnitsList( const int nListType, IUISho
 		{
 			int nSum = 0;
 			for ( int z = 0; z < nSides; ++z )
-				nSum += unitsArray[z][i].size();
+				nSum += static_cast<int>( unitsArray[z][i].size() );
 			if ( nSum == 0 )
 				continue;			//не надо барчик добавлять
 			
@@ -113,7 +113,7 @@ void CInterfaceUnitsEncyclopediaBase::FillUnitsList( const int nListType, IUISho
 					FillUnitInfoItem( pRPG, pItem, windowIDs[vec[i][k]], bFillName );
 				}
 
-				nItemIndex += vec[i].size();
+				nItemIndex += static_cast<int>( vec[i].size() );
 			}
 		}
 	}
@@ -141,7 +141,7 @@ void CInterfaceUnitsEncyclopediaBase::FillUnitsList( const int nListType, IUISho
 			pBar->SetWindowID( unitTypes[i].nClass );
 			nBarIndex++;
 			
-			pSB->AddMultyItems( vec[i].size() );
+			pSB->AddMultyItems( static_cast<int>( vec[i].size() ) );
 			for ( int k = 0; k < vec[i].size(); ++k )
 			{
 				//добавим item с такими RPG stats

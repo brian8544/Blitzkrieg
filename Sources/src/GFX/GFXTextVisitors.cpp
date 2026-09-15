@@ -6,7 +6,7 @@
 template <class TYPE>
 inline const int ResizeToFit( std::vector<TYPE> &data, const int nAmount )
 {
-	const int nOldSize = data.size();
+	const int nOldSize = static_cast<int>( data.size() );
 	data.resize( nOldSize + nAmount );
 	return nOldSize;
 }

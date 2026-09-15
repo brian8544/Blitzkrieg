@@ -1,9 +1,7 @@
 ; Animation.def : Declares the module parameters for the DLL.
 
 LIBRARY      "Anim"
-DESCRIPTION  'Animation system'
-
 EXPORTS
     ; Explicit exports can go here
 
-GetModuleDescriptor		@1
+GetModuleDescriptor        @1

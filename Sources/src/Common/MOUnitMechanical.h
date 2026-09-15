@@ -94,7 +94,7 @@ class CMOUnitMechanical : public CMOUnit
 	const SMechUnitRPGStats* GetRPGStats() const { return static_cast_gdb<const SMechUnitRPGStats*>( pRPG ); }
 	//
 	int GetNumTotalSlots() const { return GetRPGStats()->nPassangers; }
-	int GetNumFreeSlots() const { return GetNumTotalSlots() - passangers.size(); }
+	int GetNumFreeSlots() const { return GetNumTotalSlots() - static_cast<int>( passangers.size() ); }
 	//
 	void UpdateModelWithHP( const float fHP, IVisObjBuilder *pVOB );
 	void ChangeExtPassangers( IScene *pScene, IVisObjBuilder *pVOB );

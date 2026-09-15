@@ -40,9 +40,9 @@ int FindPath( const CTPoint<int> &rStartPoint,
 						  std::vector<CTPoint<int> > *pPointList )
 {
 	NI_ASSERT_T( pLockArray != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pLockArray ) );
+							 NStr::Format( "Wrong parameter: %p\n", pLockArray ) );
 	NI_ASSERT_T( pPointList != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pPointList ) );
+							 NStr::Format( "Wrong parameter: %p\n", pPointList ) );
 	NI_ASSERT_T( IsValidIndices( (*pLockArray), rStartPoint ) &&
 		           IsValidIndices( (*pLockArray), rFinishPoint ),
 							 NStr::Format( "Invalid parameters!" ) );

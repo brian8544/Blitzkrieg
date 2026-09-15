@@ -29,8 +29,8 @@
 
 ```text
 Sources/sdk/FMOD/Include/fmod.hpp
-Sources/sdk/FMOD/lib/x86/fmod_vc.lib
-Sources/sdk/FMOD/lib/x86/fmod.dll
+Sources/sdk/FMOD/lib/x64/fmod_vc.lib
+Sources/sdk/FMOD/lib/x64/fmod.dll
 ```
 
 Запустите `build.bat`. Манифест vcpkg автоматически установит FFmpeg, libpng, libsquish, pugixml и zlib. Включённый в репозиторий SDK `Sources/src/GameSpy` собирается из исходного кода; отдельно загружать GameSpy не нужно. Bink, STLPort, Stingray и старый DirectX 8 SDK для текущей цели игры не требуются.

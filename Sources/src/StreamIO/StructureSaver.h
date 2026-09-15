@@ -154,7 +154,7 @@ inline IDataStorage* CreateStorage( const char *pszName, DWORD dwAccessMode, DWO
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline IDataStream* OpenFileStream( const std::string &szFullName, DWORD dwAccessMode )
 {
-	const int nPos = szFullName.rfind( '\\' );
+	const std::string::size_type nPos = szFullName.rfind( '\\' );
 	const std::string szPathName = nPos != std::string::npos ? szFullName.substr( 0, nPos + 1 ) : ".\\";
 	const std::string szFileName = nPos != std::string::npos ? szFullName.substr( nPos + 1 ) : szFullName;
 	CPtr<IDataStorage> pStorage = OpenStorage( szPathName.c_str(), dwAccessMode, STORAGE_TYPE_FILE );
@@ -163,7 +163,7 @@ inline IDataStream* OpenFileStream( const std::string &szFullName, DWORD dwAcces
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline IDataStream* CreateFileStream( const std::string &szFullName, DWORD dwAccessMode )
 {
-	const int nPos = szFullName.rfind( '\\' );
+	const std::string::size_type nPos = szFullName.rfind( '\\' );
 	const std::string szPathName = nPos != std::string::npos ? szFullName.substr( 0, nPos + 1 ) : ".\\";
 	const std::string szFileName = nPos != std::string::npos ? szFullName.substr( nPos + 1 ) : szFullName;
 	CPtr<IDataStorage> pStorage = CreateStorage( szPathName.c_str(), dwAccessMode, STORAGE_TYPE_FILE );

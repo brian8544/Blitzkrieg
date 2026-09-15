@@ -1112,7 +1112,7 @@ void CNetDriver::StepMultiChannel()
 			pkt >> msg;
 			
 			// try to find appropriate not-common channel
-			i = existingChannels.size() - 1;
+			i = static_cast<int>( existingChannels.size() ) - 1;
 			while ( i > 0 && ( existingChannels[i] == 0 || channelMsgTypes[i].find( msg ) == channelMsgTypes[i].end() ) )
 				--i;
 		}
@@ -1146,7 +1146,7 @@ bool CNetDriver::GetChannelMessage( EMessage *pMsg, int *pClientID, int *receive
 		return false;
 #endif // __TEST_LAGS__
 
-	NI_ASSERT_T( nChannel < existingChannels.size() && existingChannels[nChannel] == 1, NStr::Format( "Channel %d doesn't exist", nChannel ) );
+	NI_ASSERT_T( nChannel < static_cast<int>(existingChannels.size()) && existingChannels[nChannel] == 1, NStr::Format( "Channel %d doesn't exist", nChannel ) );
 
 	if ( channelMsgs[nChannel].empty() )
 		return false;

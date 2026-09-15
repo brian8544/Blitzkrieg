@@ -129,10 +129,10 @@ int CScene::operator&( IStructureSaver &ss )
 		std::vector< SVisObjDesc > descs;
 		saver.Add( 34, &objects );
 		saver.Add( 35, &descs );
-		NI_ASSERT_T( objects.size() == descs.size(), NStr::Format("Wrong data readed - number of objects (%d) are not equal to the number of descs (%d)", objects.size(), descs.size()) );
+		NI_ASSERT_T( static_cast<int>(objects.size()) == static_cast<int>(descs.size()), NStr::Format("Wrong data readed - number of objects (%d) are not equal to the number of descs (%d)", static_cast<int>(objects.size()), static_cast<int>(descs.size())) );
 		// re-build table
 		objdescs.clear();
-		const int nSize = objects.size();
+		const int nSize = static_cast<int>( objects.size() );
 		for ( int i=0; i<nSize; ++i )
 			objdescs[ objects[i] ] = descs[i];
 	}
@@ -142,7 +142,7 @@ int CScene::operator&( IStructureSaver &ss )
 		std::vector< CPtr<IVisObj> > objects;
 		std::vector< SVisObjDesc > descs;
 
-		const int nSize = objdescs.size();
+		const int nSize = static_cast<int>( objdescs.size() );
 		objects.reserve( nSize );
 		descs.reserve( nSize );
 		for ( CVisObjDescMap::const_iterator it = objdescs.begin(); it != objdescs.end(); ++it )
@@ -185,9 +185,9 @@ int CScene::operator&( IStructureSaver &ss )
 	saver.Add( 56, &bWeatherOn );
 	saver.Add( 57, &eWeatherCondition );
 	saver.Add( 58, &eCurrSetting );
-	int nSandSize = sandParticles.size();
-	int nRainSize = rainDrops.size();
-	int nSnowSize = snowFlakes.size();
+	int nSandSize = static_cast<int>( sandParticles.size() );
+	int nRainSize = static_cast<int>( rainDrops.size() );
+	int nSnowSize = static_cast<int>( snowFlakes.size() );
 	saver.Add( 59, &nSandSize );
 	saver.Add( 60, &nRainSize );
 	saver.Add( 61, &nSnowSize );
@@ -680,7 +680,7 @@ void CScene::GetAreas( SShootAreas **_areas, int *pnNumAreas )
 	}
 	else
 	{
-		*pnNumAreas = areas.size();
+		*pnNumAreas = static_cast<int>( areas.size() );
 		*_areas = &( areas[0] );
 	}
 }
@@ -1096,7 +1096,7 @@ void CScene::GetPos3( CVec3 *pPos, const CVec2 &pos, bool bOnZero )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CScene::GetNumSceneObjects() const
 {
-	return objdescs.size();
+	return static_cast<int>( objdescs.size() );
 }
 int CScene::GetAllSceneObjects( std::pair<const SGDBObjectDesc*, CVec3> *pBuffer ) const
 {
@@ -1106,7 +1106,7 @@ int CScene::GetAllSceneObjects( std::pair<const SGDBObjectDesc*, CVec3> *pBuffer
 		pBuffer->second = it->first->GetPosition();
 		++pBuffer;
 	}
-	return objdescs.size();
+	return static_cast<int>( objdescs.size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CScene::SetVisibleObjects( IVisObj **ppObjects, int nNumObjects )

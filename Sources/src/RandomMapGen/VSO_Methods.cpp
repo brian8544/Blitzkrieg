@@ -30,7 +30,7 @@ void CVSOBuilder::SBackupKeyPoints::SaveKeyPoints( const SVectorStripeObject &rV
 void CVSOBuilder::SBackupKeyPoints::LoadKeyPoints( SVectorStripeObject *pVectorStripeObject )
 {
 	NI_ASSERT_T( pVectorStripeObject != 0,
-							 NStr::Format( "Wrong parameter: %x\n", pVectorStripeObject ) );
+							 NStr::Format( "Wrong parameter: %p\n", pVectorStripeObject ) );
 
 	std::list<SKeyPoint>::const_iterator keyPointIterator = keyPoints.begin();
 	for ( std::vector<SVectorStripeObjectPoint>::iterator pointIterator = pVectorStripeObject->points.begin(); pointIterator != pVectorStripeObject->points.end(); ++pointIterator )
@@ -194,7 +194,7 @@ bool CVSOBuilder::SVSOCircle::GetTangentPoint( const CVec2 &v, CVec2 *pTangentPo
 bool CVSOBuilder::SVSOCircle::GetPointsSequence( const CVec2 &v, int nSegmentsCount, std::list<CVec2> *pPointsSequence ) const
 {
 	NI_ASSERT_TF( pPointsSequence != 0,
-							  NStr::Format( "Wrong parameter: pPointsSequence %x\n", pPointsSequence ),
+							  NStr::Format( "Wrong parameter: pPointsSequence %p\n", pPointsSequence ),
 								return false );
 
 	float fStartPolarAngle = GetPolarAngle( vCreationPoint - center );

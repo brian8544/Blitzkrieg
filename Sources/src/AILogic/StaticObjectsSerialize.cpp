@@ -364,7 +364,7 @@ int CFullEntrenchment::operator&( IStructureSaver &ss )
 
 	if ( !saver.IsReading() )
 	{
-		int nSize = entrenchParts.size();
+		int nSize = static_cast<int>( entrenchParts.size() );
 		saver.Add( 1, &nSize );
 		int cnt = 2;
 		for ( std::list<CEntrenchmentPart*>::iterator iter = entrenchParts.begin(); iter != entrenchParts.end(); ++iter )
@@ -404,12 +404,12 @@ int CFullBridge::operator&( IStructureSaver &ss )
 
 	if ( !saver.IsReading() )
 	{
-		int nSize = spans.size();
+		int nSize = static_cast<int>( spans.size() );
 		saver.Add( ++cnt, &nSize );
 		for ( std::list<CBridgeSpan*>::iterator iter = spans.begin(); iter != spans.end(); ++iter )
 			SerializeOwner( ++cnt, &(*iter), &saver );
 		
-		nSize = projectedSpans.size();
+		nSize = static_cast<int>( projectedSpans.size() );
 		saver.Add( ++cnt, &nSize );
 		for ( std::list<CBridgeSpan*>::iterator iter = projectedSpans.begin(); iter != projectedSpans.end(); ++iter )
 			SerializeOwner( ++cnt, &(*iter), &saver );

@@ -56,7 +56,7 @@ void CFileSystemEnumerator::FillStats()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CFileSystemEnumerator::FindFirstFile()
 {
-	int pos = szMask.rfind( '\\' );
+	int pos = static_cast<int>( szMask.rfind( '\\' ) );
 	if ( pos == std::string::npos )
 		szPath.clear();
 	else
@@ -313,7 +313,7 @@ void CFileStream::GetStats( SStorageElementStats *pStats )
 CFileSystem::CFileSystem( const char *pszName, DWORD dwAccessMode, bool bCreate ) 
 : szBase( pszName ), dwStorageAccessMode( dwAccessMode )
 {
-	int pos = szBase.rfind( '\\' );
+	int pos = static_cast<int>( szBase.rfind( '\\' ) );
 	if ( pos == std::string::npos )
 		szBase.clear();
 	else

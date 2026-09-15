@@ -95,7 +95,7 @@ static PEERBool piParseUTM
 
 	// Find the end of the command.
 	///////////////////////////////
-	len = strcspn(message, "/ ");
+	len = (int)(strcspn(message, "/ "));
 	if(len >= PI_UTM_COMMAND_LEN)
 		return PEERFalse;
 	memcpy(piUTMCommand, message, len);
@@ -778,7 +778,7 @@ static void piGOAAddKeyValue
 
 	// How long will this be?
 	/////////////////////////
-	len = (strlen(key) + strlen(value) + 3);
+	len = ((int)(strlen(key)) + (int)(strlen(value)) + 3);
 	assert((len + pos) < maxlen);
 	if((len + pos) >= maxlen)
 		return;
@@ -789,7 +789,7 @@ static void piGOAAddKeyValue
 
 	// Get the new length of the update.
 	////////////////////////////////////
-	len = strlen(outbuf + pos);
+	len = (int)(strlen(outbuf + pos));
 
 	// Update the pos.
 	//////////////////

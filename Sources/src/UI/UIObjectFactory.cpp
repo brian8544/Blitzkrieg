@@ -69,7 +69,7 @@ CUIObjectFactory::CUIObjectFactory()
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static SModuleDescriptor theModuleDescriptor( "UI", UI_BASE_VALUE, 0x0100, &theUIObjectFactory, 0 );
-const SModuleDescriptor* STDCALL GetModuleDescriptor()
+extern "C" const SModuleDescriptor* STDCALL GetModuleDescriptor()
 {
 	return &theModuleDescriptor;
 }

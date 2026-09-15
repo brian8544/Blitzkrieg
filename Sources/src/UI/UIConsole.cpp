@@ -263,7 +263,7 @@ void CUIConsole::Draw( interface IGFX *pGFX )
 		nCurrentY -= TEXT_VERTICAL_SIZE;
 
 		// отобразим строчки в консоли
-		int nSize = vectorOfStrings.size();
+		int nSize = static_cast<int>( vectorOfStrings.size() );
 		for ( int i = nBeginString; i < nSize; ++i )
 		{
 			pGFX->DrawString( vectorOfStrings[nSize - i - 1].szString.c_str(), TEXT_LEFT_SPACE, nCurrentY, vectorOfStrings[nSize - i - 1].dwColor );
@@ -423,9 +423,9 @@ bool CUIConsole::OnChar( int nAsciiCode, int nVirtualKey, bool bPressed, DWORD k
 		{
 			if ( nBeginCommand == -1 && !vectorOfCommands.empty() )
 			{
-				nBeginCommand = vectorOfCommands.size() - 1;
+				nBeginCommand = static_cast<int>( vectorOfCommands.size() ) - 1;
 				szEditString = vectorOfCommands[ nBeginCommand ];
-				nCursorPos = szEditString.size();
+				nCursorPos = static_cast<int>( szEditString.size() );
 				break;
 			}
 
@@ -434,7 +434,7 @@ bool CUIConsole::OnChar( int nAsciiCode, int nVirtualKey, bool bPressed, DWORD k
 				//сдвинем позицию на единицу вниз
 				nBeginCommand--;
 				szEditString = vectorOfCommands[ nBeginCommand ];
-				nCursorPos = szEditString.size();
+				nCursorPos = static_cast<int>( szEditString.size() );
 			}
 		}
 		break;
@@ -451,12 +451,12 @@ bool CUIConsole::OnChar( int nAsciiCode, int nVirtualKey, bool bPressed, DWORD k
 			{
 				nBeginCommand = -1;
 				szEditString = L"";
-				nCursorPos = szEditString.size();
+				nCursorPos = static_cast<int>( szEditString.size() );
 			}
 			else
 			{
 				szEditString = vectorOfCommands[ nBeginCommand ];
-				nCursorPos = szEditString.size();
+				nCursorPos = static_cast<int>( szEditString.size() );
 			}
 		}
 		break;
@@ -471,7 +471,7 @@ bool CUIConsole::OnChar( int nAsciiCode, int nVirtualKey, bool bPressed, DWORD k
 		{
 			//показываем начало консольного текста ( самое старое )
 			if ( vectorOfStrings.size() > CONSOLE_HEIGHT / TEXT_VERTICAL_SIZE )
-				nBeginString = vectorOfStrings.size() - CONSOLE_HEIGHT / TEXT_VERTICAL_SIZE + MINUS_PAGE_SIZE;
+				nBeginString = static_cast<int>( vectorOfStrings.size() ) - CONSOLE_HEIGHT / TEXT_VERTICAL_SIZE + MINUS_PAGE_SIZE;
 		}
 		break;
 
@@ -479,7 +479,7 @@ bool CUIConsole::OnChar( int nAsciiCode, int nVirtualKey, bool bPressed, DWORD k
 		if ( keyState == E_KEYBOARD_FREE )
 		{
 			//на конец строки
-			nCursorPos = szEditString.size();
+			nCursorPos = static_cast<int>( szEditString.size() );
 		}
 		else if ( keyState == E_CTRL_KEY_DOWN )
 		{
@@ -584,7 +584,7 @@ void CUIConsole::ParseCommand( const std::wstring &szExtCommand )
 	}
 
 	//проверим, вдруг эта команда зарегистрирована для выполнения в скрипте консоли, тогда выполним ее
-	int nPos = szCommandString.find( '(' );
+	int nPos = static_cast<int>( szCommandString.find( '(' ) );
 	std::string szFunctionName;
 	if ( nPos > 0 )
 	{
@@ -707,10 +707,10 @@ int Exec( struct lua_State *state )
 	NI_ASSERT_SLOW_TF( script.IsString( 1 ), "GetSGlobalVar: the first parameter is not a string", return 1 );
 	IDataStorage *pStorage = GetSingleton<IDataStorage>();
 	std::string szFileName = pStorage->GetName();
-	int nPos = szFileName.rfind( '\\' );
+	int nPos = static_cast<int>( szFileName.rfind( '\\' ) );
 	if ( nPos != std::string::npos )
 		szFileName = szFileName.substr( 0, nPos );
-	nPos = szFileName.rfind( '\\' );
+	nPos = static_cast<int>( szFileName.rfind( '\\' ) );
 	if ( nPos != std::string::npos )
 		szFileName = szFileName.substr( 0, nPos + 1 );
 	szFileName += script.GetObject( 1 );

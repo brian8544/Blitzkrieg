@@ -34,7 +34,7 @@ private:
 public:
 	CListControlWrapper() { }
 	void ResetIterator() { curIter = playersInfo.begin(); }
-	unsigned int GetSize() const { return playersInfo.size(); }
+	unsigned int GetSize() const { return static_cast<unsigned int>( playersInfo.size() ); }
 	SUIPlayerInfo * GetNext() 
 	{ 
 		if ( curIter == playersInfo.end() )

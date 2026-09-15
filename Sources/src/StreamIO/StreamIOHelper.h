@@ -16,7 +16,7 @@ class CStreamAccessor : public CPtr<IDataStream>
 	template <class T1>
 		void WriteString( const std::basic_string<T1> &str )
 		{
-			int nSize = str.size();
+			const int nSize = NStreamIO::CheckedSizeToInt( str.size() );
 			int nCheck = (*this)->Write( &nSize, sizeof(nSize) );
 			NI_ASSERT_SLOW_T( nCheck == sizeof(nSize), NStr::Format("%d bytes written instead of %d", nCheck, sizeof(nSize)) );
 			if ( nSize != 0 )

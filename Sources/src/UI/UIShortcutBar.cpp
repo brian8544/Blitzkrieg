@@ -439,7 +439,7 @@ void CUIShortcutBar::Visit( interface ISceneVisitor *pVisitor )
 			// selection виден
 			if ( !selSubRects.empty() )
 			{
-				const int nSize = selSubRects.size();
+				const int nSize = static_cast<int>( selSubRects.size() );
 				nTop += wndRect.y1 + nTopSpace;
 
 				SGFXRect2 *pRects = GetTempBuffer<SGFXRect2>( nSize );
@@ -532,7 +532,7 @@ void CUIShortcutBar::Draw( IGFX *pGFX )
 		if ( nTop + nVSubSpace + 2*vSize.y > 0 && nTop < wndRect.Height() - nTopSpace - nBottomSpace )
 		{
 			//selection виден
-			int nSize = selSubRects.size();
+			int nSize = static_cast<int>( selSubRects.size() );
 			if ( nSize > 0 )
 			{
 				pGFX->SetTexture( 0, pSelectionTexture );
@@ -711,7 +711,7 @@ int CUIShortcutBar::GetNumberOfItems( int nBar )
 	if ( nBar >= bars.size() )
 		return 0;
 
-	return bars[nBar].items.size();
+	return static_cast<int>( bars[nBar].items.size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IUIElement* CUIShortcutBar::GetItem( int nBar, int nItem )

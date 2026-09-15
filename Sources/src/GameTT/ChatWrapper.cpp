@@ -25,12 +25,14 @@ void CChatWrapper::AddEditBoxText( const bool bWhisper )
 
 	if ( !wszTextTmp.empty() )
 	{
-		const unsigned int nPos = wszTextTmp.find_last_not_of( L" " );
-		wszTextTmp.resize( Min(wszTextTmp.size(), nPos + 1 ) );
+		const std::wstring::size_type nPos = wszTextTmp.find_last_not_of( L" " );
+		if ( nPos == std::wstring::npos )
+			wszTextTmp.clear();
+		else
+			wszTextTmp.resize( nPos + 1 );
 		
-		const unsigned int nFirstNotSpace = wszTextTmp.find_first_not_of( L" " );
-		
-		std::wstring wszText = wszTextTmp.c_str() + Min(nFirstNotSpace,wszTextTmp.size());
+		const std::wstring::size_type nFirstNotSpace = wszTextTmp.find_first_not_of( L" " );
+		std::wstring wszText = nFirstNotSpace == std::wstring::npos ? L"" : wszTextTmp.substr( nFirstNotSpace );
 		
 		if ( !wszText.empty() )
 		{

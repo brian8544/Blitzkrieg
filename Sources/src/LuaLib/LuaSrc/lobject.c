@@ -100,7 +100,7 @@ void luaO_chunkid (char *out, const char *source, int bufflen) {
       int l;
       source++;  /* skip the `@' */
       bufflen -= sizeof("file `...%s'");
-      l = strlen(source);
+      l = (int)(strlen(source));
       if (l>bufflen) {
         source += (l-bufflen);  /* get last part of file name */
         sprintf_s(out, outlen, "file `...%.99s'", source);
@@ -109,7 +109,7 @@ void luaO_chunkid (char *out, const char *source, int bufflen) {
         sprintf_s(out, outlen, "file `%.99s'", source);
     }
     else {
-      int len = strcspn(source, "\n");  /* stop at first newline */
+      int len = (int)(strcspn(source, "\n"));  /* stop at first newline */
       bufflen -= sizeof("string \"%.*s...\"");
       if (len > bufflen) len = bufflen;
       if (source[len] != '\0')  /* must truncate? */

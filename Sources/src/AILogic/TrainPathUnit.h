@@ -63,7 +63,7 @@ public:
 	void AddCarriage( class CCarriagePathUnit *pCarriage );
 	const float GetTrainLength() const { return fTrainLength; }
 
-	const int GetNCarriages() const { return carriages.size(); }
+	const int GetNCarriages() const { return static_cast<int>( carriages.size() ); }
 	CCarriagePathUnit* GetCarriage( const int n );
 	// расстояние от заднего колеса вагона n до переднего колеса вагона m, если m присоединён к m
 	const float GetDistFromBackToFrontWheel( const int n, const int m );

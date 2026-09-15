@@ -39,7 +39,7 @@ void CAckManager::UpdateAcknowledgments( SAIBoredAcknowledgement **pAckBuffer, i
 	int nSize = 0;
 	for ( CAckTypeBoredPrecence::iterator it = bored.begin(); it != bored.end(); ++it )
 	{
-		nSize += it->second.size();
+		nSize += static_cast<int>( it->second.size() );
 	}
 	*pnLen = nSize;
 	*pAckBuffer = GetTempBuffer<SAIBoredAcknowledgement>( *pnLen );
@@ -61,7 +61,7 @@ void CAckManager::UpdateAcknowledgments( SAIBoredAcknowledgement **pAckBuffer, i
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CAckManager::UpdateAcknowledgments( SAIAcknowledgment **pAckBuffer, int *pnLen )
 {
-	*pnLen = acknowledgements.size();
+	*pnLen = static_cast<int>( acknowledgements.size() );
 	*pAckBuffer = GetTempBuffer<SAIAcknowledgment>( *pnLen );
 
 	int i = 0;

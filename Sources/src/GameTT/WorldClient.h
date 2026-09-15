@@ -220,7 +220,7 @@ public:
 			groups[i].nVisGroupID = i;
 	}
 	// access to objects
-	int size() const { return objects.size(); }
+	int size() const { return static_cast<int>( objects.size() ); }
 	const CPtr<SMapObject>& back() const { return objects.back(); }
 	const CPtr<SMapObject>& front() const { return objects.front(); }
 	const CMapObjectsList& GetObjects() const { return objects; }

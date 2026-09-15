@@ -33,7 +33,7 @@ void CUnitGuns::AddGun( const interface IGunsFactory &gunsFactory, const SWeapon
 	commonGunsInfo[nCommonGun] = new SCommonGunInfo( false, nAmmo, nCommonGun );
 
 	gunsBegins[nCommonGun] = *nGuns;
-	gunsBegins[nCommonGun+1] = *nGuns + pWeapon->shells.size();
+	gunsBegins[nCommonGun+1] = *nGuns + static_cast<int>( pWeapon->shells.size() );
 
 	if ( nCommonGuns < nCommonGun + 1 )
 		nCommonGuns = nCommonGun + 1;

@@ -29,8 +29,8 @@ Direct3D 互換ソースは `Sources/sdk` に含まれています。FMOD SDK �
 
 ```text
 Sources/sdk/FMOD/Include/fmod.hpp
-Sources/sdk/FMOD/lib/x86/fmod_vc.lib
-Sources/sdk/FMOD/lib/x86/fmod.dll
+Sources/sdk/FMOD/lib/x64/fmod_vc.lib
+Sources/sdk/FMOD/lib/x64/fmod.dll
 ```
 
 `build.bat` を実行します。vcpkg マニフェストにより FFmpeg、libpng、libsquish、pugixml、zlib が自動的にインストールされます。同梱の `Sources/src/GameSpy` SDK はソースからビルドされるため、GameSpy を別途ダウンロードする必要はありません。現在のゲームターゲットでは Bink、STLPort、Stingray、旧 DirectX 8 SDK は不要です。

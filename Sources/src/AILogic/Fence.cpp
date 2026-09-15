@@ -179,7 +179,7 @@ void CFence::Delete()
 		UnlockTiles();
 		RemoveTransparencies();
 		
-		const int nDestroyedSize = pStats->dirs[nDir].cdamages.size();
+		const int nDestroyedSize = static_cast<int>( pStats->dirs[nDir].cdamages.size() );
 		if ( nDestroyedSize == 0 )
 		{
 			if ( GetGlobalVar("report", 0) == 1 )
@@ -236,7 +236,7 @@ void CFence::DamagePartially( const ETypesOfLife eType )
 		{
 			if ( eType == ETOL_LEFT )
 			{
-				const int nLeftSize = pStats->dirs[nDir].ldamages.size();
+				const int nLeftSize = static_cast<int>( pStats->dirs[nDir].ldamages.size() );
 
 				if ( nLeftSize == 0 )
 				{
@@ -256,7 +256,7 @@ void CFence::DamagePartially( const ETypesOfLife eType )
 			}
 			else
 			{
-				const int nRightSize = pStats->dirs[nDir].rdamages.size();
+				const int nRightSize = static_cast<int>( pStats->dirs[nDir].rdamages.size() );
 				if ( nRightSize == 0 )
 				{
 					if ( GetGlobalVar("report", 0) == 1 )
@@ -277,7 +277,7 @@ void CFence::DamagePartially( const ETypesOfLife eType )
 		}
 		else
 		{
-			const int nDestroyedSize = pStats->dirs[nDir].cdamages.size();
+			const int nDestroyedSize = static_cast<int>( pStats->dirs[nDir].cdamages.size() );
 
 			if ( nDestroyedSize == 0 )
 			{

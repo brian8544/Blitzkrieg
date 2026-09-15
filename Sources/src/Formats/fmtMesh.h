@@ -110,7 +110,7 @@ struct SSkeletonFormat
 	//
 	int operator&( IStructureSaver &ss );
 	//
-	int GetNumNodes() const { return nodes.size(); }
+	int GetNumNodes() const { return static_cast<int>( nodes.size() ); }
 	const SNodeFormat* GetNode( int nIndex ) const { return &( nodes[nIndex] ); }
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -149,7 +149,7 @@ public:
 	}
 	//
 	const ESetCompare Compare( const std::vector<const CControl*> &controls ) const;
-	const int GetNumControls() const { return controls.size(); }
+	const int GetNumControls() const { return static_cast<int>( controls.size() ); }
 	void AddSuppressive( CCombo *pCombo ) 
 	{ 
 		if ( std::find(pMapping->suppressives.begin(), pMapping->suppressives.end(), pCombo) == pMapping->suppressives.end() )

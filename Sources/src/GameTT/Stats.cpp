@@ -405,7 +405,7 @@ void CInterfaceStats::RepositionList()
 
 	// for counting every player (16 is maximum)
 	std::vector< std::vector<SPlayerStatInfo> > playerStat( playerInfos[0].size() + playerInfos[1].size() );
-	const int nPlayersIn0Party = playerInfos[0].size();
+	const int nPlayersIn0Party = static_cast<int>( playerInfos[0].size() );
 
 	// calcualte statistics
 	for ( int nParty = 0; nParty < 2; ++nParty )

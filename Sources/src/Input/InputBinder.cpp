@@ -401,7 +401,7 @@ bool CInputBinder::AddBindLocal( const SBindsConfig::SBindSection::SCommandBind 
 	SCommand *pCommand = GetCommand( bind.szName );
 	//
 	// compose controls list
-	const int nNumControls = bind.controls.size();
+	const int nNumControls = static_cast<int>( bind.controls.size() );
 	std::vector<const CControl*> controls;
 	controls.reserve( bind.controls.size() );
 	for ( std::vector<std::string>::const_iterator it = bind.controls.begin(); it != bind.controls.end(); ++it )

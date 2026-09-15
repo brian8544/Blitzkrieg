@@ -382,7 +382,7 @@ bool CPlayerScenarioInfo::SetExperience( const double _fExperience )
 
 	NI_ASSERT_T( rankInfos.size() >= 1, NStr::Format("wrong rank size, must have at least 1 base rank, wrong file %s", szPath.c_str() ) );
 	
-	int nRank = rankInfos.size() - 1;
+	int nRank = static_cast<int>( rankInfos.size() ) - 1;
 	for ( int i = 1; i < rankInfos.size(); ++i )
 	{
 		if ( rankInfos[i].fExperience > fExperience )
@@ -427,7 +427,7 @@ bool CPlayerScenarioInfo::SetExperience( const double _fExperience )
 //
 int CPlayerScenarioInfo::GetNumUnits() const
 {
-	return units.size();
+	return static_cast<int>( units.size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IScenarioUnit* CPlayerScenarioInfo::GetUnit( const int nIndex ) const
@@ -438,7 +438,7 @@ IScenarioUnit* CPlayerScenarioInfo::GetUnit( const int nIndex ) const
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CPlayerScenarioInfo::GetNumNewUnits() const
 {
-	return newUnits.size();
+	return static_cast<int>( newUnits.size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IScenarioUnit* CPlayerScenarioInfo::GetNewUnit( const int nIndex ) const
@@ -471,7 +471,7 @@ bool CPlayerScenarioInfo::HasMedal( const std::string &szName ) const
 // new medals
 int CPlayerScenarioInfo::GetNumNewMedals() const
 {
-	return newMedals.size();
+	return static_cast<int>( newMedals.size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const std::string& CPlayerScenarioInfo::GetNewMedal( const int nIndex ) const
@@ -493,12 +493,12 @@ const std::string& CPlayerScenarioInfo::GetUpgrade() const
 // depot (unlimited) upgrades
 int CPlayerScenarioInfo::GetNumDepotUpgrades() const
 {
-	return depotUpgrades.size();
+	return static_cast<int>( depotUpgrades.size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CPlayerScenarioInfo::GetNumNewDepotUpgrades() const
 {
-	return depotNewUpgrades.size();
+	return static_cast<int>( depotNewUpgrades.size() );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const std::string& CPlayerScenarioInfo::GetNewDepotUpgrade( const int nIndex ) const
@@ -600,7 +600,7 @@ CScenarioUnit* CPlayerScenarioInfo::AddNewSlot( const std::string &szRPGStats )
 	CScenarioUnit *pUnit = CreateObject<CScenarioUnit>( MAIN_SCENARIO_UNIT );
 	pUnit->SetRPGStats( szRPGStats );
 	units.push_back( pUnit );
-	pUnit->Init( units.size() - 1 );
+	pUnit->Init( static_cast<int>( units.size() ) - 1 );
 	return pUnit;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

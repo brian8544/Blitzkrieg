@@ -166,7 +166,7 @@ void CScene::Pick( const CVec2 &point, std::pair<IVisObj*, CVec2> **ppObjects, i
 		return;
 	}
 	//
-	*pnNumObjects = picked.size();
+	*pnNumObjects = static_cast<int>( picked.size() );
 	*ppObjects = GetTempBuffer< std::pair<IVisObj*, CVec2> >( *pnNumObjects );
 	int i = 0;
 	for ( CPickedObjectsList::const_iterator it = picked.begin(); it != picked.end(); ++it )
@@ -243,7 +243,7 @@ void CScene::Pick( const CTRect<float> &rcRect, std::pair<IVisObj*, CVec2> **ppO
 		return;
 	}
 	//
-	*pnNumObjects = picked.size();
+	*pnNumObjects = static_cast<int>( picked.size() );
 	*ppObjects = GetTempBuffer< std::pair<IVisObj*, CVec2> >( *pnNumObjects );
 	int i = 0;
 	for ( CPickedObjectsList::const_iterator it = picked.begin(); it != picked.end(); ++it )

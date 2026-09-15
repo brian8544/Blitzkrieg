@@ -48,7 +48,7 @@ public:
 	void Segment();
 
 	//
-	virtual int GetNGuns() const { return guns.size(); }
+	virtual int GetNGuns() const { return static_cast<int>( guns.size() ); }
 	virtual class CBasicGun* GetGun( const int n ) const { return guns[n]; }
 	// если есть пушки, которыми можно пристреливаться, то выдаёт первую из них, иначе 0
 	virtual class CBasicGun* GetFirstArtilleryGun() const = 0;

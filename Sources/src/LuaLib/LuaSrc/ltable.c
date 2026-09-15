@@ -40,7 +40,7 @@
 ** of its hash value)
 */
 Node *luaH_mainposition (const Hash *t, const TObject *key) {
-  unsigned long h;
+  uintptr_t h;
   switch (ttype(key)) {
     case LUA_TNUMBER:
       h = (unsigned long)(long)nvalue(key);
@@ -144,7 +144,7 @@ void luaH_remove (Hash *t, TObject *key) {
   else {
     /* try to find a number `n' with the same hash as `key' */
     Node *mp = luaH_mainposition(t, key);
-    int n = mp - &t->node[0];
+    int n = (int)(mp - &t->node[0]);
     /* make sure `n' is not in `t' */
     while (luaH_getnum(t, n) != &luaO_nilobject) {
       if (n >= MAX_INT - t->size)

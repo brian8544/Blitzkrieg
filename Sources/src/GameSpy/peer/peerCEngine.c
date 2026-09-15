@@ -16,6 +16,7 @@ devsupport@gamespy.com
 ** INCLUDES **
 *************/
 #include <string.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "peerMain.h"
@@ -73,7 +74,7 @@ static int piListedGamesHash
 
 	assert(listedGame);
 
-	hash = ((unsigned int)listedGame->server % PI_LISTED_GAMES_NUM_BUCKETS);
+	hash = (unsigned int)((uintptr_t)listedGame->server % PI_LISTED_GAMES_NUM_BUCKETS);
 
 	return hash;
 }
@@ -90,7 +91,11 @@ static int piListedGamesCompare
 	assert(listedGame1);
 	assert(listedGame2);
 
-	return ((unsigned int)listedGame1->server - (unsigned int)listedGame2->server);
+	{
+		uintptr_t server1 = (uintptr_t)listedGame1->server;
+		uintptr_t server2 = (uintptr_t)listedGame2->server;
+		return (server1 > server2) - (server1 < server2);
+	}
 }
 
 PEERBool piCEngineInit
@@ -339,7 +344,7 @@ static void piListingGamesCEngineCallback
 	if(msg == LIST_PROGRESS)
 	{
 		GServer server = (GServer)param1;
-		int progress = (int)param2;
+		int progress = (int)(intptr_t)param2;
 		const char * name;
 		const char * gamemode;
 		PEERBool staging;
@@ -474,7 +479,7 @@ void piListingGamesChannelMessage
 		endIP = slash;
 		port = 0;
 	}
-	ipLen = (endIP - hostaddr);
+	ipLen = (int)(endIP - hostaddr);
 	assert(ipLen < 16);
 	if(ipLen >= 16)
 		return;

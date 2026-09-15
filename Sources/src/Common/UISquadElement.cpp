@@ -378,7 +378,7 @@ bool CUISquadElement::OnLButtonDown( const CVec2 &vPos, EMouseState mouseState )
 			CUIUnitObserver *observer = *(passangers.begin());
 			if ( observer->GetMOUnit()->CanSelect() )
 			{
-				msg.nParam = reinterpret_cast<int>( observer->GetMOUnit() );
+				msg.nPointerParam = reinterpret_cast<std::intptr_t>( observer->GetMOUnit() );
 				GetSingleton<IInput>()->AddMessage( msg );
 			}
 		}
@@ -389,7 +389,7 @@ bool CUISquadElement::OnLButtonDown( const CVec2 &vPos, EMouseState mouseState )
 				CUIUnitObserver *observer = *(it);
 				if ( observer->GetMOUnit()->CanSelect() )
 				{
-					msg.nParam = reinterpret_cast<int>( observer->GetMOUnit() );
+					msg.nPointerParam = reinterpret_cast<std::intptr_t>( observer->GetMOUnit() );
 					GetSingleton<IInput>()->AddMessage( msg );
 				}
 			}
@@ -427,5 +427,5 @@ void CUISquadElement::RemovePassanger( IUnitStateObserver *pObserver )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int CUISquadElement::GetPassangerCount()
 {
-	return passangers.size();
+	return static_cast<int>( passangers.size() );
 }

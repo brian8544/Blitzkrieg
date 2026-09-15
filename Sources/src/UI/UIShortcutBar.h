@@ -80,7 +80,7 @@ public:
 	virtual bool STDCALL GetBarExpandState( int nBar ) { return bars.size() > nBar ? bars[nBar].bExpandState : false; }
 	virtual void STDCALL SetBarExpandState( int nBar, bool bExpand, const bool bNotify = false );
 	virtual IUIElement* STDCALL GetBar( int nBar );
-	virtual int STDCALL GetNumberOfBars() { return bars.size(); }
+	virtual int STDCALL GetNumberOfBars() { return static_cast<int>( bars.size() ); }
 	virtual int STDCALL GetNumberOfItems( int nBar );
 	virtual IUIElement* STDCALL GetItem( int nBar, int nItem );
 	virtual void STDCALL Clear();

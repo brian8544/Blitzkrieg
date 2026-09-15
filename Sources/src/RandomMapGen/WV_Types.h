@@ -37,14 +37,14 @@ public:
 	const TYPE& operator[]( int nElementIndex ) const
 	{ 
 		NI_ASSERT_T( ( nElementIndex >=0 ) && ( nElementIndex < elements.size() ),
-			           NStr::Format("Index (%d) miss in SWeightVector (%d)", nElementIndex, elements.size() ) );
+			           NStr::Format("Index (%d) miss in SWeightVector (%d)", nElementIndex, static_cast<int>(elements.size()) ) );
 		return elements[nElementIndex];
 	}
 	//----------------------------------------------------------------------------------------------------
 	TYPE& operator[]( int nElementIndex )
 	{ 
 		NI_ASSERT_T( ( nElementIndex >=0 ) && ( nElementIndex < elements.size() ),
-			           NStr::Format("Index (%d) miss in SWeightVector (%d)", nElementIndex, elements.size() ) );
+			           NStr::Format("Index (%d) miss in SWeightVector (%d)", nElementIndex, static_cast<int>(elements.size()) ) );
 		return elements[nElementIndex];
 	}
 	
@@ -53,21 +53,21 @@ public:
 	const TYPE& Get( int nElementIndex ) const
 	{
 		NI_ASSERT_T( ( nElementIndex >=0 ) && ( nElementIndex < elements.size() ),
-			           NStr::Format("Index (%d) miss in SWeightVector (%d)", nElementIndex, elements.size() ) );
+			           NStr::Format("Index (%d) miss in SWeightVector (%d)", nElementIndex, static_cast<int>(elements.size()) ) );
 		return elements[nElementIndex];
 	}
 	//----------------------------------------------------------------------------------------------------
 	void Set( int nElementIndex, const TYPE &rElement )
 	{
 		NI_ASSERT_T( ( nElementIndex >=0 ) && ( nElementIndex < elements.size() ),
-			           NStr::Format("Index (%d) miss in SWeightVector (%d)", nElementIndex, elements.size() ) );
+			           NStr::Format("Index (%d) miss in SWeightVector (%d)", nElementIndex, static_cast<int>(elements.size()) ) );
 		elements[nElementIndex] = rElement;
 	}
 	//----------------------------------------------------------------------------------------------------
 	int GetWeight( int nElementIndex ) const
 	{
 		NI_ASSERT_T( ( nElementIndex >=0 ) && ( nElementIndex < elements.size() ),
-			           NStr::Format("Index (%d) miss in SWeightVector (%d)", nElementIndex, elements.size() ) );
+			           NStr::Format("Index (%d) miss in SWeightVector (%d)", nElementIndex, static_cast<int>(elements.size()) ) );
 		return ( nElementIndex > 0 ) ? ( weights[nElementIndex] - weights[nElementIndex - 1] ) : weights[nElementIndex];
 	}
 	//----------------------------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ public:
 		weights.erase( weights.begin() + nElementIndex );
 	}
 	//----------------------------------------------------------------------------------------------------
-	inline int size() const { return elements.size(); }
+	inline int size() const { return static_cast<int>( elements.size() ); }
 	inline int weight() const { return !weights.empty() ? weights[weights.size() - 1 ] : 0; }
 	//----------------------------------------------------------------------------------------------------
 	inline void clear() { elements.clear(); weights.clear(); }
@@ -124,7 +124,7 @@ public:
 		
 		int nWeight = Random( weights[ weights.size() - 1 ] );
 		int nMinIndex = 0;
-		int nMaxIndex = weights.size() - 1;
+		int nMaxIndex = static_cast<int>( weights.size() ) - 1;
 
 		if ( bBinarySearch )
 		{
@@ -152,7 +152,7 @@ public:
 	{
 		int nElementIndex = GetRandomIndex( bBinarySearch );
 		NI_ASSERT_T( ( nElementIndex >=0 ) && ( nElementIndex < elements.size() ),
-			           NStr::Format("Index (%d) miss in SWeightVector (%d)", nElementIndex, elements.size() ) );
+			           NStr::Format("Index (%d) miss in SWeightVector (%d)", nElementIndex, static_cast<int>(elements.size()) ) );
 		return elements[nElementIndex];
 	}
 

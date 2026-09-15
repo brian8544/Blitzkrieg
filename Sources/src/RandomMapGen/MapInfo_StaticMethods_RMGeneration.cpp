@@ -57,7 +57,7 @@ struct STraceTimeKeeper
 bool CMapInfo::AddMapInfo( SLoadMapInfo *pDestLoadMapInfo, const CTPoint<int> &rDestPoint, const SLoadMapInfo &rSourceLoadMapInfo )
 {
 	NI_ASSERT_TF( pDestLoadMapInfo != 0,
-							  NStr::Format( "Wrong parameter: %x\n", pDestLoadMapInfo ),
+							  NStr::Format( "Wrong parameter: %p\n", pDestLoadMapInfo ),
 							  return false );
 	
 	NI_ASSERT_TF( rSourceLoadMapInfo.nSeason == pDestLoadMapInfo->nSeason,
@@ -149,7 +149,7 @@ bool CMapInfo::AddMapInfo( SLoadMapInfo *pDestLoadMapInfo, const CTPoint<int> &r
 			rDestRiverInfo.points[nPointndex].vPos.x += rDestPoint.x * fWorldCellSize;
 			rDestRiverInfo.points[nPointndex].vPos.y += rDestPoint.y * fWorldCellSize;
 		}
-		rDestRiverInfo.nID = pDestLoadMapInfo->terrain.rivers.size();
+		rDestRiverInfo.nID = static_cast<int>( pDestLoadMapInfo->terrain.rivers.size() );
 	}
 
 	//заполняем 3D дороги
@@ -169,7 +169,7 @@ bool CMapInfo::AddMapInfo( SLoadMapInfo *pDestLoadMapInfo, const CTPoint<int> &r
 			rDestRoad3DInfo.points[nPointndex].vPos.x += rDestPoint.x * fWorldCellSize;
 			rDestRoad3DInfo.points[nPointndex].vPos.y += rDestPoint.y * fWorldCellSize;
 		}
-		rDestRoad3DInfo.nID = pDestLoadMapInfo->terrain.roads3.size();
+		rDestRoad3DInfo.nID = static_cast<int>( pDestLoadMapInfo->terrain.roads3.size() );
 	}
 
 	//заполняем обьекты
@@ -422,7 +422,7 @@ float GetInclusivePolygonSetDistance( const CVec2 &rPoint, const std::list<CVec2
 int GetPolygonLine( int nYPos, float fSide, const std::list<CVec2> &rPolygon, std::vector<int> *pXPos )
 {
 	NI_ASSERT_TF( pXPos != 0,
-								NStr::Format( "GetPolygonLine(), invalid parameter: pXPos: %x", pXPos ),
+								NStr::Format( "GetPolygonLine(), invalid parameter: pXPos: %p", pXPos ),
 								return false );
 	pXPos->clear();
 
@@ -442,7 +442,7 @@ int GetPolygonLine( int nYPos, float fSide, const std::list<CVec2> &rPolygon, st
 			const int nXPos = currentPointIterator0->x / fSide;
 			pXPos->resize( 2, nXPos );
 		}
-		return pXPos->size();
+		return static_cast<int>( pXPos->size() );
 	}
 	
 	const float fY = ( nYPos * fSide ) + ( fSide / 2.0f );
@@ -472,17 +472,17 @@ int GetPolygonLine( int nYPos, float fSide, const std::list<CVec2> &rPolygon, st
 		}
 	}
 	std::sort( pXPos->begin(), pXPos->end() );
-	return pXPos->size();
+	return static_cast<int>( pXPos->size() );
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CMapInfo::FillTerrain( STerrainInfo *pTerrainInfo, const struct STilesetDesc &rTilesetDesc, int nTileIndex )
 {
 	NI_ASSERT_TF( pTerrainInfo != 0,
-							  NStr::Format( "CMapInfo::FillTileSet(): Invalid parameter pTerrainInfo: %x (!= 0)\n", pTerrainInfo ),
+							  NStr::Format( "CMapInfo::FillTileSet(): Invalid parameter pTerrainInfo: %p (!= 0)\n", pTerrainInfo ),
 							  return false );
 	NI_ASSERT_TF( ( nTileIndex >= 0 ) && ( nTileIndex < rTilesetDesc.terrtypes.size() ),
-							  NStr::Format( "CMapInfo::FillTileSet(): Invalid parameter nTileIndex: %d [0 %d)\n", nTileIndex, rTilesetDesc.terrtypes.size() ),
+							  NStr::Format( "CMapInfo::FillTileSet(): Invalid parameter nTileIndex: %d [0 %d)\n", nTileIndex, static_cast<int>(rTilesetDesc.terrtypes.size()) ),
 							  return false );
 	for ( int nYIndex = 0; nYIndex < pTerrainInfo->tiles.GetSizeY(); ++nYIndex )
 	{
@@ -508,7 +508,7 @@ bool CMapInfo::FillTileSet( STerrainInfo *pTerrainInfo,
 	}
 
 	NI_ASSERT_TF( pTerrainInfo != 0,
-							  NStr::Format( "CMapInfo::FillTileSet(): Invalid parameter pTerrainInfo: %x (!= 0)\n", pTerrainInfo ),
+							  NStr::Format( "CMapInfo::FillTileSet(): Invalid parameter pTerrainInfo: %p (!= 0)\n", pTerrainInfo ),
 							  return false );
 	for ( CRMTileSet::const_iterator tileSetShellIterator = rTileSet.begin(); tileSetShellIterator != rTileSet.end(); ++tileSetShellIterator )
 	{
@@ -631,7 +631,7 @@ bool CMapInfo::FillObjectSet( SLoadMapInfo *pLoadMapInfo,
 	}
 
 	NI_ASSERT_TF( pLoadMapInfo != 0,
-								NStr::Format( "CMapInfo::FillObjectSet(): Invalid parameter pLoadMapInfo: %x (!= 0)\n", pLoadMapInfo ),
+								NStr::Format( "CMapInfo::FillObjectSet(): Invalid parameter pLoadMapInfo: %p (!= 0)\n", pLoadMapInfo ),
 								return false );
 	for ( CRMObjectSet::const_iterator objectSetShellIterator = rObjectSet.begin(); objectSetShellIterator != rObjectSet.end(); ++objectSetShellIterator )
 	{
@@ -772,7 +772,7 @@ bool CMapInfo::FillProfilePattern( STerrainInfo *pTerrainInfo,
 																	 std::unordered_map<LPARAM, float> *pDistances )
 {
 	NI_ASSERT_TF( pTerrainInfo != 0,
-							  NStr::Format( "CMapInfo::FillProfilePattern(): Invalid parameter pTerrainInfo: %x (!= 0)\n", pTerrainInfo ),
+							  NStr::Format( "CMapInfo::FillProfilePattern(): Invalid parameter pTerrainInfo: %p (!= 0)\n", pTerrainInfo ),
 							  return false );
 
 	CTRect<int> boundingRect( 0, 0, pTerrainInfo->tiles.GetSizeX(), pTerrainInfo->tiles.GetSizeY() );
@@ -841,7 +841,7 @@ bool CMapInfo::FillProfilePattern( STerrainInfo *pTerrainInfo,
 					{
 						fInclusiveDistance /= fWorldCellSize;
 
-						int nPatternIndex = Random( patterns.size() );
+						int nPatternIndex = Random( static_cast<unsigned int>( patterns.size() ) );
 						SVAPattern &rPattern = patterns[nPatternIndex];
 						
 						if ( fInclusiveDistance > ( rPattern.heights.GetSizeX() / 2 ) )
@@ -881,7 +881,7 @@ bool CMapInfo::CreateRandomMap( SMissionStats *pMissionStats, const std::string 
 	STraceTimeKeeper timeKeeper;
 	
 	NI_ASSERT_TF( pMissionStats != 0,
-								NStr::Format( "CreateRandomMap, invalid parameter pMissionStats %x", pMissionStats ), 
+								NStr::Format( "CreateRandomMap, invalid parameter pMissionStats %p", pMissionStats ),
 								return false );
 	
 	NStr::DebugTrace( "CreateRandomMap, Setting: %s\n"
@@ -912,7 +912,7 @@ bool CMapInfo::CreateRandomMap( SMissionStats *pMissionStats, const std::string 
 	IRandomGen *pRandomGen = GetSingleton<IRandomGen>();
 	IImageProcessor *pImageProcessor = GetImageProcessor();
 	NI_ASSERT_TF( ( pIDB != 0 ) && ( pDataStorage != 0 ) && ( pRandomGen != 0 ) && ( pImageProcessor != 0 ),
-								NStr::Format( "CreateRandomMap, GetSingleton<IObjectsDB>(); = %x, GetSingleton<IDataStorage>() = %x, GetSingletone<IRandomGen>() = %x, etImageProcessor() = %x", pIDB, pDataStorage, pRandomGen, pImageProcessor ), 
+								NStr::Format( "CreateRandomMap, GetSingleton<IObjectsDB>(); = %p, GetSingleton<IDataStorage>() = %p, GetSingletone<IRandomGen>() = %p, etImageProcessor() = %p", pIDB, pDataStorage, pRandomGen, pImageProcessor ),
 								return false );
 	
 	//PROGRESS_HOOK
@@ -969,7 +969,7 @@ bool CMapInfo::CreateRandomMap( SMissionStats *pMissionStats, const std::string 
 	//проверяем правильность заполнения темлейта здесь!
 	//сезон и размер проверяется в CMapInfo::Create()
 	NI_ASSERT_TF( ( randomMapTemplate.nDefaultFieldIndex >= 0 ) && ( randomMapTemplate.nDefaultFieldIndex < randomMapTemplate.fields.size() ),
-								NStr::Format( "CreateRandomMap,  invalid nDefaultFieldIndex %d [%d...%d]", randomMapTemplate.nDefaultFieldIndex, 0, randomMapTemplate.fields.size() ), 
+								NStr::Format( "CreateRandomMap,  invalid nDefaultFieldIndex %d [%d...%d]", randomMapTemplate.nDefaultFieldIndex, 0, static_cast<int>(randomMapTemplate.fields.size()) ),
 								return false );
 
 	//сохраняем random seed
@@ -1214,7 +1214,7 @@ bool CMapInfo::CreateRandomMap( SMissionStats *pMissionStats, const std::string 
 		{
 			return false;
 		}
-		placedPatches.push_back( rContainer.patches[ availiableIndices[Random( availiableIndices.size() )] ] );
+		placedPatches.push_back( rContainer.patches[ availiableIndices[Random( static_cast<unsigned int>( availiableIndices.size() ) )] ] );
 		SRMPlacedPatch &rPlacedPatch = placedPatches[nNodeIndex];
 
 		const CTRect<float> nodeRect( rGraphNode.rect.minx - terrainTilesCenterPoint.x,
@@ -1310,7 +1310,7 @@ bool CMapInfo::CreateRandomMap( SMissionStats *pMissionStats, const std::string 
 				if ( ( classifyMapPolygon != CP_OUTSIDE ) && ( classifyPatchPolygon != CP_INSIDE ) )
 				{
 					SRMPlacedPatch::SVSOPoint vsoPoint;
-					vsoPoint.nID = mapInfo.terrain.rivers.size() - patchMapInfo.terrain.rivers.size() + nRiverIndex;
+					vsoPoint.nID = static_cast<int>( mapInfo.terrain.rivers.size() ) - static_cast<int>( patchMapInfo.terrain.rivers.size() ) + nRiverIndex;
 					vsoPoint.bBegin = true;
 					vsoPoint.vPos = vPos;
 					vsoPoint.szVSODescFileName = patchMapInfo.terrain.rivers[nRiverIndex].szDescName;
@@ -1326,7 +1326,7 @@ bool CMapInfo::CreateRandomMap( SMissionStats *pMissionStats, const std::string 
 				if ( ( classifyMapPolygon != CP_OUTSIDE ) && ( classifyPatchPolygon != CP_INSIDE ) )
 				{
 					SRMPlacedPatch::SVSOPoint vsoPoint;
-					vsoPoint.nID = mapInfo.terrain.rivers.size() - patchMapInfo.terrain.rivers.size() + nRiverIndex;
+					vsoPoint.nID = static_cast<int>( mapInfo.terrain.rivers.size() ) - static_cast<int>( patchMapInfo.terrain.rivers.size() ) + nRiverIndex;
 					vsoPoint.bBegin = false;
 					vsoPoint.vPos = vPos;
 					vsoPoint.szVSODescFileName = patchMapInfo.terrain.rivers[nRiverIndex].szDescName;
@@ -1348,7 +1348,7 @@ bool CMapInfo::CreateRandomMap( SMissionStats *pMissionStats, const std::string 
 				if ( ( classifyMapPolygon != CP_OUTSIDE ) && ( classifyPatchPolygon != CP_INSIDE ) )
 				{
 					SRMPlacedPatch::SVSOPoint vsoPoint;
-					vsoPoint.nID = mapInfo.terrain.roads3.size()  - patchMapInfo.terrain.roads3.size() + nRoad3DIndex;
+					vsoPoint.nID = static_cast<int>( mapInfo.terrain.roads3.size() )  - static_cast<int>( patchMapInfo.terrain.roads3.size() ) + nRoad3DIndex;
 					vsoPoint.bBegin = true;
 					vsoPoint.vPos = vPos;
 					vsoPoint.szVSODescFileName = patchMapInfo.terrain.roads3[nRoad3DIndex].szDescName;
@@ -1364,7 +1364,7 @@ bool CMapInfo::CreateRandomMap( SMissionStats *pMissionStats, const std::string 
 				if ( ( classifyMapPolygon != CP_OUTSIDE ) && ( classifyPatchPolygon != CP_INSIDE ) )
 				{
 					SRMPlacedPatch::SVSOPoint vsoPoint;
-					vsoPoint.nID = mapInfo.terrain.roads3.size() - patchMapInfo.terrain.roads3.size() + nRoad3DIndex;
+					vsoPoint.nID = static_cast<int>( mapInfo.terrain.roads3.size() ) - static_cast<int>( patchMapInfo.terrain.roads3.size() ) + nRoad3DIndex;
 					vsoPoint.bBegin = false;
 					vsoPoint.vPos = vPos;
 					vsoPoint.szVSODescFileName = patchMapInfo.terrain.roads3[nRoad3DIndex].szDescName;
@@ -1762,12 +1762,12 @@ bool CMapInfo::CreateRandomMap( SMissionStats *pMissionStats, const std::string 
 						//добавим в карту
 						if ( rGraphLink.nType != SRMGraphLink::TYPE_ROAD )
 						{
-							newVSO.nID = mapInfo.terrain.rivers.size();
+							newVSO.nID = static_cast<int>( mapInfo.terrain.rivers.size() );
 							mapInfo.terrain.rivers.push_back( newVSO );
 						}
 						else
 						{
-							newVSO.nID = mapInfo.terrain.roads3.size();
+							newVSO.nID = static_cast<int>( mapInfo.terrain.roads3.size() );
 							mapInfo.terrain.roads3.push_back( newVSO );
 						}
 						
@@ -1848,7 +1848,7 @@ bool CMapInfo::CreateRandomMap( SMissionStats *pMissionStats, const std::string 
 		// заполняем массив лoканных тайлов (поле каждой вствки дерева его необходимо обновлять)
 		if ( !mapInfo.objects.empty() )
 		{
-			ApplyTilesInObjectsPassability( tileMapRect, &( mapInfo.objects[0] ), mapInfo.objects.size(), tileMapModifyTiles, true );
+			ApplyTilesInObjectsPassability( tileMapRect, &( mapInfo.objects[0] ), static_cast<int>( mapInfo.objects.size() ), tileMapModifyTiles, true );
 		}
 
 		for ( std::list<std::list<CVec2> >::const_iterator inclusivePolygonIterator = fieldGraph.inclusivePolygons.begin(); inclusivePolygonIterator != fieldGraph.inclusivePolygons.end(); ++inclusivePolygonIterator )

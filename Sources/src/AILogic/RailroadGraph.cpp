@@ -76,7 +76,7 @@ CSplineEdge::CSplineEdge( const SVectorStripeObject &edgeDescriptor )
 	Vis2AI( &p3, edgeDescriptor.controlpoints[0] );
 	p0 = p1 = p2 = p3;
 
-	const int nControlPointsSize = edgeDescriptor.controlpoints.size();
+	const int nControlPointsSize = static_cast<int>( edgeDescriptor.controlpoints.size() );
 	edgeParts.resize( nControlPointsSize + 1 );
 	for ( int i = 1; i < nControlPointsSize; ++i )
 	{
@@ -175,7 +175,7 @@ CEdgePoint* CSplineEdge::CreateFirstEdgePoint()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CEdgePoint* CSplineEdge::CreateLastEdgePoint()
 {
-	const int nSize = edgeParts.size();
+	const int nSize = static_cast<int>( edgeParts.size() );
 	return 
 		new CEdgePoint( this, nSize - 1, edgeParts[nSize-1].fTEnd );
 }
@@ -215,7 +215,7 @@ const CVec2 CSplineEdge::GetFirst2DPoint() const
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const CVec2 CSplineEdge::GetLast2DPoint() const
 {
-	const int nSize = edgeParts.size();
+	const int nSize = static_cast<int>( edgeParts.size() );
 	return 
 		edgeParts[ nSize - 1].spline.Get( edgeParts[nSize - 1].fTEnd );
 }
@@ -296,7 +296,7 @@ const float CSplineEdge::GetLength( CEdgePoint *p1, CEdgePoint *p2 )
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CEdgePoint* CSplineEdge::MakeIndentOnOneSpline( const CVec2 &vPointToMeasureDist, const int nPart, const float fTBegin, const float fTEnd, float fDist )
 {
-	NI_ASSERT_T( nPart < edgeParts.size(), NStr::Format( "Wrong part (%d) passed", nPart ) );
+	NI_ASSERT_T( nPart < static_cast<int>(edgeParts.size()), NStr::Format( "Wrong part (%d) passed", nPart ) );
 	if ( fDist > -0.000001 && fDist < 0 )
 		fDist = 0.0f;
 	NI_ASSERT_T( fDist >= 0.0f, NStr::Format( "Negaitve distance passed (%g)", fDist ) );
@@ -429,7 +429,7 @@ const CVec2 CSplineEdge::GetTangentOfEnd() const
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CSplineEdge::IsLastPoint( const int nPart, const float fT ) const 
 { 
-	NI_ASSERT_T( nPart < edgeParts.size(), NStr::Format( "Wrong part of edge (%d)", nPart ) );
+	NI_ASSERT_T( nPart < static_cast<int>(edgeParts.size()), NStr::Format( "Wrong part of edge (%d)", nPart ) );
 	return nPart == edgeParts.size() - 1 && fabs( edgeParts[nPart-1].fTEnd - fT ) < 0.00001f; 
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

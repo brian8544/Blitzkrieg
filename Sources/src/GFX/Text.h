@@ -74,7 +74,7 @@ struct SPreFormattedText
 	SPreFormattedText() : fWidth( 0 ) {  }
   //
 	void Clear() { lines.clear(); }
-  int GetNumLines() const { return lines.size(); }
+  int GetNumLines() const { return static_cast<int>( lines.size() ); }
   float GetWidth() const { return fWidth; }
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

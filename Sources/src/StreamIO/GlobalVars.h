@@ -30,7 +30,7 @@ public:
 	}
 	virtual void STDCALL RemoveVarsByMatch( const char *pszValueMatch )
 	{
-		const int nMatchLen = strlen( pszValueMatch );
+		const int nMatchLen = static_cast<int>( strlen( pszValueMatch ) );
 		// search in values
 		for ( CValuesMap::iterator it = values.begin(); it != values.end(); )
 		{
@@ -55,7 +55,7 @@ public:
 
 		if ( !saver.IsReading() )
 		{
-			const int nMatchLen = strlen( pszValueMatch );
+			const int nMatchLen = static_cast<int>( strlen( pszValueMatch ) );
 			CValuesMap valuesToSave;
 			for ( CValuesMap::const_iterator it = values.begin(); it != values.end(); ++it )
 			{
@@ -118,7 +118,7 @@ public:
 			for ( std::map<std::string, std::string>::const_iterator it = sortmap.begin(); it != sortmap.end(); ++it )
 			{
 				const char *pszString = NStr::Format( "%s = %s\n", it->first.c_str(), it->second.c_str() );
-				file.Write( pszString, strlen(pszString) );
+				file.Write( pszString, static_cast<int>( strlen(pszString) ) );
 			}
 			return true;
 		}

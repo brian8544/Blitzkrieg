@@ -28,7 +28,7 @@ CAnimObjectFactory::CAnimObjectFactory()
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static SModuleDescriptor theModuleDescriptor( "Animation", ANIM_ANIM, 0x0100, &theAnimObjectFactory, 0 );
-const SModuleDescriptor* STDCALL GetModuleDescriptor()
+extern "C" const SModuleDescriptor* STDCALL GetModuleDescriptor()
 {
 	return &theModuleDescriptor;
 }

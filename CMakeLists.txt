@@ -35,8 +35,8 @@ if(NOT DEFINED CMAKE_TOOLCHAIN_FILE OR CMAKE_TOOLCHAIN_FILE STREQUAL "")
         "-DCMAKE_TOOLCHAIN_FILE=<vcpkg>/scripts/buildsystems/vcpkg.cmake.")
 endif()
 
-set(VCPKG_TARGET_TRIPLET "x86-windows" CACHE STRING "vcpkg target triplet")
-set(VCPKG_HOST_TRIPLET "x64-windows" CACHE STRING "vcpkg host triplet")
+set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "vcpkg target triplet" FORCE)
+set(VCPKG_HOST_TRIPLET "x64-windows" CACHE STRING "vcpkg host triplet" FORCE)
 set(VCPKG_MANIFEST_MODE ON CACHE BOOL "Use vcpkg manifest mode")
 set(VCPKG_MANIFEST_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE PATH "vcpkg manifest directory")
 set(VCPKG_INSTALLED_DIR "${CMAKE_BINARY_DIR}/vcpkg_installed" CACHE PATH "vcpkg installed tree")
@@ -48,9 +48,6 @@ if(NOT WIN32)
 endif()
 if(NOT MSVC)
     message(FATAL_ERROR "Visual Studio/MSVC is required.")
-endif()
-if(NOT CMAKE_SIZEOF_VOID_P EQUAL 4)
-    message(FATAL_ERROR "Build the Win32 target (for Visual Studio use -A Win32).")
 endif()
 if(NOT CMAKE_GENERATOR MATCHES "^Visual Studio")
     message(FATAL_ERROR "A Visual Studio generator is currently required.")
@@ -89,15 +86,15 @@ find_path(FMOD_INCLUDE_DIR NAMES fmod.hpp
     PATHS "${FMOD_ROOT}/Include"
     NO_DEFAULT_PATH REQUIRED)
 find_library(FMOD_IMPLIB NAMES fmod_vc fmod
-    PATHS "${FMOD_ROOT}/lib/x86"
+    PATHS "${FMOD_ROOT}/lib/x64"
     NO_DEFAULT_PATH REQUIRED)
-file(GLOB FMOD_DLL_CANDIDATES LIST_DIRECTORIES FALSE "${FMOD_ROOT}/lib/x86/fmod.dll")
+file(GLOB FMOD_DLL_CANDIDATES LIST_DIRECTORIES FALSE "${FMOD_ROOT}/lib/x64/fmod.dll")
 if(NOT FMOD_DLL_CANDIDATES)
     file(GLOB_RECURSE FMOD_DLL_CANDIDATES LIST_DIRECTORIES FALSE
-        "${FMOD_ROOT}/lib/x86/*fmod.dll")
+        "${FMOD_ROOT}/lib/x64/*fmod.dll")
 endif()
 if(NOT FMOD_DLL_CANDIDATES)
-    message(FATAL_ERROR "FMOD runtime DLL was not found under ${FMOD_ROOT}/lib/x86")
+    message(FATAL_ERROR "FMOD runtime DLL was not found under ${FMOD_ROOT}/lib/x64")
 endif()
 list(GET FMOD_DLL_CANDIDATES 0 FMOD_DLL)
 
@@ -147,6 +144,7 @@ function(blitz_target_defaults target)
         $<$<CONFIG:Debug>:_DEBUG;_DO_ASSERT_SLOW;_DO_CHECKED_CAST>)
     target_compile_options(${target} PRIVATE
         $<$<COMPILE_LANGUAGE:C,CXX>:/W3>
+        $<$<COMPILE_LANGUAGE:C,CXX>:/WX>
         $<$<COMPILE_LANGUAGE:C,CXX>:/MP>
         $<$<COMPILE_LANGUAGE:CXX>:/EHsc>
         $<$<COMPILE_LANGUAGE:CXX>:/permissive>
@@ -188,7 +186,9 @@ blitz_static(Misc)
 blitz_static(Formats)
 blitz_static(Common)
 blitz_static(LuaLib)
+target_compile_definitions(LuaLib PRIVATE _CRT_SECURE_NO_WARNINGS)
 blitz_static(RandomMapGen)
+blitz_static(WheatyExceptionReport)
 
 set(GAMESPY_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/Sources/src/GameSpy")
 add_library(GameSpy STATIC
@@ -218,34 +218,44 @@ add_library(GameSpy STATIC
     "${GAMESPY_ROOT}/peer/peerRooms.c"
     "${GAMESPY_ROOT}/pinger/pingerMain.c")
 blitz_target_defaults(GameSpy)
+target_compile_definitions(GameSpy PRIVATE _CRT_SECURE_NO_WARNINGS)
 
 blitz_static(Main)
 
-blitz_shared(BugSlay STLDebugTerminate.cpp)
-blitz_shared(StreamIO
-    FileIO.def OpenStorage.cpp StructureSaver.cpp StructureSaverInternal.h)
+blitz_shared(StreamIO)
 blitz_shared(Image)
 blitz_shared(Input)
-blitz_shared(Net Net.rc)
+blitz_shared(Net)
 blitz_shared(SFX)
-blitz_shared(GFX Sphere.cpp Sphere.h)
-blitz_shared(Anim Anim.rc)
-blitz_shared(Scene MechTraceVisObj.cpp MechTraceVisObj.h)
+blitz_shared(GFX)
+blitz_shared(Anim)
+blitz_shared(Scene)
 blitz_shared(UI)
 blitz_shared(GameTT)
-blitz_shared(AILogic
-    AIEditorSerialize.h AILogicTypes.h AIPath.def AnimUnit.cpp
-    CCommonStates.h GunDescriptorInternal.cpp GunDescriptorInternal.h)
+blitz_shared(AILogic)
 
-# Preserve the per-project defines from the original VC6 .dsp files.  These
-# control static GlobalsLoader bootstrap behaviour and are REQUIRED before WinMain runs!
-target_compile_definitions(BugSlay PRIVATE
-    BUGSLAYER_EXPORTS _DONT_LOAD_SINGLETONS _DONT_LOAD_STREAMIO)
+# Preserve per-project bootstrap defines that are still required by active modules.
 target_compile_definitions(StreamIO PRIVATE
     _STREAMIO_DLL _DONT_LOAD_SINGLETONS _DONT_LOAD_STREAMIO)
 target_compile_definitions(Image PRIVATE _DONT_LOAD_SINGLETONS)
 
-target_link_libraries(BugSlay PRIVATE comctl32 dbghelp version)
+target_link_libraries(WheatyExceptionReport PRIVATE dbghelp)
+
+set(BLITZ_GIT_REVISION "unknown")
+find_package(Git QUIET)
+if(GIT_FOUND)
+    execute_process(
+        COMMAND "${GIT_EXECUTABLE}" rev-parse --short=12 HEAD
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+        OUTPUT_VARIABLE BLITZ_GIT_REVISION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+        RESULT_VARIABLE BLITZ_GIT_REVISION_RESULT)
+    if(NOT BLITZ_GIT_REVISION_RESULT EQUAL 0 OR BLITZ_GIT_REVISION STREQUAL "")
+        set(BLITZ_GIT_REVISION "unknown")
+    endif()
+endif()
+target_compile_definitions(WheatyExceptionReport PRIVATE BLITZ_GIT_REVISION="${BLITZ_GIT_REVISION}")
 
 target_include_directories(Scene PRIVATE ${FFMPEG_INCLUDE_DIRS})
 target_link_directories(Scene PRIVATE ${FFMPEG_LIBRARY_DIRS})
@@ -259,53 +269,46 @@ target_link_libraries(StreamIO PRIVATE ZLIB::ZLIB pugixml::pugixml)
 
 target_link_libraries(Formats PRIVATE Misc)
 target_link_libraries(Common PRIVATE Misc)
-target_link_libraries(RandomMapGen PRIVATE BugSlay Misc StreamIO)
+target_link_libraries(RandomMapGen PRIVATE Misc StreamIO)
 target_link_libraries(LuaLib PRIVATE Misc)
 
-target_link_libraries(StreamIO PRIVATE BugSlay Misc winmm ws2_32)
-target_link_libraries(Image PRIVATE BugSlay Misc)
-target_link_libraries(Input PRIVATE BugSlay Misc StreamIO winmm dinput8 dxguid)
+target_link_libraries(StreamIO PRIVATE Misc winmm ws2_32)
+target_link_libraries(Image PRIVATE Misc)
+target_link_libraries(Input PRIVATE Misc StreamIO winmm dinput8 dxguid)
 target_compile_definitions(Input PRIVATE DIRECTINPUT_VERSION=0x0800)
-target_link_libraries(Net PRIVATE BugSlay GameSpy Misc StreamIO ws2_32)
-target_link_libraries(SFX PRIVATE BugSlay Misc StreamIO)
-target_link_libraries(Anim PRIVATE BugSlay Misc StreamIO Formats)
-target_link_libraries(UI PRIVATE BugSlay Misc StreamIO LuaLib)
-target_link_libraries(Scene PRIVATE BugSlay Misc StreamIO SFX Formats winmm)
-target_link_libraries(GameTT PRIVATE BugSlay Misc StreamIO Common Formats RandomMapGen version winmm)
-target_link_libraries(AILogic PRIVATE BugSlay StreamIO Misc Image LuaLib Formats RandomMapGen ZLIB::ZLIB)
+target_link_libraries(Net PRIVATE GameSpy Misc StreamIO ws2_32)
+target_link_libraries(SFX PRIVATE Misc StreamIO)
+target_link_libraries(Anim PRIVATE Misc StreamIO Formats)
+target_link_libraries(UI PRIVATE Misc StreamIO LuaLib)
+target_link_libraries(Scene PRIVATE Misc StreamIO SFX Formats winmm)
+target_link_libraries(GameTT PRIVATE Misc StreamIO Common Formats RandomMapGen version winmm)
+target_link_libraries(AILogic PRIVATE StreamIO Misc Image LuaLib Formats RandomMapGen ZLIB::ZLIB)
 
 target_include_directories(GFX PRIVATE "${D3D8_API_ROOT}/source")
-target_link_libraries(GFX PRIVATE BugSlay Image Misc StreamIO Formats d3d11 dxgi)
+target_link_libraries(GFX PRIVATE Image Misc StreamIO Formats d3d11 dxgi)
 
 target_link_libraries(Main PRIVATE
-    BugSlay UI AILogic Anim Image Input Scene SFX GFX
+    UI AILogic Anim Image Input Scene SFX GFX
     GameSpy LuaLib ZLIB::ZLIB StreamIO Net Misc Formats RandomMapGen)
 
-blitz_sources(GAME_SOURCES Game CManuverHorisontal.cpp BetaRelease/error.txt FastDebug/error.txt)
+blitz_sources(GAME_SOURCES Game)
 add_executable(Game WIN32 ${GAME_SOURCES})
 blitz_target_defaults(Game)
 target_link_libraries(Game PRIVATE
-    BugSlay Main Misc StreamIO GameTT RandomMapGen Formats LuaLib Net
+    WheatyExceptionReport Main Misc StreamIO GameTT RandomMapGen Formats LuaLib Net
     version winmm Shlwapi)
 
 add_dependencies(Game d3d8to9)
 
 blitz_stage_file(Game "${FMOD_DLL}")
-foreach(runtime_config IN ITEMS config.cfg defconf.cfg)
-    blitz_stage_file(Game "${CMAKE_CURRENT_SOURCE_DIR}/Versions/Current/${runtime_config}")
-endforeach()
 blitz_stage_file(Game "$<TARGET_FILE:d3d8to9>")
+# The game creates the per-install config.cfg by repairing an empty profile
+# from this canonical defaults file.  Without it, first-run shutdown writes a
+# syntactically valid config with no input bindings.
+blitz_stage_file(Game "${CMAKE_CURRENT_SOURCE_DIR}/Versions/Current/defconf.cfg")
 
 add_custom_command(TARGET Game POST_BUILD
     COMMAND "${CMAKE_COMMAND}" -E copy_directory
         "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/$<IF:$<CONFIG:Debug>,debug/bin,bin>"
         "$<TARGET_FILE_DIR:Game>"
     VERBATIM)
-
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Data")
-    add_custom_command(TARGET Game POST_BUILD
-        COMMAND "${CMAKE_COMMAND}" -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/Data"
-            "$<TARGET_FILE_DIR:Game>/Data"
-        VERBATIM)
-endif()

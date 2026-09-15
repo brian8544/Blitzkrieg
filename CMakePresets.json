@@ -2,18 +2,18 @@
   "version": 6,
   "configurePresets": [
     {
-      "name": "win32",
-      "displayName": "Visual Studio 2026 Win32",
+      "name": "x64",
+      "displayName": "Visual Studio 2026 x64",
       "generator": "Visual Studio 18 2026",
-      "architecture": "Win32",
+      "architecture": "x64",
       "binaryDir": "${sourceDir}/build"
     }
   ],
   "buildPresets": [
     {
       "name": "release",
-      "displayName": "Release",
-      "configurePreset": "win32",
+      "displayName": "Release x64",
+      "configurePreset": "x64",
       "configuration": "Release"
     }
   ]

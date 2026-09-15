@@ -172,7 +172,7 @@ public:
 	virtual void TakeDamage( const float fDamage, const bool bFromExplosion, const int nPlayerOfShoot, CAIUnit *pShotUnit );
 	virtual void Die( const float fDamage );
 
-	const int GetNEntrancePoints() const { return pStats->entrances.size(); }
+	const int GetNEntrancePoints() const { return static_cast<int>( pStats->entrances.size() ); }
 	const CVec2 GetEntrancePoint( const int nEntrance ) const;
 	// найти выход, ближайший чтобы идти в точку point
 	bool ChooseEntrance( class CCommonUnit *pUnit, const CVec2 &vPoint, int *pnEntrance ) const;

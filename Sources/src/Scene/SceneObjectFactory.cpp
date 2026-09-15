@@ -75,7 +75,7 @@ CSceneObjectFactory::CSceneObjectFactory()
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static SModuleDescriptor theModuleDescriptor( "Scene", SCENE_SCENE, 0x0100, &theSceneObjectFactory, 0 );
-const SModuleDescriptor* STDCALL GetModuleDescriptor()
+extern "C" const SModuleDescriptor* STDCALL GetModuleDescriptor()
 {
 	return &theModuleDescriptor;
 }

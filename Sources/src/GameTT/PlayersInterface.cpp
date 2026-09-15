@@ -270,9 +270,9 @@ void CPlayersInterface::Create( const bool _bAfterMission )
 		szSaveName += " - ";
 		
 		std::string szCampaignStatsName = GetGlobalVar( "Campaign.Current.Name", "" );
-		int nPos = szCampaignStatsName.rfind("\\");
+		int nPos = static_cast<int>( szCampaignStatsName.rfind("\\") );
 		if ( nPos == std::string::npos )
-			nPos = szCampaignStatsName.rfind("/");
+			nPos = static_cast<int>( szCampaignStatsName.rfind("/") );
 		if ( nPos != std::string::npos )
 		{
 			szCampaignStatsName = szCampaignStatsName.substr( nPos == std::string::npos ? 0 : nPos + 1  );

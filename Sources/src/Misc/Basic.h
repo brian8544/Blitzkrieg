@@ -5,6 +5,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include <zlib.h>
 #include <memory>
+#include <cstdint>
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <int N> struct SGenericNumber { int operator()() const { return N; } };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -681,13 +682,20 @@ inline TOut const_cast_gdb( const CGDBPtr<TUserObj> &ptr )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct SGameMessage
 {
-	int nEventID;													// message event ID
-	int nParam;														// optional parameter
+	int nEventID;											// message event ID
+	int nParam;												// optional integer parameter
+	std::intptr_t nPointerParam;					// optional in-process pointer parameter
 	//
 	SGameMessage()
-		: nEventID( -1 ), nParam( 0 ) {  }
+		: nEventID( -1 ), nParam( 0 ), nPointerParam( 0 ) {  }
 	explicit SGameMessage( int _nEventID, int _nParam = 0 )
-		: nEventID( _nEventID ), nParam( _nParam ) {  }
+		: nEventID( _nEventID ), nParam( _nParam ), nPointerParam( 0 ) {  }
+	static SGameMessage WithPointer( int _nEventID, const void *pPointer )
+	{
+		SGameMessage message( _nEventID );
+		message.nPointerParam = reinterpret_cast<std::intptr_t>( pPointer );
+		return message;
+	}
 };
 struct STextMessage
 {

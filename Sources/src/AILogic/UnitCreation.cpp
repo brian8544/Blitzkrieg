@@ -648,7 +648,7 @@ const CUnitCreation::SPartyDependentInfo & CUnitCreation::GetPartyDependentInfo(
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CUnitCreation::CreateMine( const enum SMineRPGStats::EType nType, const class CVec2 &vPoint, const int nDipl )
 {
-	NI_ASSERT_T( nDipl < inGameUnits.size(), NStr::Format( "no mines for player %d", nDipl ) );
+	NI_ASSERT_T( nDipl < static_cast<int>(inGameUnits.size()), NStr::Format( "no mines for player %d", nDipl ) );
 	
 	const SPartyDependentInfo & info = GetPartyDependentInfo( nDipl );
 
@@ -685,7 +685,7 @@ CFormation* CUnitCreation::CreateParatroopers( const CVec3 &where, CAIUnit *pPla
 {
 	const int nDipl = pPlane->GetPlayer();
 	
-	NI_ASSERT_T( nDipl < inGameUnits.size(), NStr::Format( "wrong player %d", nDipl ) );
+	NI_ASSERT_T( nDipl < static_cast<int>(inGameUnits.size()), NStr::Format( "wrong player %d", nDipl ) );
 
 	const std::string &name = inGameUnits[nDipl].szParatrooper;
 	CGDBPtr<SGDBObjectDesc> pDesc = pIDB->GetDesc( name.c_str() );
@@ -713,7 +713,7 @@ CFormation* CUnitCreation::CreateParatroopers( const CVec3 &where, CAIUnit *pPla
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CFormation* CUnitCreation::CreateResupplyEngineers( CAITransportUnit *pWithUnit )const
 {
-	NI_ASSERT_T( pWithUnit->GetPlayer() < inGameUnits.size(), NStr::Format( "wrong player %d",pWithUnit->GetPlayer()) );
+	NI_ASSERT_T( pWithUnit->GetPlayer() < static_cast<int>(inGameUnits.size()), NStr::Format( "wrong player %d",pWithUnit->GetPlayer()) );
 	
 	const char * pszName = GetPartyDependentInfo(pWithUnit->GetPlayer()).szResupplyEngineerSquad.c_str();
 	CGDBPtr<SGDBObjectDesc> pDesc = pIDB->GetDesc( pszName );
@@ -753,7 +753,7 @@ CFormation * CUnitCreation::CreateCrew( CArtillery *pUnit, IObjectsDB *_pIDB, co
 	if ( 0 == _pIDB )
 		_pIDB = pIDB;
 
-	NI_ASSERT_T( (_nPlayer == -1 ? pUnit->GetPlayer() : _nPlayer ) < inGameUnits.size(), NStr::Format( "wrong player GetPlayer = %d, nPlayer = %d", pUnit->GetPlayer(), _nPlayer ) );
+	NI_ASSERT_T( (_nPlayer == -1 ? pUnit->GetPlayer() : _nPlayer ) < static_cast<int>(inGameUnits.size()), NStr::Format( "wrong player GetPlayer = %d, nPlayer = %d", pUnit->GetPlayer(), _nPlayer ) );
 	
 	CVec3 vCreatePos (vPos);
 	if ( -1 == vPos.x )
@@ -906,7 +906,7 @@ CVec2 CUnitCreation::GetRandomAppearPoint( const int _nPlayer, const bool bLeave
 				break;
 			}
 	}
-	NI_ASSERT_T( 0 != inGameUnits[nPlayer].vAppearPoints.size(), NStr::Format("WRONG CALL for player (initial) %d, calculated %d", _nPlayer, nPlayer ) );
+	NI_ASSERT_T( 0 != static_cast<int>(inGameUnits[nPlayer].vAppearPoints.size()), NStr::Format("WRONG CALL for player (initial) %d, calculated %d", _nPlayer, nPlayer ) );
 	const int nCurrentRandom = nAviationCallNumeber%inGameUnits[nPlayer].vAppearPoints.size();
 	if ( bLockedFlags[nPlayer] )
 		return vLockedAppearPoints[nPlayer];
@@ -915,7 +915,7 @@ CVec2 CUnitCreation::GetRandomAppearPoint( const int _nPlayer, const bool bLeave
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const char *CUnitCreation::GetRandomAntitankObjectName() const 
 {
-	return commonInfo.antitankObjects[Random(commonInfo.antitankObjects.size())].c_str();
+	return commonInfo.antitankObjects[Random(static_cast<unsigned int>( commonInfo.antitankObjects.size() ))].c_str();
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const char * CUnitCreation::GetEntrenchmentName() const 
@@ -946,7 +946,7 @@ const char * CUnitCreation::GetRandomTankPit( const class CVec2 &vSize, const bo
 void CUnitCreation::GetCentersOfAllFormationUnits( const SSquadRPGStats *pStats, const CVec2 &vFormCenter, const WORD wFormDir, const int nFormation, const int nUnits, std::list<CVec2> *pCenters ) const
 {
 	const SSquadRPGStats::SFormation &formation = pStats->formations[nFormation];
-	const int nSizeOfFormation = (nUnits == -1) ? formation.order.size() : nUnits;
+	const int nSizeOfFormation = (nUnits == -1) ? static_cast<int>( formation.order.size() ) : nUnits;
 
 	CVec2 vRelFormDir = GetVectorByDirection( wFormDir );
 	std::swap( vRelFormDir.x, vRelFormDir.y );
@@ -1012,7 +1012,7 @@ CCommonUnit* CUnitCreation::AddNewFormation( const SSquadRPGStats *pStats, const
 	GetCentersOfAllFormationUnits( pStats, vFormCenter, wDir, nFormation, nUnits, &centers );
 
 	// по слотам конфигурации
-	const int nSizeOfFormation = Min( formation.order.size(), (nUnits == -1) ? formation.order.size() : nUnits );
+	const int nSizeOfFormation = Min( static_cast<int>( formation.order.size() ), (nUnits == -1) ? static_cast<int>( formation.order.size() ) : nUnits );
 	std::list<CVec2>::iterator iter = centers.begin();
 	for ( int j = 0; j < nSizeOfFormation; ++j, ++iter )
 	{

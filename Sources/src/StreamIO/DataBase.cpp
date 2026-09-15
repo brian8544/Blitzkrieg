@@ -20,7 +20,7 @@ CIniFileDataBase::CIniFileDataBase( const char *pszName, DWORD dwAccessMode )
 	else
 	{
 		szBase = pszName;
-		int pos = szBase.rfind( '\\' );
+		int pos = static_cast<int>( szBase.rfind( '\\' ) );
 		if ( pos == std::string::npos )
 			szBase.clear();
 		else

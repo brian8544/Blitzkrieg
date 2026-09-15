@@ -580,7 +580,7 @@ void CInputAPI::AddDevice( SDeviceEnumDesc *pDesc, const int nID )
 	format.dwObjSize = sizeof( DIOBJECTDATAFORMAT );
 	format.dwDataSize = dwDataSize;
 	format.dwFlags = DIDF_ABSAXIS;
-	format.dwNumObjs = pDesc->objects.size();
+	format.dwNumObjs = static_cast<DWORD>( pDesc->objects.size() );
 	format.rgodf = &( pDesc->objects[0] );
 	dxrval = pDevice->SetDataFormat( &format );
 	NI_ASSERTHR_T( dxrval, NStr::Format("Can't set data format for device \"%s\"", pDesc->szFriendlyName.c_str()) );
@@ -640,7 +640,7 @@ void CInputAPI::AddDevice( SDeviceEnumDesc *pDesc, const int nID )
 	devices.push_back( SDevice() );
 	SDevice &device = devices.back();
 	device.guid = pDesc->guid;
-	device.nID = devices.size();
+	device.nID = static_cast<int>( devices.size() );
 	device.eType = pDesc->eType;
 	device.szName = pDesc->szName;
 	device.szFriendlyName = pDesc->szFriendlyName;
@@ -843,7 +843,7 @@ void CInputAPI::SetDeviceEmulationStatus( const enum EDeviceType eDeviceType, co
 			bCoopLevelSet = false;
 			const bool bOldFocusCaptured = bFocusCaptured;
 			bFocusCaptured = false;
-			SetFocus( bFocusCaptured );
+			SetFocus( bOldFocusCaptured );
 			//
 			break;
 		}
@@ -1195,7 +1195,7 @@ void CInputAPI::GenerateRepeats( CControl *pControl )
 			didod.dwTimeStamp = dwLastPumpingTime;
 
 			std::vector<DIDEVICEOBJECTDATA> didods( nRepeats, didod );
-			Convert2Text( &(didods[0]), didods.size() );
+			Convert2Text( &(didods[0]), static_cast<int>( didods.size() ) );
 		}
 	}
 }

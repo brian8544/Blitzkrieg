@@ -67,7 +67,7 @@ int luaV_tostring (lua_State *L, TObject *obj) {  /* LUA_NUMBER */
 static void traceexec (lua_State *L, StkId base, StkId top, lua_Hook linehook) {
   CallInfo *ci = infovalue(base-1);
   int *lineinfo = ci->func->f.l->lineinfo;
-  int pc = (*ci->pc - ci->func->f.l->code) - 1;
+  int pc = (int)(*ci->pc - ci->func->f.l->code) - 1;
   int newline;
   if (pc == 0) {  /* may be first time? */
     ci->line = 1;
@@ -295,8 +295,7 @@ void luaV_strconc (lua_State *L, int total, StkId top) {
     }
     else if (tsvalue(top-1)->len > 0) {  /* if len=0, do nothing */
       /* at least two string values; get as many as possible */
-      lint32 tl = (lint32)tsvalue(top-1)->len + 
-                  (lint32)tsvalue(top-2)->len;
+      size_t tl = tsvalue(top-1)->len + tsvalue(top-2)->len;
       char *buffer;
       int i;
       while (n < total && !tostring(L, top-n-1)) {  /* collect total length */
@@ -334,7 +333,7 @@ static void luaV_pack (lua_State *L, StkId firstelem) {
 
 
 static void adjust_varargs (lua_State *L, StkId base, int nfixargs) {
-  int nvararg = (L->top-base) - nfixargs;
+  int nvararg = (int)(L->top-base) - nfixargs;
   if (nvararg < 0)
     luaD_adjusttop(L, base, nfixargs);
   luaV_pack(L, base+nfixargs);

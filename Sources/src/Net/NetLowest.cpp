@@ -18,7 +18,7 @@ bool CNodeAddress::SetInetName( const char *pszHost, int nDefaultPort )
 	nameRemote.sin_family = AF_INET;
 	// extract port number from address
 	string szAddr = pszHost;
-	nIdx = szAddr.find( ':' );
+	nIdx = static_cast<int>( szAddr.find( ':' ) );
 	if ( nIdx != -1 )
 	{
 		nPort = atoi( string( szAddr, nIdx + 1 ).c_str() );

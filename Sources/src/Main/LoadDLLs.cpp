@@ -88,7 +88,7 @@ namespace NMain
 			}
 		}
 		//
-		return modules.size();
+		return static_cast<int>( modules.size() );
 	}
 	// 
 	void STDCALL UnloadAllModules()

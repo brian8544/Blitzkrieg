@@ -79,7 +79,7 @@ void CServersList::RefreshServersList()
 	INetDriver::SGameInfo gameInfo;
 	CPtr<INetNodeAddress> pAddress = CreateObject<INetNodeAddress>( NET_NODE_ADDRESS );
 	
-	const int nDebugTemp = servers.size();
+	const int nDebugTemp = static_cast<int>( servers.size() );
 
 	bool bWrongVersion = true;
 	float fPing = 0;
@@ -169,7 +169,7 @@ bool CServersList::CanJoinToServerByID( const WORD wServerID )
 	if ( pInfo )
 	{
 		std::string szIPAdderss = pInfo->pAddress->GetFastName();
-		const int n = szIPAdderss.find( ':' );
+		const int n = static_cast<int>( szIPAdderss.find( ':' ) );
 		if ( n >= 0 )
 			szIPAdderss.resize( n );
 
@@ -205,7 +205,7 @@ IGameCreation* CServersList::JoinToServerByAddress( INetNodeAddress *pAddress, C
 	CPtr<INetDriver> pNetDriver = CreateInGameNetDriver( SMultiplayerConsts::NET_PORT );
 	
 	std::string szIPAdderss = pAddress->GetFastName();
-	const int n = szIPAdderss.find( ':' );
+	const int n = static_cast<int>( szIPAdderss.find( ':' ) );
 	if ( n >= 0 )
 		szIPAdderss.resize( n );
 

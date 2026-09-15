@@ -23,7 +23,7 @@ CStreamIOObjectFactory::CStreamIOObjectFactory()
 // ************************************************************************************************************************ //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static SModuleDescriptor theModuleDescriptor( "StreamIO", STREAMIO_STREAMIO, 0x0100, &theStreamIOObjectFactory, 0 );
-const SModuleDescriptor* STDCALL GetModuleDescriptor()
+extern "C" const SModuleDescriptor* STDCALL GetModuleDescriptor()
 {
 	return &theModuleDescriptor;
 }

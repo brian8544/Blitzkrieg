@@ -85,7 +85,7 @@ class CSaverAccessor
 			if ( !pSS->StartChunk( idChunk ) )
 				return;
 			//
-			int nSize = IsReading() ? 0 : pData->size();
+			int nSize = IsReading() ? 0 : NStreamIO::CheckedSizeToInt( pData->size() );
 			Add( 1, &nSize );
 			if ( IsReading() )
 				pData->resize( nSize );
@@ -267,7 +267,7 @@ class CSaverAccessor
 				data.resize( nSize = pSS->CountChunks( 1 ) );
 			}
 			else
-				nSize = data.size();
+				nSize = NStreamIO::CheckedSizeToInt( data.size() );
 			for ( i = 0; i < nSize; i++ )
 			{
 				pSS->SetChunkCounter( i + 1 );
@@ -277,7 +277,7 @@ class CSaverAccessor
 	template <class T1, class T2> 
 		void DoDataVector( std::vector<T1, T2> &data )
 		{
-			int nSize = data.size();
+			int nSize = IsReading() ? 0 : NStreamIO::CheckedSizeToInt( data.size() );
 			Add( 1, &nSize );
 			if ( IsReading() )
 			{
@@ -389,7 +389,7 @@ class CSaverAccessor
 			}
 			else
 			{
-				int nSize = data.size();
+				const int nSize = NStreamIO::CheckedSizeToInt( data.size() );
 				// queue => vector translation (with queue clearing)
 				elements.reserve( nSize );
 				while ( !data.empty() )

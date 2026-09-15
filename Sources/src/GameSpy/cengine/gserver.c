@@ -397,7 +397,9 @@ int GCaseInsensitiveCompare(const void *entry1, const void *entry2)
  */
 static int KeyValCompareKeyP(const void *entry1, const void *entry2)
 {
-   	return ((GKeyValuePair *)entry1)->key - ((GKeyValuePair *)entry2)->key;
+	const char *key1 = ((GKeyValuePair *)entry1)->key;
+	const char *key2 = ((GKeyValuePair *)entry2)->key;
+	return (key1 > key2) - (key1 < key2);
 }
 
 void GStringFree(void *elem)

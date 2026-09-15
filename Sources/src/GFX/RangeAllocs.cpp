@@ -253,7 +253,7 @@ int CPow2Allocator::GetNumBlocks() const
 {
 	int nNumBlocks = 0;
 	for ( std::vector< std::list<SRangeLimits> >::const_iterator it = ranges.begin(); it != ranges.end(); ++it )
-		nNumBlocks += it->size();
+		nNumBlocks += static_cast<int>( it->size() );
 	return nNumBlocks;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -262,7 +262,7 @@ int CPow2Allocator::GetFree() const
 	int nAllocated = 0;
 	int i = 0;
 	for ( std::vector< std::list<SRangeLimits> >::const_iterator it = ranges.begin(); it != ranges.end(); ++it, ++i )
-		nAllocated += it->size() * GetChunkSize( i );
+		nAllocated += static_cast<int>( it->size() ) * GetChunkSize( i );
 	return nAllocated;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

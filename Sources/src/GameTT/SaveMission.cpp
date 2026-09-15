@@ -110,7 +110,7 @@ void CInterfaceSaveMission::StartInterface()
 		//отобразим этот элемент в сохраняемом имени
 		IUIEditBox *pEdit = checked_cast<IUIEditBox*>( pUIScreen->GetChildByID( 2000 ) );
 		pEdit->SetWindowText( 0, NStr::ToUnicode(szEdit).c_str() );
-		pEdit->SetCursor( szEdit.size() );
+		pEdit->SetCursor( static_cast<int>( szEdit.size() ) );
 		pEdit->SetSel( 0, -1 );
 		pList->SetSelectionItem( 0 );
 	}
@@ -147,7 +147,7 @@ bool CInterfaceSaveMission::ProcessMessage( const SGameMessage &msg )
 				IUIEditBox *pEdit = checked_cast<IUIEditBox*>( pUIScreen->GetChildByID( 2000 ) );
 				const std::wstring wszEditUnicode = NStr::ToUnicode(szEdit).c_str();
 				pEdit->SetWindowText( 0, wszEditUnicode.c_str() );
-				pEdit->SetCursor( wszEditUnicode.length() );
+				pEdit->SetCursor( static_cast<int>( wszEditUnicode.length() ) );
 				pEdit->SetSel( 0, -1 );
 				pEdit->ShowWindow( UI_SW_SHOW );
 				pEdit->SetFocus( true );

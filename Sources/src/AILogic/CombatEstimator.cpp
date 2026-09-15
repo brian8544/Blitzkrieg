@@ -52,8 +52,8 @@ void CCombatEstimator::Clear()
 bool CCombatEstimator::IsCombatSituation() const 
 { 
 	//CRAP{ FOR TEST
-	const int nMechs = registeredMechUnits.size();
-	const int nInfantry = registeredInfantry.size();
+	const int nMechs = static_cast<int>( registeredMechUnits.size() );
+	const int nInfantry = static_cast<int>( registeredInfantry.size() );
 	//CRAP}
 	return fDamage > SConsts::DIRECT_HIT_DAMAGE_COMBAT_SITUATION ||
 			registeredMechUnits.size() > SConsts::NUMBER_ENEMY_MECH_MOVING_TO_COMBAT_SITUATION ||

@@ -693,7 +693,7 @@ class CRMFieldGraph
 	inline const CVec2& GetPatchMinXYVertex( int nPatchIndex ) { return patches[nPatchIndex].boundingPolygon[0]; }
 	inline SPatch& GetPatch( int nPatchIndex ) { return patches[nPatchIndex]; }
 	inline SLine& GetLine( int nLineIndex ) { return lines[nLineIndex]; }
-	inline int GetLinesCount() { return lines.size(); }
+	inline int GetLinesCount() { return static_cast<int>( lines.size() ); }
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -844,7 +844,7 @@ struct SRMContext
 				}
 			}
 		}
-		return pAvailableUnits->size();
+		return static_cast<int>( pAvailableUnits->size() );
 	}
 
 	// serializing...

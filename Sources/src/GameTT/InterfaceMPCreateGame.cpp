@@ -186,7 +186,7 @@ void CInterfaceMPCreateGame::PrepareMapsList()
 	
 	CPtr<IMovieProgressHook> pProgress = CreateObject<IMovieProgressHook>( MAIN_PROGRESS_INDICATOR );
 	pProgress->Init( IMovieProgressHook::PT_MINIMAP );
-	pProgress->SetNumSteps( szFileNames.size() );
+	pProgress->SetNumSteps( static_cast<int>( szFileNames.size() ) );
 	for ( std::unordered_set<std::string>::const_iterator it = szFileNames.begin(); it != szFileNames.end(); ++it )
 	{
 		const std::string &szFileName = *it;
@@ -203,7 +203,7 @@ void CInterfaceMPCreateGame::PrepareMapsList()
 			pGameType->SetWindowText( 0, CUIConsts::GetMapTypeString( pInfo->mapInfo.nType ) );
 			
 			IUIStatic * pMaxPlayers = checked_cast<IUIStatic*>( pRow->GetElement( 2 ) );
-			pMaxPlayers->SetWindowText( 0, NStr::ToUnicode( NStr::Format( "%d", pInfo->mapInfo.playerParties.size() ) ).c_str() );
+			pMaxPlayers->SetWindowText( 0, NStr::ToUnicode( NStr::Format( "%d", static_cast<int>(pInfo->mapInfo.playerParties.size()) ) ).c_str() );
 
 			IUIStatic *pMapSize = checked_cast<IUIStatic*>( pRow->GetElement( 3 ) );
 			pMapSize->SetWindowText( 0, NStr::ToUnicode( NStr::Format( "%d", pInfo->mapInfo.size.x ) ).c_str() );

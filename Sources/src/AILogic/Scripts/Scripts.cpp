@@ -779,7 +779,7 @@ void CScripts::SetNewLinksToReinforcement( CReinfList *pReinf, std::unordered_ma
 {
 	// set new links (not intersected with existing)
 	std::list<int> freeLinks;
-	CLinkObject::GetFreeLinks( &freeLinks, pReinf->size() );
+	CLinkObject::GetFreeLinks( &freeLinks, static_cast<int>( pReinf->size() ) );
 	for ( CReinfList::iterator iter = pReinf->begin(); iter != pReinf->end(); ++iter )
 	{
 		(*pOld2NewLinks)[iter->mapObject.link.nLinkID] = freeLinks.front();
@@ -1012,7 +1012,7 @@ int CScripts::ProcessCommand( struct lua_State *state, const bool bPlaceInQueue 
 
 		pScripts->DelInvalidUnits( scriptId );
 		// group registration
-		IRefCount **pObjects = GetTempBuffer<IRefCount*>( pScripts->groups[scriptId].size() );
+		IRefCount **pObjects = GetTempBuffer<IRefCount*>( static_cast<int>( pScripts->groups[scriptId].size() ) );
 		int nLen = 0;
 		for ( std::list<CPtr<IUpdatableObj> >::iterator iter = pScripts->groups[scriptId].begin(); iter != pScripts->groups[scriptId].end(); ++iter )
 		{
@@ -2253,7 +2253,7 @@ int CScripts::ReturnScriptIDs( struct lua_State *pState )
 		NI_ASSERT_T( script.IsNumber( i ), "ReturnScriptIDs: %d parameter isn't a number" );
 		
 		const int nPtr = script.GetObject( i );
-		IRefCount *pObj = reinterpret_cast<IRefCount*>( nPtr );
+		IRefCount *pObj = reinterpret_cast<IRefCount*>( static_cast<intptr_t>( nPtr ) );
 
 		NI_ASSERT_T( dynamic_cast<IUpdatableObj*>(pObj) != 0, "Unknown object passed" );
 		IUpdatableObj *pUpdatableObject = dynamic_cast<IUpdatableObj*>(pObj);

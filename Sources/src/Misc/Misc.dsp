@@ -331,14 +331,6 @@ SOURCE=.\Manipulator.cpp
 
 SOURCE=.\Manipulator.h
 # End Source File
-# Begin Source File
-
-SOURCE=.\MemorySystem.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\MemorySystem.h
-# End Source File
 # End Group
 # Begin Group "Thread"
 

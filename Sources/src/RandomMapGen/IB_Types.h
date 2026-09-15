@@ -187,7 +187,7 @@ private:
 								 ( pDestImage != 0 ) &&
 								 ( pFilter != 0 ) &&
 								 ( nDivider != 0 ),
-								 NStr::Format( "Wrong parameter: %x, %x, %x, %d\n", pSourceImage, pDestImage, pFilter, nDivider ) );
+								 NStr::Format( "Wrong parameter: %p, %p, %p, %d\n", pSourceImage, pDestImage, pFilter, nDivider ) );
 		NI_ASSERT_T( ( pSourceImage->GetSizeX() == pDestImage->GetSizeX() ) &&
 								 ( pSourceImage->GetSizeY() == pDestImage->GetSizeY() ) && 
 								 ( ( pFilter->GetSizeX() & 0x1 ) != 0 ) &&
@@ -260,7 +260,7 @@ private:
 								 ( pDestImage != 0 ) &&
 								 ( pFilter != 0 ) &&
 								 ( nDivider != 0 ),
-								 NStr::Format( "Wrong parameter: %x, %x, %x, %d\n", pSourceImage, pDestImage, pFilter, nDivider ) );
+								 NStr::Format( "Wrong parameter: %p, %p, %p, %d\n", pSourceImage, pDestImage, pFilter, nDivider ) );
 		NI_ASSERT_T( ( pSourceImage->GetSizeX() == pDestImage->GetSizeX() ) &&
 								 ( pSourceImage->GetSizeY() == pDestImage->GetSizeY() ) && 
 								 ( ( pFilter->GetSizeX() & 0x1 ) != 0 ) &&
@@ -352,7 +352,7 @@ private:
 	{
 		NI_ASSERT_T( ( pImage != 0 ) &&
 								 ( pEdgedImage != 0 ),
-								 NStr::Format( "Wrong parameter: %x, %x\n", pImage, pEdgedImage ) );
+								 NStr::Format( "Wrong parameter: %p, %p\n", pImage, pEdgedImage ) );
 		NI_ASSERT_T( ( pImage->GetSizeX() == pEdgedImage->GetSizeX() ) &&
 								 ( pImage->GetSizeY() == pEdgedImage->GetSizeY() ),
 								 NStr::Format( "Invalid size: source:(%d, %d), dest:(%d, %d)\n", pImage->GetSizeX(), pImage->GetSizeY(), pEdgedImage->GetSizeX(), pEdgedImage->GetSizeY() ) );
@@ -400,7 +400,7 @@ private:
 	{
 		NI_ASSERT_T( ( pImage != 0 ) &&
 								 ( pEdgedImage != 0 ),
-								 NStr::Format( "Wrong parameter: %x, %x\n", pImage, pEdgedImage ) );
+								 NStr::Format( "Wrong parameter: %p, %p\n", pImage, pEdgedImage ) );
 		NI_ASSERT_T( ( pImage->GetSizeX() == pEdgedImage->GetSizeX() ) &&
 								 ( pImage->GetSizeY() == pEdgedImage->GetSizeY() ),
 								 NStr::Format( "Invalid size: source:(%d, %d), dest:(%d, %d)\n", pImage->GetSizeX(), pImage->GetSizeY(), pEdgedImage->GetSizeX(), pEdgedImage->GetSizeY() ) );

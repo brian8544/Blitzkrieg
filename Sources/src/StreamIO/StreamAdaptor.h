@@ -161,7 +161,7 @@ public:
 	virtual HRESULT STDCALL CopyTo( IStream *pDst, ULARGE_INTEGER cb, ULARGE_INTEGER *pcbRead, ULARGE_INTEGER *pcbWritten )
 	{
 		std::vector<BYTE> buffer( int(cb.QuadPart) );
-		int nRead = pStream->Read( &(buffer[0]), buffer.size() );
+		int nRead = pStream->Read( &(buffer[0]), static_cast<int>( buffer.size() ) );
 		if ( pcbRead )
 			pcbRead->QuadPart = nRead;
 		ULONG uWrite = 0;

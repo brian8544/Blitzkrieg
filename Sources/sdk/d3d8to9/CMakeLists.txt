@@ -44,7 +44,7 @@ target_compile_definitions(
 )
 
 if(MSVC)
-  target_compile_options(d3d8to9 PRIVATE /W3)
+  target_compile_options(d3d8to9 PRIVATE /W3 /WX)
   target_link_options(d3d8to9 PRIVATE /DEF:${CMAKE_CURRENT_SOURCE_DIR}/res/d3d8.def)
 else()
   target_compile_options(d3d8to9 PRIVATE -Wall -Wno-delete-non-virtual-dtor -Wno-unknown-pragmas)

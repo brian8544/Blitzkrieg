@@ -217,9 +217,9 @@ std::string CUIConsts::GetCampaignNameAddition()
 	std::string szFirstLetter;
 	std::string szWord;
 	
-	int nPos = szCampaignName.rfind("\\");
+	int nPos = static_cast<int>( szCampaignName.rfind("\\") );
 	if ( nPos == std::string::npos )
-		nPos = szCampaignName.rfind("/");
+		nPos = static_cast<int>( szCampaignName.rfind("/") );
 	if ( nPos != std::string::npos )
 	{
 		szCampaignName = szCampaignName.substr( nPos == std::string::npos ? 0 : nPos + 1  );

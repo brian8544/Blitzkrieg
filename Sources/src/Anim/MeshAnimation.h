@@ -54,10 +54,10 @@ public:
 	const SNodeData& GetNode( int nIndex ) const { return nodes[nIndex]; }
 	const SNodeData& GetTopNode() const { return nodes[nTopNode]; }
 
-	const int GetNumNodes() const { return nodes.size(); }
+	const int GetNumNodes() const { return static_cast<int>( nodes.size() ); }
 	const SNodeData* GetNodes() const { return &( nodes[0] ); }
 
-	const int GetNumLocators() const { return locators.size(); }
+	const int GetNumLocators() const { return static_cast<int>( locators.size() ); }
 	const int* GetLocatorIndices() const { return &( locators[0] ); }
 };
 // ************************************************************************************************************************ //
@@ -267,7 +267,7 @@ class CMeshSkeleton : public IRefCount
 public:
 	void Init( SMeshSkeletonData *_pSkeleton );
 	// 
-	int GetNumNodes() const { return pSkeleton->nodes.size(); }
+	int GetNumNodes() const { return static_cast<int>( pSkeleton->nodes.size() ); }
 	void GetMatrices( DWORD time, CMatrixStack<32> &mstack, SHMatrix *pMatrices, 
 		                SMatrixEffectorsList *pEffectors, const SMeshAnimData *pAnimation, const NTimer::STime &timeDiff );
 	void GetBaseMatrix( DWORD time, CMatrixStack<32> &mstack, SHMatrix *pMatrix, 
@@ -289,7 +289,7 @@ public:
 			nodes[nModelPart]->CutProceduralAnimation( time );
 	}
 	// data-for-editor retrieving
-	int GetNumLocators() const { return pSkeleton->locators.size(); }
+	int GetNumLocators() const { return static_cast<int>( pSkeleton->locators.size() ); }
 	const int* GetAllLocatorIndices() const { return &( pSkeleton->locators[0] ); }
 	void GetAllLocatorNames( const char **ppBuffer, int nBufferSize ) const
 	{
@@ -403,7 +403,7 @@ public:
 	}
 	virtual int STDCALL GetAnimation() const { return nCurrAnim; };
 	virtual int STDCALL GetLengthOf( const int nAnim ) { return 1; }
-	virtual int STDCALL GetNumNodes() const { return matrices.size(); }
+	virtual int STDCALL GetNumNodes() const { return static_cast<int>( matrices.size() ); }
 	virtual const SHMatrix* STDCALL GetMatrices( const SHMatrix &matBase );
 	virtual const SHMatrix* STDCALL GetCurrMatrices() const { return &( matrices[0] ); }
 	virtual void STDCALL GetBaseMatrix( const SHMatrix &matBase, SHMatrix * pResult );

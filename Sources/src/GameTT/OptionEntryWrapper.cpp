@@ -148,7 +148,7 @@ void CUIOption::OnClicked( const bool bLeft )
 			++nCurSelection;
 		else 
 		{
-			nCurSelection = nCurSelection == 0 ? szSelections.size()-1 : nCurSelection - 1;
+			nCurSelection = nCurSelection == 0 ? static_cast<int>( szSelections.size() )-1 : nCurSelection - 1;
 		}
 		nCurSelection %= szSelections.size();
 		ChangeSelection( nCurSelection );

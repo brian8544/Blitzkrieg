@@ -70,7 +70,7 @@ void CInterfaceCutsceneList::StartInterface()
 			pContainer->SetWindowText( 0, pText->GetString() );
 		else
 		{
-			const int nPos = szVideoName.rfind('\\');
+			const int nPos = static_cast<int>( szVideoName.rfind('\\') );
 			if ( nPos != std::string::npos )
 				szVideoName = szVideoName.substr( nPos + 1 );
 			pContainer->SetWindowText( 0, NStr::ToUnicode(szVideoName).c_str() );

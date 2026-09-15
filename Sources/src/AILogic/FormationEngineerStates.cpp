@@ -1487,7 +1487,7 @@ bool CFormationGunCrewState::ClearState()
 	{
 		crew.clear();
 		// определить сколько мест нам нужно, чтобы распределить всю команду
-		NI_ASSERT_T( pStats->vGunners.size() == EGSS_MOVE + 1, NStr::Format("gunners structure has wrong size (%d)", pStats->vGunners.size()) );
+		NI_ASSERT_T( static_cast<int>(pStats->vGunners.size()) == EGSS_MOVE + 1, NStr::Format("gunners structure has wrong size (%d)", static_cast<int>(pStats->vGunners.size())) );
 		crew.resize( pStats->vGunners[eGunState].size() );
 		NI_ASSERT_T( !crew.empty(), NStr::Format( "locators for gunner places in artillery %s are not exist", pStats->GetParentName()) );
 
@@ -1640,7 +1640,7 @@ void CFormationGunCrewState::RefillCrew()
 			}
 			else	// перераспределить команду.
 			{
-				for ( int j = crew.size() - 1; j > i; --j ) // найти живого на менее приоритетном месте
+				for ( int j = static_cast<int>( crew.size() ) - 1; j > i; --j ) // найти живого на менее приоритетном месте
 				{
 					if ( crew[j].IsAlive() )
 					{
@@ -1661,9 +1661,9 @@ void CFormationGunCrewState::RecountPoints( const CVec2 &vGunDir, const CVec2 &v
 {
 	const CVec2 vCenter ( pArtillery->GetCenter() );
 
-	const int nCrew = crew.size();
-	const int nDesiredSize = pStats->vGunners[eGunState].size();
-	NI_ASSERT_T( nDesiredSize != 0, NStr::Format("%s in state %d has 0 gunners", pStats->szKeyName, eGunState) )
+	const int nCrew = static_cast<int>( crew.size() );
+	const int nDesiredSize = static_cast<int>( pStats->vGunners[eGunState].size() );
+	NI_ASSERT_T( nDesiredSize != 0, NStr::Format("%s in state %d has 0 gunners", pStats->szKeyName, eGunState) );
 
 	for ( int i = 0; i < nCrew; ++i )
 	{

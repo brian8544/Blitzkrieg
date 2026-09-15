@@ -1392,7 +1392,7 @@ void ciPrivmsgHandler(CHAT chat, ciServerMessage * message)
 
 	// Check for CTCP.
 	//////////////////
-	len = strlen(msg);
+	len = (int)(strlen(msg));
 	ctcp = "";
 	if((msg[0] == '\001') && IS_ALPHA(msg[1]) && (msg[len - 1] == '\001'))
 	{
@@ -2412,7 +2412,7 @@ void ciNameReplyHandler(CHAT chat, ciServerMessage * message)
 
 			// Allocate mem for the nick.
 			/////////////////////////////
-			len = (strlen(nick) + 1);
+			len = ((int)(strlen(nick)) + 1);
 			str = (char *)gsimalloc(len);
 			if(str == NULL)
 			{
@@ -3576,7 +3576,7 @@ void ciRplListHandler(CHAT chat, ciServerMessage * message)
 
 			// Get the channel.
 			///////////////////
-			len = (strlen(message->params[1]) + 1);
+			len = ((int)(strlen(message->params[1])) + 1);
 			channel = (char *)gsimalloc(len);
 			if(channel == NULL)
 				return; //ERRCON
@@ -3588,7 +3588,7 @@ void ciRplListHandler(CHAT chat, ciServerMessage * message)
 
 			// Get the topic.
 			/////////////////
-			len = (strlen(message->params[3]) + 1);
+			len = ((int)(strlen(message->params[3])) + 1);
 			topic = (char *)gsimalloc(len);
 			if(topic == NULL)
 			{
@@ -3995,7 +3995,7 @@ void ciRplBanListHandler(CHAT chat, ciServerMessage * message)
 
 		// Add the new ban.
 		///////////////////
-		len = (strlen(ban) + 1);
+		len = ((int)(strlen(ban)) + 1);
 		tempPtr = gsimalloc(len);
 		if(tempPtr == NULL)
 			return; //ERRCON
@@ -4094,8 +4094,8 @@ void ciRplSecureKeyHandler(CHAT chat, ciServerMessage * message)
 
 	// Take the random keys and the secret key to create the encoding/decoding keys.
 	////////////////////////////////////////////////////////////////////////////////
-	outKeyLen = strlen(outKeyRand);
-	inKeyLen = strlen(inKeyRand);
+	outKeyLen = (int)(strlen(outKeyRand));
+	inKeyLen = (int)(strlen(inKeyRand));
 	gs_xcode_buf(outKeyRand, outKeyLen, connection->secretKey);
 	gs_xcode_buf(inKeyRand, inKeyLen, connection->secretKey);
 	gs_prepare_key((unsigned char *)outKeyRand, outKeyLen, &connection->chatSocket.outKey);

@@ -27,7 +27,7 @@ IManipulator *CSimpleWindow::GetManipulator()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CSimpleWindow::GetTextSize( const int nState, int *pSizeX, int *pSizeY ) const
 {
-	NI_ASSERT_T( states.size() > nState, NStr::Format( "wrong state number %d", nState ) );
+	NI_ASSERT_T( static_cast<int>(states.size()) > nState, NStr::Format( "wrong state number %d", nState ) );
 	if ( states[nState].pGfxText )
 	{
 		if ( pSizeY )
@@ -451,7 +451,7 @@ void CSimpleWindow::SetWindowText( int nState, const WORD *pszText )
 		return;
 	}
 
-	NI_ASSERT_T( nState < states.size(), NStr::Format("Can't set text for state %d (max %d states)", nState, states.size()) );
+	NI_ASSERT_T( nState < static_cast<int>(states.size()), NStr::Format("Can't set text for state %d (max %d states)", nState, static_cast<int>(states.size())) );
 	IText *pText = states[nState].pGfxText->GetText();
 	pText->SetText( pszText );
 	states[nState].pGfxText->SetText( pText );
@@ -460,7 +460,7 @@ void CSimpleWindow::SetWindowText( int nState, const WORD *pszText )
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const WORD* CSimpleWindow::GetWindowText( int nState )
 {
-	NI_ASSERT_T( nState < states.size(), NStr::Format("Can't get text from state %d (max %d states)", nState, states.size()) );
+	NI_ASSERT_T( nState < static_cast<int>(states.size()), NStr::Format("Can't get text from state %d (max %d states)", nState, static_cast<int>(states.size())) );
 	if ( nState < 0 || nState >= states.size() )
 		return 0;
 	IText *pText = states[nState].pGfxText->GetText();
@@ -748,7 +748,7 @@ void CSimpleWindow::VisitBackground( ISceneVisitor *pVisitor )
 		return;
 	//
 	const CUIWindowSubState &currentSubState = states[nCurrentState].subStates[nCurrentSubState];		
-	const int nSize = currentSubState.subRects.size();
+	const int nSize = static_cast<int>( currentSubState.subRects.size() );
 	SGFXRect2 *pRects = GetTempBuffer<SGFXRect2>( nSize );
 	for ( int i = 0; i < nSize; ++i )
 	{
@@ -902,7 +902,7 @@ void CSimpleWindow::DrawBackground( IGFX *pGFX )
 	const CUIWindowSubState &currentSubState = states[nCurrentState].subStates[nCurrentSubState];
 	pGFX->SetTexture( 0, currentSubState.pTexture );
 	
-	const int nSize = currentSubState.subRects.size();
+	const int nSize = static_cast<int>( currentSubState.subRects.size() );
 	if ( nSize > 0 )
 	{
 		SGFXRect2 *pRects = GetTempBuffer<SGFXRect2>( nSize );
@@ -1553,7 +1553,7 @@ int CMultipleWindow::operator&( IStructureSaver &ss )
 					luaScript.PushNumber( staticLuaValues[i].nID );
 					luaScript.PushNumber( staticLuaValues[i].nVal );
 				}
-				int nRes = luaScript.Call( staticLuaValues.size()*2, 0 );			//вызываем LUA функцию, переменное число параметров, 0 результатов
+				int nRes = luaScript.Call( static_cast<int>( staticLuaValues.size() )*2, 0 );			//вызываем LUA функцию, переменное число параметров, 0 результатов
 				NI_ASSERT_T( nRes == 0, "LUA script call failed" );
 			}
 

@@ -314,7 +314,7 @@ void CTrainPathUnit::ChangeDirection( const bool bNewFrontDir )
 	{
 		bFrontDir = bNewFrontDir;
 
-		const int nCarriagesSize = carriages.size();
+		const int nCarriagesSize = static_cast<int>( carriages.size() );
 		for ( int i = 0; i < nCarriagesSize / 2; ++i )
 		{
 			std::swap( carriages[i], carriages[nCarriagesSize - 1 - i] );

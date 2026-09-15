@@ -42,9 +42,9 @@ void CTerrainWater::BuildLayers()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CTerrainWater::SelectPatches( const std::vector<DWORD> &sels )
 {
-	river.bottom.SelectPatches( sels, GetDesc().points.size() );
+	river.bottom.SelectPatches( sels, static_cast<int>( GetDesc().points.size() ) );
 	for ( std::vector<STVOLayer>::iterator layer = river.layers.begin(); layer != river.layers.end(); ++layer )
-		layer->SelectPatches( sels, GetDesc().points.size() );
+		layer->SelectPatches( sels, static_cast<int>( GetDesc().points.size() ) );
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool CTerrainWater::DrawBase( IGFX *pGFX ) const

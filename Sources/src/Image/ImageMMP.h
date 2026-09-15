@@ -15,7 +15,7 @@ public:
 	// size (x, y, z :)
 	virtual int STDCALL GetSizeX( const int nMipLevel ) const { return nSizeX >> nMipLevel; }
 	virtual int STDCALL GetSizeY( const int nMipLevel ) const { return nSizeY >> nMipLevel; }
-	virtual int STDCALL GetNumMipLevels() const { return mips.size(); }
+	virtual int STDCALL GetNumMipLevels() const { return static_cast<int>( mips.size() ); }
 	// format...
 	virtual const struct SDDSPixelFormat* STDCALL GetDDSFormat() const { return &format; }
 	virtual EGFXPixelFormat STDCALL GetGFXFormat() const;

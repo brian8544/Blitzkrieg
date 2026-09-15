@@ -190,16 +190,16 @@ void CTerrain::DrawMarker()
 	//
 	if ( !vismarker.info.empty() && !vismarker.vertices.empty() && !vismarker.indices.empty() )
 	{
-		CPtr<IGFXVertices> pVertices = pGFX->CreateVertices( vismarker.vertices.size(), SMarkerVertex::format, GFXPT_TRIANGLELIST, GFXD_DYNAMIC );
-		CPtr<IGFXIndices> pIndices = pGFX->CreateIndices( vismarker.indices.size(), GFXIF_INDEX16, GFXPT_TRIANGLELIST, GFXD_DYNAMIC );
+		CPtr<IGFXVertices> pVertices = pGFX->CreateVertices( static_cast<int>( vismarker.vertices.size() ), SMarkerVertex::format, GFXPT_TRIANGLELIST, GFXD_DYNAMIC );
+		CPtr<IGFXIndices> pIndices = pGFX->CreateIndices( static_cast<int>( vismarker.indices.size() ), GFXIF_INDEX16, GFXPT_TRIANGLELIST, GFXD_DYNAMIC );
 		CreateMarker( vScreenO.x, vScreenO.y, vismarker.info, terrainInfo, pVertices, pIndices );
 		pGFX->Draw( pVertices, pIndices );
 	}
 	if ( !aimarker.info.empty() && !aimarker.vertices.empty() && !aimarker.indices.empty() )
 	{
-		CPtr<IGFXVertices> pVertices = pGFX->CreateVertices( aimarker.vertices.size(), SMarkerVertex::format, GFXPT_TRIANGLELIST, GFXD_DYNAMIC );
-		CPtr<IGFXIndices> pIndices = pGFX->CreateIndices( aimarker.indices.size(), GFXIF_INDEX16, GFXPT_TRIANGLELIST, GFXD_DYNAMIC );
-		CreateAIMarker( vScreenO.x, vScreenO.y, terrainInfo, &(aimarker.info[0]), aimarker.info.size(), 
+		CPtr<IGFXVertices> pVertices = pGFX->CreateVertices( static_cast<int>( aimarker.vertices.size() ), SMarkerVertex::format, GFXPT_TRIANGLELIST, GFXD_DYNAMIC );
+		CPtr<IGFXIndices> pIndices = pGFX->CreateIndices( static_cast<int>( aimarker.indices.size() ), GFXIF_INDEX16, GFXPT_TRIANGLELIST, GFXD_DYNAMIC );
+		CreateAIMarker( vScreenO.x, vScreenO.y, terrainInfo, &(aimarker.info[0]), static_cast<int>( aimarker.info.size() ),
 										pVertices, pIndices );
 		pGFX->Draw( pVertices, pIndices );
 	}

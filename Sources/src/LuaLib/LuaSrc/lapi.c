@@ -55,7 +55,7 @@ void luaA_pushobject (lua_State *L, const TObject *o) {
 }
 
 LUA_API int lua_stackspace (lua_State *L) {
-  return (L->stack_last - L->top);
+  return (int)(L->stack_last - L->top);
 }
 
 
@@ -66,7 +66,7 @@ LUA_API int lua_stackspace (lua_State *L) {
 
 
 LUA_API int lua_gettop (lua_State *L) {
-  return (L->top - L->Cbase);
+  return (int)(L->top - L->Cbase);
 }
 
 

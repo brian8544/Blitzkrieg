@@ -176,7 +176,8 @@ static int piRemoveCompareCallback
 	assert(container1);
 	assert(container2);
 
-	return (container1->operation - container2->operation);
+	return (container1->operation > container2->operation) -
+		(container1->operation < container2->operation);
 }
 
 void piRemoveOperation
@@ -268,7 +269,7 @@ static void piConnectConnectCallback
 		if(!piConnectTitle(peer))
 		{
 			piDisconnectTitle(peer);
-			success = PEERFalse;
+			success = CHATFalse;
 		}
 	}
 
@@ -374,7 +375,7 @@ PEERBool piNewConnectOperation
 	// Encode the unique ID.
 	////////////////////////
 	uniqueID = GOAGetUniqueID();
-	MD5Digest((unsigned char *)uniqueID, strlen(uniqueID), encodedUniqueID);
+	MD5Digest((unsigned char *)uniqueID, (unsigned int)(strlen(uniqueID)), encodedUniqueID);
 
 	// Connect to chat.
 	///////////////////
@@ -1019,7 +1020,7 @@ void piGetPlayerInfoCallback
 		// Get the info.
 		////////////////
 		if(!piDemangleUser(user, &IP, &profileID))
-			success = PEERFalse;
+			success = CHATFalse;
 
 		// Cache the info.
 		//////////////////
